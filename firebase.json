@@ -1,7 +1,7 @@
 {
   "hosting": [
     {
-      "site": "conference-schedule-outofthisworld",
+      "site": "conference-schedule-viewer",
       "public": ".",
       "ignore": [
         "firebase.json",
