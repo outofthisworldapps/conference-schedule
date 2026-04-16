@@ -29,7 +29,7 @@
                     "start": "09:15",
                     "end": "09:40",
                     "name": "Caitlin Casey",
-                    "subtitle": "So, what\u2019s a normal galaxy at high-z?",
+                    "subtitle": "So, what’s a normal galaxy at high-z?",
                     "type": "session"
                 },
                 {
@@ -84,7 +84,7 @@
                 {
                     "start": "11:20",
                     "end": "11:45",
-                    "name": "Hannah \u00dcbler",
+                    "name": "Hannah Übler",
                     "subtitle": "Observational constraints on black holes and their immediate environments with NIRSpec-IFS",
                     "type": "session"
                 },
@@ -674,8 +674,8 @@
                 {
                     "start": "09:00",
                     "end": "09:25",
-                    "name": "Daniel Stark",
-                    "subtitle": "The reionisation of the Universe: clues from JWST (Reionisation review)",
+                    "name": "Daniel Stark (reionisation review)",
+                    "subtitle": "The reionisation of the Universe: clues from JWST",
                     "type": "session"
                 },
                 {
@@ -689,8 +689,9 @@
                     "start": "09:35",
                     "end": "09:45",
                     "name": "Zuyi Chen",
-                    "subtitle": "The impact of galaxy overdensities and ionized bubbles on Ly\u03b1 emission in the reionization era",
-                    "type": "session"
+                    "subtitle": "The impact of galaxy overdensities and ionized bubbles on Lyα emission in the reionization era",
+                    "type": "session",
+                    "delay": 6
                 },
                 {
                     "start": "09:45",
@@ -711,7 +712,8 @@
                     "end": "10:30",
                     "name": "Charlotte Simmonds",
                     "subtitle": "Unveiling the sources of reionisation",
-                    "type": "session"
+                    "type": "session",
+                    "delay": 8
                 },
                 {
                     "start": "10:30",
@@ -752,7 +754,7 @@
                     "start": "13:30",
                     "end": "15:50",
                     "name": "Mini-workshop: Theory and Simulations",
-                    "subtitle": "",
+                    "subtitle": "Rachel Somerville, Laura Sommovigo, Desika Narayanan",
                     "type": "workshop"
                 },
                 {
@@ -765,7 +767,7 @@
                 {
                     "start": "16:15",
                     "end": "16:40",
-                    "name": "Rohan Naidu",
+                    "name": "Rohan Naidu (galaxy formation review)",
                     "subtitle": "The Surprising Galaxies & Black Holes (?) of the First Billion Years",
                     "type": "session"
                 },
@@ -786,8 +788,8 @@
                 {
                     "start": "17:15",
                     "end": "19:00",
-                    "name": "Transport to Helsing\u00f8r",
-                    "subtitle": "Streetfood & drinks",
+                    "name": "Streetfood & drinks",
+                    "subtitle": "Værftet in Helsingør (leave lobby between 5:15 – 5:30)",
                     "type": "social"
                 }
             ]
@@ -799,14 +801,14 @@
                 {
                     "start": "07:30",
                     "end": "09:00",
-                    "name": "Breakfast / Check-out",
-                    "subtitle": "",
+                    "name": "Breakfast buffet",
+                    "subtitle": "Check out by 9:00a",
                     "type": "break"
                 },
                 {
                     "start": "09:00",
                     "end": "09:25",
-                    "name": "Rachel Somerville",
+                    "name": "Rachel Somerville (galaxy formation review)",
                     "subtitle": "The physics of galaxy formation in the early universe: puzzles and progress",
                     "type": "session"
                 },
@@ -814,7 +816,7 @@
                     "start": "09:25",
                     "end": "09:35",
                     "name": "Andrea Weibel",
-                    "subtitle": "PANORAMIC constraints on the UVLF at z ~ 9 \u2013 17, and on Galaxy Clustering at z ~ 10",
+                    "subtitle": "PANORAMIC constraints on the UVLF at z ~ 9 – 17, and on Galaxy Clustering at z ~ 10",
                     "type": "session"
                 },
                 {
