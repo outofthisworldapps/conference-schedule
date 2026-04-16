@@ -1,0 +1,708 @@
+/* Base Design System */
+:root {
+    --bg-color: #0d0e12;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --accent-color: #ff4757;
+    --text-primary: #f1f2f6;
+    --text-secondary: #a4b0be;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(8px);
+    --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    --session-color: #54a0ff;
+    /* Blue */
+    --tiktalk-color: #6c5ce7;
+    /* Dark Purple */
+    --long-talk-color: #00b894;
+    /* Green */
+    --break-color: #8b4513;
+    /* Brown */
+    --meal-color: #feca57;
+    /* Yellow */
+    --social-color: #ff9f43;
+    /* Orange */
+    --workshop-color: #48dbfb;
+    /* Cyan */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.app-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem 2rem;
+    position: relative;
+}
+
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--bg-color);
+    border-bottom: 1px solid var(--border-color);
+    transition: box-shadow 0.3s ease;
+}
+
+.header-content {
+    padding-top: 1rem;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff 0%, #a4b0be 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.2rem;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 0.4rem;
+    transition: color 0.3s ease;
+}
+
+header a:hover h1 {
+    background: linear-gradient(135deg, #fff 0%, var(--accent-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+header a:hover .subtitle {
+    color: var(--accent-color);
+}
+
+header a {
+    text-decoration: none;
+}
+
+/* Actions Toolbar */
+.actions-toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.actions-toolbar button {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.actions-toolbar button svg {
+    opacity: 0.7;
+    transition: transform 0.2s ease;
+}
+
+.actions-toolbar button:hover svg {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.actions-toolbar button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+.actions-toolbar button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.actions-toolbar .divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border-color);
+    margin: 0 4px;
+}
+
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-secondary);
+}
+
+#zoom-slider {
+    width: 100px;
+    cursor: pointer;
+    accent-color: var(--accent-color);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+#zoom-slider:hover {
+    opacity: 1;
+}
+
+.editable:hover {
+    outline: 1px dashed var(--accent-color);
+    outline-offset: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Timeline Container */
+.timeline-container {
+    position: relative;
+    padding-left: 100px;
+    /* Space for time labels */
+}
+
+/* The Vertical Line */
+.timeline-axis {
+    position: absolute;
+    left: 40px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(255, 255, 255, 0.2) 50%,
+            rgba(255, 255, 255, 0.05) 100%);
+    z-index: 1;
+}
+
+/* Day Section */
+.day-section {
+    margin-bottom: 4rem;
+}
+
+.day-header {
+    position: sticky;
+    top: 1rem;
+    z-index: 10;
+    background: rgba(13, 14, 18, 0.8);
+    backdrop-filter: blur(8px);
+    padding: 0.5rem 0;
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--review-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Event Card */
+.event-card {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: var(--glass-blur);
+    transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.event-card:hover {
+    transform: translateX(10px);
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.event-card.past {
+    opacity: 0.5;
+    filter: grayscale(0.5);
+}
+
+.event-card.current {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.1);
+}
+
+.event-time {
+    position: absolute;
+    left: -85px;
+    top: 1.5rem;
+    width: 65px;
+    text-align: right;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: -0.5px;
+}
+
+.event-type-dot {
+    position: absolute;
+    left: -44px;
+    top: 1.8rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: currentColor;
+    z-index: 3;
+    box-shadow: 0 0 12px currentColor;
+    border: 2px solid var(--bg-color);
+}
+
+.event-content h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.event-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+/* Now Indicator Line */
+#now-line {
+    position: absolute;
+    left: -20px;
+    right: 0;
+    height: 2px;
+    background: var(--accent-color);
+    z-index: 100;
+    pointer-events: none;
+    display: none;
+    /* Hidden by default if not current day */
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+#now-line::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    box-shadow: 0 0 15px var(--accent-color);
+}
+
+#now-line::after {
+    content: 'NOW';
+    position: absolute;
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--accent-color);
+    background: var(--bg-color);
+    padding: 2px 4px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+}
+
+/* Calendar View Styles */
+.calendar-grid {
+    position: relative;
+    /* Removed hardcoded height to allow it to grow with injected content */
+    margin-top: 2rem;
+    border-left: 1px solid var(--border-color);
+}
+
+.hour-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.05);
+    z-index: 1;
+}
+
+.calendar-time-marker {
+    position: absolute;
+    left: -60px;
+    top: -10px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.calendar-time-marker.clickable {
+    pointer-events: auto;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.calendar-time-marker.clickable:hover {
+    color: var(--accent-color);
+    transform: scale(1.1);
+}
+
+.original-time {
+    position: absolute;
+    top: -12px;
+    right: 0;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    opacity: 0.6;
+    text-decoration: line-through;
+    white-space: nowrap;
+}
+
+.calendar-time-marker.end-time {
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.calendar-event {
+    position: absolute;
+    left: 20px;
+    right: 0;
+    background: rgba(18, 19, 24, 0.95);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--session-color);
+    /* Default */
+    border-radius: 4px;
+    padding: 4px 10px;
+    overflow: hidden;
+    z-index: 5;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Event Color Variants */
+.calendar-event.event-talk {
+    border-left-color: var(--session-color);
+    background: rgba(84, 160, 255, 0.1);
+}
+
+.calendar-event.event-long-talk {
+    border-left-color: var(--long-talk-color);
+    background: rgba(0, 184, 148, 0.15);
+}
+
+.calendar-event.event-tiktalk {
+    border-left-color: var(--tiktalk-color);
+    background: rgba(108, 92, 231, 0.15);
+}
+
+.calendar-event.event-break {
+    border-left-color: var(--break-color);
+    background: rgba(139, 69, 19, 0.15);
+}
+
+.calendar-event.event-meal {
+    border-left-color: var(--meal-color);
+    background: rgba(254, 202, 87, 0.15);
+}
+
+.calendar-event.event-social {
+    border-left-color: var(--social-color);
+    background: rgba(255, 159, 67, 0.1);
+}
+
+.calendar-event.event-workshop {
+    border-left-color: var(--workshop-color);
+    background: rgba(72, 219, 251, 0.15);
+}
+
+.calendar-event:hover {
+    overflow: visible;
+    z-index: 1000 !important;
+    background: #1e1f26;
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.calendar-event h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-event .event-subtitle {
+    opacity: 0.85;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 400;
+    margin-top: 2px;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 1em;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 71, 87, 0.8);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.2s ease;
+    z-index: 10;
+}
+
+.delete-btn:hover {
+    background: #ff4757;
+}
+
+.calendar-event:hover .delete-btn {
+    opacity: 1;
+}
+
+.type-selector-container {
+    position: absolute;
+    top: 5px;
+    right: 35px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 200;
+}
+
+.calendar-event:hover .type-selector-container {
+    opacity: 1;
+}
+
+.custom-type-dropdown {
+    position: relative;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    min-width: 100px;
+    cursor: pointer;
+}
+
+.type-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: var(--text-primary);
+}
+
+.type-options {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 100%;
+    background: #1a1b22;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-top: 4px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.custom-type-dropdown:hover .type-options {
+    display: flex;
+}
+
+/* Bridge the gap between trigger and options to maintain hover state */
+.custom-type-dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: transparent;
+    display: none;
+}
+
+.custom-type-dropdown:hover::after {
+    display: block;
+}
+
+.type-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    font-size: 11px;
+    transition: background 0.2s ease;
+    color: var(--text-secondary);
+}
+
+.type-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.type-color-box {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+#calendar-now-line {
+    position: absolute;
+    left: -80px;
+    right: 0;
+    height: 3px;
+    background: var(--accent-color);
+    z-index: 2;
+    pointer-events: none;
+    box-shadow: 0 0 20px 2px var(--accent-color);
+    /* Stronger glow */
+}
+
+#calendar-now-line::before {
+    content: attr(data-time);
+    position: absolute;
+    left: -75px;
+    top: -12px;
+    background: var(--accent-color);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+/* Day Selection for Calendar */
+.day-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 0.6rem 0;
+    background: var(--bg-color);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.5rem;
+}
+
+.nav-arrow {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.nav-arrow:hover {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: scale(1.1);
+}
+
+.nav-arrow:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.day-tabs {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 5px;
+    scrollbar-width: none;
+}
+
+.day-tab {
+    padding: 8px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.day-tab.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .timeline-container {
+        padding-left: 60px;
+    }
+
+    .timeline-axis {
+        left: 30px;
+    }
+
+    .event-time {
+        left: -60px;
+        width: 45px;
+        font-size: 0.75rem;
+    }
+
+    .event-type-dot {
+        left: -34px;
+    }
+
+    #now-line::after {
+        display: none;
+    }
+}

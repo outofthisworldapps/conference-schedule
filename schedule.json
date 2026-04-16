@@ -1,0 +1,914 @@
+{
+    "scheduleData": [
+        {
+            "day": "Monday, April 13",
+            "date": "2026-04-13",
+            "events": [
+                {
+                    "start": "07:30",
+                    "end": "09:00",
+                    "name": "Breakfast Buffet",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "08:00",
+                    "end": "09:00",
+                    "name": "Registration",
+                    "subtitle": "",
+                    "type": "session"
+                },
+                {
+                    "start": "09:00",
+                    "end": "09:15",
+                    "name": "Opening Remarks",
+                    "subtitle": "Kasper, Joris & Sune",
+                    "type": "session"
+                },
+                {
+                    "start": "09:15",
+                    "end": "09:40",
+                    "name": "Caitlin Casey",
+                    "subtitle": "So, what\u2019s a normal galaxy at high-z?",
+                    "type": "session"
+                },
+                {
+                    "start": "09:40",
+                    "end": "09:50",
+                    "name": "Minjung Park",
+                    "subtitle": "Revealing the formation and quenching of early massive quiescent galaxies with alpha-enhanced stellar population models.",
+                    "type": "session"
+                },
+                {
+                    "start": "09:50",
+                    "end": "10:00",
+                    "name": "Marko Shuntov",
+                    "subtitle": "Constraining the galaxy-halo connection and star formation efficiency at cosmic dawn from galaxy clustering",
+                    "type": "session"
+                },
+                {
+                    "start": "10:00",
+                    "end": "10:10",
+                    "name": "Claudia Di Cesare",
+                    "subtitle": "The slope and scatter of the star forming main sequence at z~5 : reconciling observations with simulations",
+                    "type": "session"
+                },
+                {
+                    "start": "10:10",
+                    "end": "10:20",
+                    "name": "Jackie Champagne",
+                    "subtitle": "Understanding Large Scale Structure with COSMOS-3D: Massive Protoclusters in the Epoch of Reionization",
+                    "type": "session"
+                },
+                {
+                    "start": "10:20",
+                    "end": "10:30",
+                    "name": "Galaxy Assembly TikTalks 1",
+                    "subtitle": "Baker, Carranza Escudero, Hamadouche, Kramarenko",
+                    "type": "session"
+                },
+                {
+                    "start": "10:30",
+                    "end": "11:15",
+                    "name": "Coffee Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "11:15",
+                    "end": "11:20",
+                    "name": "Galaxy Assembly TikTalks 2",
+                    "subtitle": "Looser, Omori, Salazar, Sapori, Sarrouh, Whitaker",
+                    "type": "session"
+                },
+                {
+                    "start": "11:20",
+                    "end": "11:45",
+                    "name": "Hannah \u00dcbler",
+                    "subtitle": "Observational constraints on black holes and their immediate environments with NIRSpec-IFS",
+                    "type": "session"
+                },
+                {
+                    "start": "11:45",
+                    "end": "13:30",
+                    "name": "Lunch Break",
+                    "subtitle": "Restaurant Isabell",
+                    "type": "break"
+                },
+                {
+                    "start": "13:30",
+                    "end": "13:55",
+                    "name": "Christina Williams",
+                    "subtitle": "Massive galaxy assembly at z > 3: constraining formation pathways, environments, and future prospects",
+                    "type": "session"
+                },
+                {
+                    "start": "13:55",
+                    "end": "14:05",
+                    "name": "Daming Yang",
+                    "subtitle": "Discovery of two extremely UV-bright starbursts at z>6.5",
+                    "type": "session"
+                },
+                {
+                    "start": "14:05",
+                    "end": "14:15",
+                    "name": "John Weaver",
+                    "subtitle": "Euclid and the discovery of the most luminous galaxies at cosmic dawn",
+                    "type": "session"
+                },
+                {
+                    "start": "14:15",
+                    "end": "14:25",
+                    "name": "Seunghwan Lim",
+                    "subtitle": "Cosmic Conformity of Early Giants: A Single Massive Galaxy as a Beacon of Its Entire Survey",
+                    "type": "session"
+                },
+                {
+                    "start": "14:25",
+                    "end": "14:50",
+                    "name": "Francesco Valentino",
+                    "subtitle": "Early Quenching of Massive Galaxies: A Spectroscopic View",
+                    "type": "session"
+                },
+                {
+                    "start": "14:50",
+                    "end": "15:00",
+                    "name": "Chamilla Terp",
+                    "subtitle": "Characterising Protoclusters and Their Galaxies at 5.5 < z < 8 with JWST",
+                    "type": "session"
+                },
+                {
+                    "start": "15:00",
+                    "end": "15:10",
+                    "name": "Ian McConachie",
+                    "subtitle": "Environments of the First Quiescent Galaxies",
+                    "type": "session"
+                },
+                {
+                    "start": "15:10",
+                    "end": "15:25",
+                    "name": "Galaxy Formation TikTalks 1",
+                    "subtitle": "Donnan, Gottumukkala, Hirling",
+                    "type": "session"
+                },
+                {
+                    "start": "15:25",
+                    "end": "15:50",
+                    "name": "Coffee Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "15:50",
+                    "end": "16:00",
+                    "name": "Galaxy Formation TikTalks 2",
+                    "subtitle": "Kiyota, Llerena Ona, Martis",
+                    "type": "session"
+                },
+                {
+                    "start": "16:00",
+                    "end": "16:10",
+                    "name": "Yunchong Zhang",
+                    "subtitle": "Are there too many early dead galaxies?",
+                    "type": "session"
+                },
+                {
+                    "start": "16:10",
+                    "end": "16:20",
+                    "name": "Pengpei Zhu",
+                    "subtitle": "DeepDive: Neutral gas outflows in z~3.5 quiescent galaxies",
+                    "type": "session"
+                },
+                {
+                    "start": "16:20",
+                    "end": "16:30",
+                    "name": "Adam Carnall",
+                    "subtitle": "The Origins of Massive Galaxies",
+                    "type": "session"
+                },
+                {
+                    "start": "16:30",
+                    "end": "16:40",
+                    "name": "Karin Cescon",
+                    "subtitle": "Cold Gas, Stellar Mass, and Kinematics of a Massive Disk Galaxy at z = 7.31",
+                    "type": "session"
+                },
+                {
+                    "start": "16:40",
+                    "end": "16:55",
+                    "name": "Reionisation TikTalks 1",
+                    "subtitle": "Conaboy, Felicioni, Giovinazzo, Lu, Maity",
+                    "type": "session"
+                },
+                {
+                    "start": "16:55",
+                    "end": "17:05",
+                    "name": "Bartolomeo Trefoloni",
+                    "subtitle": "Accretion and feedback in the farthest quasars: a JWST/NIRSpec perspective",
+                    "type": "session"
+                },
+                {
+                    "start": "17:05",
+                    "end": "17:15",
+                    "name": "Matilde Mingozzi",
+                    "subtitle": "A UV-to-IR view of nearby high-z analogs with JWST and HST to interpret the first galaxies",
+                    "type": "session"
+                },
+                {
+                    "start": "17:15",
+                    "end": "17:25",
+                    "name": "Yilun Ma",
+                    "subtitle": "Tracking Little Red Dots from Cosmic Dawn to Cosmic Noon with Large-Area Surveys and JWST",
+                    "type": "session"
+                },
+                {
+                    "start": "17:25",
+                    "end": "17:35",
+                    "name": "Francesco Guarneri",
+                    "subtitle": "Pushing the quasar redshift frontier with Euclid: a new era for z>7 quasar searches",
+                    "type": "session"
+                },
+                {
+                    "start": "17:35",
+                    "end": "17:45",
+                    "name": "Reionisation TikTalks 2",
+                    "subtitle": "Patrick, Steen, Hutter, Witten",
+                    "type": "session"
+                },
+                {
+                    "start": "17:45",
+                    "end": "19:30",
+                    "name": "Dinner",
+                    "subtitle": "At Marienlyst",
+                    "type": "social"
+                },
+                {
+                    "start": "19:30",
+                    "end": "20:00",
+                    "name": "Talk + Q&A: Paul Woods",
+                    "subtitle": "Nature Astronomy",
+                    "type": "session"
+                },
+                {
+                    "start": "20:00",
+                    "end": "22:00",
+                    "name": "Student Night",
+                    "subtitle": "",
+                    "type": "social"
+                }
+            ]
+        },
+        {
+            "day": "Tuesday, April 14",
+            "date": "2026-04-14",
+            "events": [
+                {
+                    "start": "07:30",
+                    "end": "09:00",
+                    "name": "Breakfast Buffet",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "09:00",
+                    "end": "09:25",
+                    "name": "Kohei Inayoshi",
+                    "subtitle": "Little Red Dots: Theoretical Insights",
+                    "type": "session"
+                },
+                {
+                    "start": "09:25",
+                    "end": "09:35",
+                    "name": "Albert Sneppen",
+                    "subtitle": "The origin of the spectra of Little Red Dots",
+                    "type": "session"
+                },
+                {
+                    "start": "09:35",
+                    "end": "09:45",
+                    "name": "Federica Loiacono",
+                    "subtitle": "The abundance of little red dots from cosmic dawn to noon",
+                    "type": "session"
+                },
+                {
+                    "start": "09:45",
+                    "end": "09:55",
+                    "name": "Lukas Furtak",
+                    "subtitle": "Investigating JWST's 'Little Red Dots' with gravitational lensing -- Building a sample of lensed LRDs",
+                    "type": "session"
+                },
+                {
+                    "start": "09:55",
+                    "end": "10:05",
+                    "name": "Josephine Baggen",
+                    "subtitle": "(Re)solving a Little Red Dot with Strong Gravitational Lensing",
+                    "type": "session"
+                },
+                {
+                    "start": "10:05",
+                    "end": "10:20",
+                    "name": "AGN TikTalks 1",
+                    "subtitle": "Antwi-Danso, Golubchik, Jurk, Nikopoulos, Pizzati, Seymour",
+                    "type": "session"
+                },
+                {
+                    "start": "10:20",
+                    "end": "10:30",
+                    "name": "Conference Photo",
+                    "subtitle": "Roof terrace",
+                    "type": "session"
+                },
+                {
+                    "start": "10:30",
+                    "end": "11:05",
+                    "name": "Coffee Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "11:05",
+                    "end": "11:15",
+                    "name": "AGN TikTalks 2",
+                    "subtitle": "Berg, Ronayne, Roupas, Watson",
+                    "type": "session"
+                },
+                {
+                    "start": "11:15",
+                    "end": "11:25",
+                    "name": "Takumi Tanaka",
+                    "subtitle": "NIRCam-MIRI Joint Color Selection for z~10 Little Red Dots",
+                    "type": "session"
+                },
+                {
+                    "start": "11:25",
+                    "end": "11:35",
+                    "name": "Xihan Ji",
+                    "subtitle": "Connecting Little Red Dots in the first and last Gyr of the Universe with JWST and wide-field surveys",
+                    "type": "session"
+                },
+                {
+                    "start": "11:35",
+                    "end": "11:45",
+                    "name": "Robert Pascalau",
+                    "subtitle": "Winds of Quench: The First NIRSpec/IFU + ALMA Study of AGN Feedback in z>3 Massive Quenched Galaxies",
+                    "type": "session"
+                },
+                {
+                    "start": "11:45",
+                    "end": "13:15",
+                    "name": "Lunch Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "13:15",
+                    "end": "13:40",
+                    "name": "Jenny Greene",
+                    "subtitle": "Massive black holes in the early Universe: clues from JWST (AGN review)",
+                    "type": "session"
+                },
+                {
+                    "start": "13:40",
+                    "end": "13:50",
+                    "name": "Sophia Geris",
+                    "subtitle": "Exploring the physical differences between Little Red Dots and Little Blue Dots",
+                    "type": "session"
+                },
+                {
+                    "start": "13:50",
+                    "end": "14:00",
+                    "name": "Jiamu Huang",
+                    "subtitle": "Probing Quasar and Galaxy Dark Matter Halo Masses at z>6 with Clustering Analysis",
+                    "type": "session"
+                },
+                {
+                    "start": "14:00",
+                    "end": "14:10",
+                    "name": "Lucy Ivey",
+                    "subtitle": "Investigating a Little Red Dot at z ~ 3.5 with JWST NIRSpec/IFU",
+                    "type": "session"
+                },
+                {
+                    "start": "14:10",
+                    "end": "14:20",
+                    "name": "Meredith Stone",
+                    "subtitle": "The Unique Environment and Uncertain Future of the z=7.08 Quasar ULAS J1120+0641",
+                    "type": "session"
+                },
+                {
+                    "start": "14:20",
+                    "end": "14:45",
+                    "name": "Ryan Sanders",
+                    "subtitle": "High-redshift galaxy metallicities, abundance patterns, and chemical evolution in the JWST era",
+                    "type": "session"
+                },
+                {
+                    "start": "14:45",
+                    "end": "14:55",
+                    "name": "Nikki Geesink",
+                    "subtitle": "A new view of Cosmic noon with ACE: unveiling dust-to-gas ratios in sub-solar metallicity galaxies",
+                    "type": "session"
+                },
+                {
+                    "start": "14:55",
+                    "end": "15:05",
+                    "name": "Alex Cameron",
+                    "subtitle": "Nitrogen abundances in the first 3 Gyr of galaxy evolution",
+                    "type": "session"
+                },
+                {
+                    "start": "15:05",
+                    "end": "15:20",
+                    "name": "Dust & Metals TikTalks 1",
+                    "subtitle": "Cooper, Donnan, Kendrew, Kotiwale, Manning, Markov",
+                    "type": "session"
+                },
+                {
+                    "start": "15:20",
+                    "end": "15:50",
+                    "name": "Coffee Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "15:50",
+                    "end": "16:00",
+                    "name": "Dust & Metals TikTalks 2",
+                    "subtitle": "Ormerod, Rowland, Savitch, Woodrum",
+                    "type": "session"
+                },
+                {
+                    "start": "16:00",
+                    "end": "16:25",
+                    "name": "Desika Narayanan",
+                    "subtitle": "The formation and evolution of dusty galaxies in the early Universe (Dust & metals review)",
+                    "type": "session"
+                },
+                {
+                    "start": "16:25",
+                    "end": "16:35",
+                    "name": "Macarena G. del Valle-Espinosa",
+                    "subtitle": "Resilient aromatics: JWST/MIRI insights into PAHs at low metallicities",
+                    "type": "session"
+                },
+                {
+                    "start": "16:45",
+                    "end": "17:00",
+                    "name": "Leave from Lobby",
+                    "subtitle": "Bring your conference badge (Leave for Kronborg Castle)",
+                    "type": "social"
+                },
+                {
+                    "start": "17:00",
+                    "end": "18:00",
+                    "name": "Tour of Kronberg Castle",
+                    "subtitle": "",
+                    "type": "social"
+                },
+                {
+                    "start": "18:00",
+                    "end": "21:00",
+                    "name": "Conference Dinner",
+                    "subtitle": "Kronborg Dansesalen",
+                    "type": "social"
+                }
+            ]
+        },
+        {
+            "day": "Wednesday, April 15",
+            "date": "2026-04-15",
+            "events": [
+                {
+                    "start": "07:30",
+                    "end": "09:00",
+                    "name": "Breakfast Buffet",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "09:00",
+                    "end": "09:25",
+                    "name": "Irene Shivani",
+                    "subtitle": "Dust and metal enrichment in the early Universe: clues from JWST (Dust & metals review)",
+                    "type": "session"
+                },
+                {
+                    "start": "09:25",
+                    "end": "09:35",
+                    "name": "Tom Bakx",
+                    "subtitle": "Revealing the Hidden Evolutionary Phases of the Earliest Galaxies",
+                    "type": "session",
+                    "delay": 5
+                },
+                {
+                    "start": "09:35",
+                    "end": "09:45",
+                    "name": "Piyush Sharda",
+                    "subtitle": "Surprises in ISM chemistry at cosmic dawn",
+                    "type": "session"
+                },
+                {
+                    "start": "09:45",
+                    "end": "09:55",
+                    "name": "Bianca Moreschini",
+                    "subtitle": "High-z abundances revisited: constraining ISM conditions with HOMERUN",
+                    "type": "session"
+                },
+                {
+                    "start": "09:55",
+                    "end": "10:05",
+                    "name": "Gabriel Maheson",
+                    "subtitle": "Big, Dusty Galaxies: Dust Attenuation and Morphology in Massive Galaxies at Cosmic Noon with Blue Jay",
+                    "type": "session"
+                },
+                {
+                    "start": "10:05",
+                    "end": "10:15",
+                    "name": "Giuliano Lorenzon",
+                    "subtitle": "Rethinking late stage evolution: a striking diversity of cold dust and gas in old quiescent galaxies with ALMA",
+                    "type": "session"
+                },
+                {
+                    "start": "10:15",
+                    "end": "10:25",
+                    "name": "Maria Koller",
+                    "subtitle": "Metallicity Gradients at Cosmic Dawn: Insights from JWST/NIRSpec IFU",
+                    "type": "session",
+                    "delay": 5
+                },
+                {
+                    "start": "10:25",
+                    "end": "11:00",
+                    "name": "Coffee Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "11:00",
+                    "end": "11:45",
+                    "name": "Discussion Session",
+                    "subtitle": "Mirko Curti, Jorryt Matthee & Kate Whitaker",
+                    "type": "session"
+                },
+                {
+                    "start": "11:45",
+                    "end": "13:00",
+                    "name": "Lunch Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "13:00",
+                    "end": "13:30",
+                    "name": "P. Jakobsen",
+                    "subtitle": "NIRSpec Correlated Noise (NIRSpec Correlated Noise)",
+                    "type": "workshop"
+                },
+                {
+                    "start": "13:30",
+                    "end": "14:30",
+                    "name": "Plenary + MIRI LRS / WFSS",
+                    "subtitle": "Sarah Kendrew",
+                    "type": "workshop",
+                    "delay": 10
+                },
+                {
+                    "start": "14:30",
+                    "end": "15:10",
+                    "name": "NIRSpec APT, eMPT planning",
+                    "subtitle": "Dan Coe, Emma Curtis-Lake",
+                    "type": "workshop"
+                },
+                {
+                    "start": "15:10",
+                    "end": "15:50",
+                    "name": "NIRSpec pipeline, DJA",
+                    "subtitle": "Dan Coe, Gabe Brammer",
+                    "type": "workshop",
+                    "delay": 20
+                },
+                {
+                    "start": "15:50",
+                    "end": "16:20",
+                    "name": "Coffee Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "16:20",
+                    "end": "16:30",
+                    "name": "Ivanna Myoko Langan",
+                    "subtitle": "ALMA Chemical Evolution Survey: The gas fundamental metallicity relation at cosmic noon",
+                    "type": "session",
+                    "delay": 4
+                },
+                {
+                    "start": "16:30",
+                    "end": "16:40",
+                    "name": "Emilie Pernet",
+                    "subtitle": "Next-generation spectral models for high-redshift galaxies observed with JWST",
+                    "type": "session"
+                },
+                {
+                    "start": "16:40",
+                    "end": "17:05",
+                    "name": "Laura Keating",
+                    "subtitle": "The evolution of the intergalactic medium during reionization",
+                    "type": "session"
+                },
+                {
+                    "start": "17:05",
+                    "end": "17:15",
+                    "name": "Samuel Gagnon-Hartman",
+                    "subtitle": "Timing the end of reionization using a new empirical model of Lyman alpha emitting galaxies",
+                    "type": "session"
+                },
+                {
+                    "start": "17:15",
+                    "end": "17:25",
+                    "name": "Benedetta Spina",
+                    "subtitle": "Measuring the IGM correlation length at 5<z<6.1: a fast change at the end of Reionization",
+                    "type": "session"
+                },
+                {
+                    "start": "17:25",
+                    "end": "17:35",
+                    "name": "Sindhu Satyavolu",
+                    "subtitle": "Measurements of the 1D Lyman-alpha flux power spectrum within quasar proximity zones",
+                    "type": "session"
+                },
+                {
+                    "start": "17:35",
+                    "end": "17:45",
+                    "name": "Timo Kist",
+                    "subtitle": "Learning the local ionization topology with quasar IGM damping wings",
+                    "type": "session"
+                },
+                {
+                    "start": "17:45",
+                    "end": "20:00",
+                    "name": "Dinner",
+                    "subtitle": "Marienlyst",
+                    "type": "social"
+                },
+                {
+                    "start": "20:00",
+                    "end": "22:00",
+                    "name": "Pub Drinks",
+                    "subtitle": "Konrads",
+                    "type": "social"
+                }
+            ]
+        },
+        {
+            "day": "Thursday, April 16",
+            "date": "2026-04-16",
+            "events": [
+                {
+                    "start": "07:30",
+                    "end": "09:00",
+                    "name": "Breakfast Buffet",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "09:00",
+                    "end": "09:25",
+                    "name": "Daniel Stark",
+                    "subtitle": "The reionisation of the Universe: clues from JWST (Reionisation review)",
+                    "type": "session"
+                },
+                {
+                    "start": "09:25",
+                    "end": "09:35",
+                    "name": "Caio Moreira Goolsby",
+                    "subtitle": "The Missing Turnover: Constraining the Faint-End of the UVLF and its Role in Reionization",
+                    "type": "session"
+                },
+                {
+                    "start": "09:35",
+                    "end": "09:45",
+                    "name": "Zuyi Chen",
+                    "subtitle": "The impact of galaxy overdensities and ionized bubbles on Ly\u03b1 emission in the reionization era",
+                    "type": "session"
+                },
+                {
+                    "start": "09:45",
+                    "end": "09:55",
+                    "name": "Sara Mascia",
+                    "subtitle": "The missing pieces: unveiling faint reionization sources",
+                    "type": "session"
+                },
+                {
+                    "start": "09:55",
+                    "end": "10:05",
+                    "name": "Damien Korber",
+                    "subtitle": "A GLIMPSE into the very faint end of the [OIII]+Hbeta luminosity function",
+                    "type": "session"
+                },
+                {
+                    "start": "10:05",
+                    "end": "10:30",
+                    "name": "Charlotte Simmonds",
+                    "subtitle": "Unveiling the sources of reionisation",
+                    "type": "session"
+                },
+                {
+                    "start": "10:30",
+                    "end": "11:00",
+                    "name": "Coffee Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "11:00",
+                    "end": "11:10",
+                    "name": "Silvia Onorato",
+                    "subtitle": "The Ly-a transmission probability distribution function from the E-XQR-30 sample",
+                    "type": "session"
+                },
+                {
+                    "start": "11:10",
+                    "end": "11:20",
+                    "name": "Cody Carr",
+                    "subtitle": "Supernova-Driven Winds Impede LyC Escape in First 10 Myr of Compact Starbursts",
+                    "type": "session"
+                },
+                {
+                    "start": "11:20",
+                    "end": "11:45",
+                    "name": "Hakim Atek",
+                    "subtitle": "Early galaxy formation at Cosmic Dawn: insights from JWST",
+                    "type": "session"
+                },
+                {
+                    "start": "11:45",
+                    "end": "13:30",
+                    "name": "Lunch Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "13:30",
+                    "end": "15:50",
+                    "name": "Mini-workshop: Theory and Simulations",
+                    "subtitle": "",
+                    "type": "workshop"
+                },
+                {
+                    "start": "15:50",
+                    "end": "16:15",
+                    "name": "Coffee Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "16:15",
+                    "end": "16:40",
+                    "name": "Rohan Naidu",
+                    "subtitle": "The Surprising Galaxies & Black Holes (?) of the First Billion Years",
+                    "type": "session"
+                },
+                {
+                    "start": "16:40",
+                    "end": "16:50",
+                    "name": "Sander Schouws",
+                    "subtitle": "An ALMA perspective on Early Galaxies",
+                    "type": "session"
+                },
+                {
+                    "start": "16:50",
+                    "end": "17:00",
+                    "name": "Clara Pollock",
+                    "subtitle": "Insights into star-formation efficiency at cosmic dawn from damped Lyman-alpha absorption",
+                    "type": "session"
+                },
+                {
+                    "start": "17:15",
+                    "end": "19:00",
+                    "name": "Transport to Helsing\u00f8r",
+                    "subtitle": "Streetfood & drinks",
+                    "type": "social"
+                }
+            ]
+        },
+        {
+            "day": "Friday, April 17",
+            "date": "2026-04-17",
+            "events": [
+                {
+                    "start": "07:30",
+                    "end": "09:00",
+                    "name": "Breakfast / Check-out",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "09:00",
+                    "end": "09:25",
+                    "name": "Rachel Somerville",
+                    "subtitle": "The physics of galaxy formation in the early universe: puzzles and progress",
+                    "type": "session"
+                },
+                {
+                    "start": "09:25",
+                    "end": "09:35",
+                    "name": "Andrea Weibel",
+                    "subtitle": "PANORAMIC constraints on the UVLF at z ~ 9 \u2013 17, and on Galaxy Clustering at z ~ 10",
+                    "type": "session"
+                },
+                {
+                    "start": "09:35",
+                    "end": "09:45",
+                    "name": "Christian Kragh Jespersen",
+                    "subtitle": "Cosmic variance and clustering at Cosmic Dawn",
+                    "type": "session"
+                },
+                {
+                    "start": "09:45",
+                    "end": "09:55",
+                    "name": "Sara Saleh",
+                    "subtitle": "How JWST Sheds Light onto the Galaxy-Halo Connection in the Early Universe",
+                    "type": "session"
+                },
+                {
+                    "start": "09:55",
+                    "end": "10:05",
+                    "name": "Andrew Bunker",
+                    "subtitle": "The High Redshift Frontier: NIRSpec spectroscopy with JADES",
+                    "type": "session"
+                },
+                {
+                    "start": "10:05",
+                    "end": "10:15",
+                    "name": "Viola Gelli",
+                    "subtitle": "The impact of bursty star formation in the first galaxies: insights from JWST",
+                    "type": "session"
+                },
+                {
+                    "start": "10:15",
+                    "end": "10:25",
+                    "name": "Mengtao Tang",
+                    "subtitle": "The JWST Spectroscopic Properties of Galaxies at z > 9",
+                    "type": "session"
+                },
+                {
+                    "start": "10:30",
+                    "end": "11:00",
+                    "name": "Coffee Break",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "11:00",
+                    "end": "11:10",
+                    "name": "Jens Melinder",
+                    "subtitle": "JWST/MIRI observations of the red stellar continuum in the most distant galaxies",
+                    "type": "session"
+                },
+                {
+                    "start": "11:10",
+                    "end": "11:20",
+                    "name": "Dario Dottorini",
+                    "subtitle": "The origin of extremely blue galaxies at high redshift",
+                    "type": "session"
+                },
+                {
+                    "start": "11:20",
+                    "end": "11:30",
+                    "name": "Alberto Saldana-Lopez",
+                    "subtitle": "A glimpse to outflows in the lowest-mass galaxies at Cosmic Dawn",
+                    "type": "session"
+                },
+                {
+                    "start": "11:30",
+                    "end": "11:40",
+                    "name": "Kimi Cardoso Kreilgaard",
+                    "subtitle": "New constraints on the z~7-14 UVLFs and characterising the environments of UV bright galaxies with BEACON",
+                    "type": "session"
+                },
+                {
+                    "start": "11:40",
+                    "end": "13:30",
+                    "name": "Concluding Remarks",
+                    "subtitle": "Anne Hutter, Charlotte Mason, Pascal Oesch",
+                    "type": "session"
+                },
+                {
+                    "start": "13:30",
+                    "end": "15:00",
+                    "name": "Farewell Lunch",
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "15:00",
+                    "end": "15:00",
+                    "name": "Conference End",
+                    "subtitle": "",
+                    "type": "session"
+                }
+            ]
+        }
+    ]
+}
