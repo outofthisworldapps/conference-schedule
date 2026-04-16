@@ -765,22 +765,22 @@
                     "type": "break"
                 },
                 {
-                    "start": "16:15",
-                    "end": "16:40",
+                    "start": "16:10",
+                    "end": "16:35",
                     "name": "Rohan Naidu (galaxy formation review)",
                     "subtitle": "The Surprising Galaxies & Black Holes (?) of the First Billion Years",
                     "type": "session"
                 },
                 {
-                    "start": "16:40",
-                    "end": "16:50",
+                    "start": "16:35",
+                    "end": "16:45",
                     "name": "Sander Schouws",
                     "subtitle": "An ALMA perspective on Early Galaxies",
                     "type": "session"
                 },
                 {
-                    "start": "16:50",
-                    "end": "17:00",
+                    "start": "16:45",
+                    "end": "16:55",
                     "name": "Clara Pollock",
                     "subtitle": "Insights into star-formation efficiency at cosmic dawn from damped Lyman-alpha absorption",
                     "type": "session"
