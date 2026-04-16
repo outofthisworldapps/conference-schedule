@@ -473,13 +473,6 @@ function renderCalendarEvents(date, startHour, hourHeight) {
         return { event, actualStart, actualEnd, index };
     });
 
-    // Extend end times to next start if gap is small (<= 10 mins)
-    for (let i = 0; i < computedEvents.length - 1; i++) {
-        const gap = getMinutesDiff(computedEvents[i+1].actualStart, computedEvents[i].actualEnd);
-        if (gap > 0 && gap <= 10) {
-            computedEvents[i].actualEnd = computedEvents[i+1].actualStart;
-        }
-    }
 
     return computedEvents.map(({ event, actualStart, actualEnd, index }) => {
 
