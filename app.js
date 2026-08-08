@@ -186,8 +186,25 @@ function setupEventListeners() {
 
     document.addEventListener('keydown', (e) => {
         const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        const isEditable = document.activeElement && (document.activeElement.isContentEditable || activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select');
+
+        if (!isEditable && !isCmdOrCtrl) {
+            const keyLower = e.key.toLowerCase();
+            if (keyLower === 'w') {
+                setSelectedDay('all');
+                return;
+            }
+            if (['1', '2', '3', '4', '5'].includes(e.key)) {
+                const dayIdx = parseInt(e.key, 10) - 1;
+                if (scheduleData && scheduleData[dayIdx]) {
+                    setSelectedDay(scheduleData[dayIdx].date);
+                }
+                return;
+            }
+        }
         
-        if (e.key.toLowerCase() === 't') {
+        if (!isEditable && e.key.toLowerCase() === 't') {
             scrollToNow();
         }
         
