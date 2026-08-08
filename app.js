@@ -812,6 +812,16 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
         const originalTimeDisplay = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
 
+        const subWidthPercent = isMultiCol ? (colWidthPercent / numCols) : (100 / numCols);
+        const subLeftOffset = isMultiCol 
+            ? `calc(${colLeftPercent}% + ${subColIdx} * (${colWidthPercent}% / ${numCols}) + 2px)` 
+            : `calc(20px + ${subColIdx} * ((100% - 25px) / ${numCols}))`;
+        const leftCss = subLeftOffset;
+        const widthCss = isMultiCol 
+            ? `calc(${subWidthPercent}% - 4px)` 
+            : `calc((100% - 25px) / ${numCols} - 4px)`;
+        const fontScaleCss = isMultiCol ? 'font-size: 0.85rem;' : '';
+
         const weekEndTimeMarkerHTML = showEndTime ? `
             <div class="calendar-event-end-marker" style="position: absolute; top: ${top + height + 2}px; left: calc(${leftCss} + 10px); z-index: ${100 + index}; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; font-family: monospace; color: var(--text-primary);">
                 <div class="end-time-black-square" style="width: 10px; height: 10px; background: #000; border: 1px solid var(--border-color); border-radius: 2px; flex-shrink: 0;"></div>
@@ -822,39 +832,6 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                       title="Click to edit end time">${formatTime(actualEnd)}</span>
             </div>
         ` : '';
-
-        let markerHTML = '';
-        if (!isMultiCol) {
-            const endTimeMarkerHTML = showEndTime ? `
-                <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
-                    <span class="inline-time-badge" contenteditable="true" 
-                          onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
-                          onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
-                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
-                          title="Click to edit end time">${formatTime(actualEnd)}</span>
-                </div>` : '';
-            markerHTML = `
-                <div class="calendar-time-marker" style="top: ${top}px;">
-                    ${originalTimeDisplay}
-                    <span class="inline-time-badge" contenteditable="true" 
-                          onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
-                          onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
-                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
-                          title="Click to edit start time">${formatTime(actualStart)}</span>
-                </div>
-                ${endTimeMarkerHTML}
-            `;
-        }
-
-        const subWidthPercent = isMultiCol ? (colWidthPercent / numCols) : (100 / numCols);
-        const subLeftOffset = isMultiCol 
-            ? `calc(${colLeftPercent}% + ${subColIdx} * (${colWidthPercent}% / ${numCols}) + 2px)` 
-            : `calc(20px + ${subColIdx} * ((100% - 25px) / ${numCols}))`;
-        const leftCss = subLeftOffset;
-        const widthCss = isMultiCol 
-            ? `calc(${subWidthPercent}% - 4px)` 
-            : `calc((100% - 25px) / ${numCols} - 4px)`;
-        const fontScaleCss = isMultiCol ? 'font-size: 0.85rem;' : '';
 
         const inlineHeaderTime = `<span class="inline-time-badge" contenteditable="true" 
                                        onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
@@ -1015,8 +992,6 @@ window.setSelectedDay = setSelectedDay;
 window.nextDay = nextDay;
 window.prevDay = prevDay;
 window.editStartTime = editStartTime;
-window.editEventName = editEventName;
-window.editEventSubtitle = editEventSubtitle;
 window.deleteEvent = deleteEvent;
 window.editEndTime = editEndTime;
 window.changeEventType = changeEventType;
