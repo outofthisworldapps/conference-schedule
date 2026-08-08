@@ -47,36 +47,139 @@ const history = {
 
 async function init() {
     try {
-        const response = await fetch('schedule.json');
-        const data = await response.json();
-        scheduleData = data.scheduleData;
-        
-        const todayStr = new Date().toISOString().split('T')[0];
-        const hasToday = scheduleData.some(d => d.date === todayStr);
-        if (hasToday) {
-            selectedDay = todayStr;
-        } else if (scheduleData.length > 0) {
-            selectedDay = scheduleData[0].date;
+        setupEventListeners();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const confParam = urlParams.get('conf');
+        let initialFile = 'santander2026.json';
+        if (confParam && (confParam.includes('copenhagen') || confParam.includes('schedule'))) {
+            initialFile = 'schedule.json';
         }
 
-        setupEventListeners();
-        history.updateButtons();
-        renderSchedule();
+        const select = document.getElementById('conference-select');
+        if (select) {
+            select.value = initialFile;
+        }
+
+        await loadConference(initialFile);
         
         setInterval(updateNowLine, 60000);
     } catch (error) {
         console.error('Error loading schedule:', error);
-        document.body.innerHTML += '<div style="padding: 2rem; color: #ff6b6b;">Failed to load schedule data. Please ensure schedule.json exists.</div>';
+        document.body.innerHTML += '<div style="padding: 2rem; color: #ff6b6b;">Failed to load schedule data.</div>';
     }
 }
 
+
+async function loadConference(fileName) {
+    try {
+        const response = await fetch(fileName);
+        const data = await response.json();
+        scheduleData = data.scheduleData || [];
+
+        if (data.conference) {
+            const titleEl = document.getElementById('header-title');
+            const titleLinkEl = document.getElementById('header-title-link');
+            const subEl = document.getElementById('header-subtitle');
+            const subLinkEl = document.getElementById('header-subtitle-link');
+
+            if (titleEl && data.conference.title) titleEl.textContent = data.conference.title;
+            if (titleLinkEl && data.conference.link) titleLinkEl.href = data.conference.link;
+            if (subEl && data.conference.subtitle) subEl.textContent = data.conference.subtitle;
+            if (subLinkEl && data.conference.link) subLinkEl.href = data.conference.link;
+        }
+
+        const isWideWindow = window.innerWidth >= 900;
+        if (isWideWindow) {
+            selectedDay = 'all';
+        } else {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const hasToday = scheduleData.some(d => d.date === todayStr);
+            if (hasToday) {
+                selectedDay = todayStr;
+            } else if (scheduleData.length > 0) {
+                selectedDay = scheduleData[0].date;
+            }
+        }
+
+
+        history.undoStack = [];
+        history.redoStack = [];
+        history.updateButtons();
+        renderSchedule();
+        setTimeout(scrollToEarliestEvent, 100);
+    } catch (err) {
+        console.error('Failed to load conference JSON:', err);
+    }
+}
+
+function scrollToEarliestEvent() {
+    const startHour = 7;
+    const hourHeight = currentHourHeight;
+    let earliestMinutes = 24 * 60;
+    
+    const daysToCheck = selectedDay === 'all' ? scheduleData : scheduleData.filter(d => d.date === selectedDay);
+    daysToCheck.forEach(d => {
+        if (!d.events) return;
+        d.events.forEach(e => {
+            const timeVal = e.start || "09:00";
+            const [h, m] = timeVal.split(':').map(Number);
+            const mins = h * 60 + m;
+            if (mins < earliestMinutes) earliestMinutes = mins;
+        });
+    });
+
+    if (earliestMinutes < 24 * 60) {
+        const topPx = (earliestMinutes - startHour * 60) * (hourHeight / 60);
+        const grid = document.getElementById('calendar-grid');
+        const header = document.querySelector('.sticky-header');
+        const headerHeight = header ? header.offsetHeight : 0;
+
+        if (grid) {
+            const gridTop = grid.getBoundingClientRect().top + window.scrollY;
+            const targetY = Math.max(0, gridTop + topPx - headerHeight - 15);
+            window.scrollTo({
+                top: targetY,
+                behavior: 'smooth'
+            });
+        }
+    }
+}
+
+
+function selectConferenceOption(jsonFile) {
+    loadConference(jsonFile);
+    const menu = document.getElementById('conference-dropdown-menu');
+    if (menu) menu.style.display = 'none';
+}
+
 function setupEventListeners() {
+    const openBtn = document.getElementById('open-btn');
+    const menu = document.getElementById('conference-dropdown-menu');
+
+    if (openBtn && menu) {
+        openBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isHidden = menu.style.display === 'none';
+            menu.style.display = isHidden ? 'flex' : 'none';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (menu && !menu.contains(e.target) && e.target !== openBtn) {
+                menu.style.display = 'none';
+            }
+        });
+    }
+
+
+
     document.getElementById('undo-btn').addEventListener('click', () => history.undo());
     document.getElementById('redo-btn').addEventListener('click', () => history.redo());
     document.getElementById('save-btn').addEventListener('click', saveSchedule);
     document.getElementById('load-btn').addEventListener('click', () => document.getElementById('file-input').click());
     document.getElementById('file-input').addEventListener('change', loadSchedule);
     document.getElementById('now-btn').addEventListener('click', scrollToNow);
+
 
     document.addEventListener('keydown', (e) => {
         const isCmdOrCtrl = e.metaKey || e.ctrlKey;
@@ -228,11 +331,18 @@ function addMinutes(timeStr, minutes) {
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
+function timeToMinutes(timeStr) {
+    if (!timeStr) return 0;
+    const [h, m] = timeStr.split(':').map(Number);
+    return h * 60 + m;
+}
+
 function getMinutesDiff(timeStr1, timeStr2) {
     const [h1, m1] = timeStr1.split(':').map(Number);
     const [h2, m2] = timeStr2.split(':').map(Number);
     return (h1 * 60 + m1) - (h2 * 60 + m2);
 }
+
 
 function formatTime(timeStr) {
     if (!timeStr) return '';
@@ -307,31 +417,58 @@ function editStartTime(date, index) {
     }
 }
 
-function editEventName(date, index) {
+let activeInlineNameBefore = null;
+let activeInlineSubtitleBefore = null;
+
+function handleInlineFocus(e, date, index) {
     const day = scheduleData.find(d => d.date === date);
     if (!day) return;
     const event = day.events[index];
-    
-    const newName = prompt(`Edit name for this event:`, event.name);
-    if (newName !== null && newName.trim() !== "" && newName !== event.name) {
+    if (!event) return;
+    activeInlineNameBefore = event.name || "";
+    activeInlineSubtitleBefore = event.subtitle || "";
+}
+
+function handleInlineBlur(e, date, index) {
+    const day = scheduleData.find(d => d.date === date);
+    if (!day) return;
+    const event = day.events[index];
+    if (!event) return;
+
+    const speakerEl = e.target.querySelector('.speaker-name');
+    const titleEl = e.target.querySelector('.talk-title');
+
+    let newName = speakerEl ? speakerEl.innerText.trim() : "";
+    let newTitle = titleEl ? titleEl.innerText.trim() : "";
+
+    if (!speakerEl && !titleEl) {
+        const text = e.target.innerText.trim();
+        const lines = text.split('\n').filter(Boolean);
+        newName = lines[0] || "";
+        newTitle = lines.slice(1).join(' ') || "";
+    }
+
+    if (newName !== activeInlineNameBefore || newTitle !== activeInlineSubtitleBefore) {
         history.push();
         event.name = newName;
-        renderSchedule();
+        event.subtitle = newTitle;
+    }
+    activeInlineNameBefore = null;
+    activeInlineSubtitleBefore = null;
+}
+
+function handleInlineKeydown(e, date, index) {
+    e.stopPropagation();
+    if (e.key === 'Enter' && e.metaKey) {
+        e.preventDefault();
+        e.target.blur();
     }
 }
 
-function editEventSubtitle(date, index) {
-    const day = scheduleData.find(d => d.date === date);
-    if (!day) return;
-    const event = day.events[index];
-    
-    const newSubtitle = prompt(`Edit subtitle for this event:`, event.subtitle || "");
-    if (newSubtitle !== null && newSubtitle !== event.subtitle) {
-        history.push();
-        event.subtitle = newSubtitle;
-        renderSchedule();
-    }
-}
+
+function editEventName(date, index) {}
+function editEventSubtitle(date, index) {}
+
 
 function editEndTime(date, index) {
     const day = scheduleData.find(d => d.date === date);
@@ -422,22 +559,38 @@ function getInferredType(event) {
 function renderCalendarView() {
     const navContainer = document.getElementById('day-nav-container');
     const gridContainer = document.getElementById('calendar-grid');
-    const dayIndex = scheduleData.findIndex(d => d.date === selectedDay);
-    
+    const isAllDays = selectedDay === 'all';
+    const dayIndex = isAllDays ? -1 : scheduleData.findIndex(d => d.date === selectedDay);
+    const gutterWidth = isAllDays ? 0 : 60;
+
+    const colHeaderHTML = isAllDays ? `
+        <div class="calendar-column-headers" style="display: flex; width: 100%; box-sizing: border-box; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--bg-color); padding: 8px 0; margin-top: 6px;">
+            ${scheduleData.map((d, i) => `
+                <div class="col-header-item" style="flex: 1; text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text-primary); border-right: ${i < scheduleData.length - 1 ? '1px solid var(--border-color)' : 'none'}; box-sizing: border-box;">
+                    ${d.day}
+                </div>
+            `).join('')}
+        </div>
+    ` : '';
+
     navContainer.innerHTML = `
         <div class="day-navigation">
-            <button class="nav-arrow" onclick="prevDay()" ${dayIndex === 0 ? 'disabled' : ''}>&larr;</button>
+            <button class="nav-arrow" onclick="prevDay()" ${isAllDays || dayIndex === 0 ? 'disabled' : ''}>&larr;</button>
             <div class="day-tabs">
+                <div class="day-tab ${isAllDays ? 'active' : ''}" onclick="setSelectedDay('all')">
+                    All Week
+                </div>
                 ${scheduleData.map(day => `
-                    <div class="day-tab ${day.date === selectedDay ? 'active' : ''}" onclick="setSelectedDay('${day.date}')">
+                    <div class="day-tab ${!isAllDays && day.date === selectedDay ? 'active' : ''}" onclick="setSelectedDay('${day.date}')">
                         ${day.day.split(',')[0]} ${day.day.split(' ')[2]}
                     </div>
                 `).join('')}
             </div>
-            <button class="nav-arrow" onclick="nextDay()" ${dayIndex === scheduleData.length - 1 ? 'disabled' : ''}>&rarr;</button>
+            <button class="nav-arrow" onclick="nextDay()" ${isAllDays || dayIndex === scheduleData.length - 1 ? 'disabled' : ''}>&rarr;</button>
         </div>
+        ${colHeaderHTML}
     `;
-    
+
     const startHour = 7;
     const endHour = 22;
     const hourHeight = currentHourHeight; 
@@ -445,39 +598,91 @@ function renderCalendarView() {
     
     gridContainer.style.height = `${gridHeight}px`;
 
+    const eventsHTML = isAllDays ? 
+        scheduleData.map((day, colIdx) => renderCalendarEvents(day.date, startHour, hourHeight, colIdx, scheduleData.length)).join('') :
+        renderCalendarEvents(selectedDay, startHour, hourHeight, 0, 1);
+
+    const dividersHTML = isAllDays ?
+        scheduleData.map((_, i) => i > 0 ? `<div style="position: absolute; top: 0; bottom: 0; left: ${(i / scheduleData.length) * 100}%; width: 1px; background: rgba(255,255,255,0.08); z-index: 10;"></div>` : '').join('') : '';
+
     gridContainer.innerHTML = `
-        <div style="position: relative; height: ${gridHeight}px; margin-left: 60px;">
+        <div style="position: relative; height: ${gridHeight}px; margin-left: ${gutterWidth}px;">
             ${Array.from({length: endHour - startHour + 1}, (_, i) => {
                 const hour = startHour + i;
                 const top = i * hourHeight;
-                return `<div class="hour-line" style="top: ${top}px" data-hour="${hour}:00"></div>`;
+                const hourTag = isAllDays ? `<span style="position: absolute; left: 8px; top: -10px; font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.3); background: var(--bg-color); padding: 0 4px; z-index: 5;">${hour}:00</span>` : '';
+                return `<div class="hour-line" style="top: ${top}px" data-hour="${hour}:00">${hourTag}</div>`;
             }).join('')}
             
+            ${dividersHTML}
+
             <div id="calendar-now-line" style="display: none;"></div>
             
-            ${renderCalendarEvents(selectedDay, startHour, hourHeight)}
+            ${eventsHTML}
         </div>
     `;
 }
 
-function renderCalendarEvents(date, startHour, hourHeight) {
+
+
+
+function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCols = 1) {
     const dayData = scheduleData.find(d => d.date === date);
     if (!dayData) return '';
 
     let cumulativeDelay = 0;
     const pixelsPerMinute = hourHeight / 60;
+    const isMultiCol = totalCols > 1;
+    const colWidthPercent = 100 / totalCols;
+    const colLeftPercent = colIndex * colWidthPercent;
 
-    const computedEvents = dayData.events.map((event, index) => {
-        const { actualStart, actualEnd, newDelay } = getEventTimes(event, cumulativeDelay);
-        cumulativeDelay = newDelay;
-        return { event, actualStart, actualEnd, index };
-    });
+    // Calculate parallel session layout columns
+    const computedItems = (function() {
+        let cumulativeDelay = 0;
+        const items = dayData.events.map((event, index) => {
+            const { actualStart, actualEnd, newDelay } = getEventTimes(event, cumulativeDelay);
+            cumulativeDelay = newDelay;
+            const startM = timeToMinutes(actualStart);
+            const endM = timeToMinutes(actualEnd);
+            return { event, actualStart, actualEnd, startM, endM, index };
+        });
 
+        items.forEach(item => {
+            item.overlapping = items.filter(other =>
+                other.index !== item.index &&
+                item.startM < other.endM &&
+                item.endM > other.startM
+            );
+        });
 
-    return computedEvents.map(({ event, actualStart, actualEnd, index }) => {
+        items.forEach(item => {
+            if (item.overlapping.length === 0) {
+                item.colIndex = 0;
+                item.numCols = 1;
+            } else {
+                const usedCols = item.overlapping
+                    .filter(other => other.colIndex !== undefined)
+                    .map(other => other.colIndex);
+                let col = 0;
+                while (usedCols.includes(col)) col++;
+                item.colIndex = col;
+            }
+        });
 
+        items.forEach(item => {
+            if (item.overlapping.length === 0) {
+                item.numCols = 1;
+            } else {
+                const allInCluster = [item, ...item.overlapping];
+                item.numCols = Math.max(...allInCluster.map(x => (x.colIndex !== undefined ? x.colIndex : 0))) + 1;
+            }
+        });
+
+        return items;
+    })();
+
+    return computedItems.map(({ event, actualStart, actualEnd, index, colIndex: subColIdx, numCols }) => {
         const [sh, sm] = actualStart.split(':').map(Number);
-        
         const top = ((sh - startHour) * 60 + sm) * pixelsPerMinute;
         const duration = getMinutesDiff(actualEnd, actualStart);
         const height = duration * pixelsPerMinute;
@@ -486,69 +691,79 @@ function renderCalendarEvents(date, startHour, hourHeight) {
         let talkTitle = event.subtitle || event.description || "";
 
         let typeClass = 'event-talk';
-        const lowerName = displayName.toLowerCase();
         const currentType = getInferredType(event);
 
-        if (currentType === 'tiktalk') {
-            typeClass = 'event-tiktalk';
-        } else if (currentType === 'meal') {
-            typeClass = 'event-meal';
-        } else if (currentType === 'break') {
-            typeClass = 'event-break';
-        } else if (currentType === 'social') {
-            typeClass = 'event-social';
-        } else if (currentType === 'workshop') {
-            typeClass = 'event-workshop';
-        } else if (currentType === 'session') {
-            typeClass = duration > 20 ? 'event-long-talk' : 'event-talk';
-        } else if (currentType === 'long-talk') {
-            typeClass = 'event-long-talk';
-        }
-
-        /* 
-        Removal of textOffsetStyle logic as it interfered with zoom and triggered clipping.
-        We now rely on the user zooming in to resolve any text overlaps.
-        */
+        if (currentType === 'tiktalk') typeClass = 'event-tiktalk';
+        else if (currentType === 'meal') typeClass = 'event-meal';
+        else if (currentType === 'break') typeClass = 'event-break';
+        else if (currentType === 'social') typeClass = 'event-social';
+        else if (currentType === 'workshop') typeClass = 'event-workshop';
+        else if (currentType === 'session') typeClass = duration > 20 ? 'event-long-talk' : 'event-talk';
+        else if (currentType === 'long-talk') typeClass = 'event-long-talk';
 
         const nextEvent = dayData.events[index + 1];
         const showEndTime = nextEvent ? (nextEvent.start !== event.end) : true;
-        const endTimeGutter = showEndTime ? `<div class="calendar-time-marker end-time clickable" style="top: ${top + height}px;" onclick="editEndTime('${date}', ${index})">${formatTime(actualEnd)}</div>` : '';
+        
+        let markerHTML = '';
+        if (!isMultiCol) {
+            const endTimeGutter = showEndTime ? `<div class="calendar-time-marker end-time clickable" style="top: ${top + height}px;" onclick="editEndTime('${date}', ${index})">${formatTime(actualEnd)}</div>` : '';
+            const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
+            const originalTimeDisplay = isShifted ? `<div class="original-time">${formatTime(event.start)}</div>` : '';
+            markerHTML = `
+                <div class="calendar-time-marker clickable" style="top: ${top}px;" onclick="editStartTime('${date}', ${index})">
+                    ${originalTimeDisplay}
+                    ${formatTime(actualStart)}
+                </div>
+                ${endTimeGutter}
+            `;
+        }
 
-        // Show original time if the event is shifted
-        const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
-        const originalTimeDisplay = isShifted
-            ? `<div class="original-time">${formatTime(event.start)}</div>` 
-            : '';
+        const subWidthPercent = isMultiCol ? (colWidthPercent / numCols) : (100 / numCols);
+        const subLeftOffset = isMultiCol 
+            ? `calc(${colLeftPercent}% + ${subColIdx} * (${colWidthPercent}% / ${numCols}) + 2px)` 
+            : `calc(20px + ${subColIdx} * ((100% - 25px) / ${numCols}))`;
+        const leftCss = subLeftOffset;
+        const widthCss = isMultiCol 
+            ? `calc(${subWidthPercent}% - 4px)` 
+            : `calc((100% - 25px) / ${numCols} - 4px)`;
+        const fontScaleCss = isMultiCol ? 'font-size: 0.85rem;' : '';
+
 
         return `
-            <div class="calendar-time-marker clickable" style="top: ${top}px;" onclick="editStartTime('${date}', ${index})">
-                ${originalTimeDisplay}
-                ${formatTime(actualStart)}
-            </div>
-            ${endTimeGutter}
-            <div class="calendar-event ${typeClass}" style="top: ${top}px; height: ${height}px; z-index: ${100 + index};" 
+            ${markerHTML}
+            <div class="calendar-event ${typeClass}" style="top: ${top}px; height: ${height}px; left: ${leftCss}; width: ${widthCss}; z-index: ${100 + index}; ${fontScaleCss}" 
                  data-start="${actualStart}" data-end="${actualEnd}">
-                <div class="type-selector-container">
-                    <div class="custom-type-dropdown">
-                        <div class="type-trigger">
-                            <div class="type-color-box" style="background: ${EVENT_TYPES[currentType]?.color || '#fff'}"></div>
-                            <span>${EVENT_TYPES[currentType]?.label || 'Talk'}</span>
+                <button class="delete-btn" onclick="deleteEvent('${date}', ${index})" title="Delete event">&times;</button>
+                <div class="event-header-tag" style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                    <div class="type-square-container">
+                        <div class="event-color-square" 
+                             title="Change event type" 
+                             style="background: ${EVENT_TYPES[currentType]?.color || '#00b894'};">
                         </div>
-                        <div class="type-options">
+                        <div class="type-options-popover">
                             ${Object.entries(EVENT_TYPES).map(([type, data]) => `
-                                <div class="type-option" onclick="changeEventType('${date}', ${index}, '${type}')">
-                                    <div class="type-color-box" style="background: ${data.color}"></div>
-                                    ${data.label}
+                                <div class="type-option-item" onclick="event.stopPropagation(); changeEventType('${date}', ${index}, '${type}')">
+                                    <span class="type-color-box" style="background: ${data.color}"></span>
+                                    <span>${data.label}</span>
                                 </div>
                             `).join('')}
                         </div>
                     </div>
+                    ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${formatTime(actualStart)}</span>` : ''}
                 </div>
-                <button class="delete-btn" onclick="deleteEvent('${date}', ${index})" title="Delete event">&times;</button>
-                <h4 class="editable" onclick="editEventName('${date}', ${index})">${esc(displayName)}</h4>
-                <div class="event-subtitle editable" onclick="editEventSubtitle('${date}', ${index})">${esc(talkTitle)}</div>
+                <div class="event-card-text" contenteditable="true" 
+                     onfocus="handleInlineFocus(event, '${date}', ${index})" 
+                     onblur="handleInlineBlur(event, '${date}', ${index})" 
+                     onkeydown="handleInlineKeydown(event, '${date}', ${index})">
+                    ${displayName ? `<div class="speaker-name">${esc(displayName)}</div>` : ''}
+                    ${talkTitle ? `<div class="talk-title">${esc(talkTitle)}</div>` : ''}
+                </div>
             </div>
+
         `;
+
+
+
     }).join('');
 }
 
@@ -559,13 +774,31 @@ function updateNowLine() {
     const timeStr = now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
 
     const nowLine = document.getElementById('calendar-now-line');
-    if (selectedDay === todayStr && nowLine) {
+    if (!nowLine) return;
+
+    const isAllDays = selectedDay === 'all';
+    const isTodayInSchedule = scheduleData.some(d => d.date === todayStr);
+
+    if ((isAllDays && isTodayInSchedule) || selectedDay === todayStr) {
         nowLine.style.display = 'block';
         const startHour = 7;
         const hourHeight = currentHourHeight;
         const top = (nowMinutes - startHour * 60) * (hourHeight / 60);
         nowLine.style.top = `${top}px`;
         nowLine.setAttribute('data-time', formatTime(timeStr));
+
+        if (isAllDays) {
+            const colIdx = scheduleData.findIndex(d => d.date === todayStr);
+            if (colIdx >= 0) {
+                const colWidthPercent = 100 / scheduleData.length;
+                const colLeftPercent = colIdx * colWidthPercent;
+                nowLine.style.left = `calc(${colLeftPercent}% + 2px)`;
+                nowLine.style.width = `calc(${colWidthPercent}% - 4px)`;
+            }
+        } else {
+            nowLine.style.left = '0';
+            nowLine.style.width = '100%';
+        }
         
         document.querySelectorAll('.calendar-event').forEach(el => {
             const [sh, sm] = el.dataset.start.split(':').map(Number);
@@ -578,10 +811,11 @@ function updateNowLine() {
                 el.classList.remove('current');
             }
         });
-    } else if (nowLine) {
+    } else {
         nowLine.style.display = 'none';
     }
 }
+
 
 function scrollToNow() {
     const now = new Date();
@@ -652,3 +886,5 @@ window.editEventSubtitle = editEventSubtitle;
 window.deleteEvent = deleteEvent;
 window.editEndTime = editEndTime;
 window.changeEventType = changeEventType;
+window.selectConferenceOption = selectConferenceOption;
+

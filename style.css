@@ -58,9 +58,11 @@ body {
 }
 
 .app-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 1rem 2rem;
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0 1.25rem 2rem;
+    box-sizing: border-box;
     position: relative;
 }
 
@@ -78,6 +80,34 @@ body {
     text-align: center;
 }
 
+.header-subtitle-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 0.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.header-subtitle-row .conference-dropdown {
+    background: #1e293b;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.header-subtitle-row .conference-dropdown:hover {
+    border-color: var(--accent-color);
+}
+
 h1 {
     font-size: 2rem;
     font-weight: 700;
@@ -90,7 +120,6 @@ h1 {
 .subtitle {
     color: var(--text-secondary);
     font-size: 0.95rem;
-    margin-bottom: 0.4rem;
     transition: color 0.3s ease;
 }
 
@@ -108,6 +137,7 @@ header a {
     text-decoration: none;
 }
 
+
 /* Actions Toolbar */
 .actions-toolbar {
     display: flex;
@@ -119,7 +149,8 @@ header a {
     border-top: 1px solid var(--border-color);
 }
 
-.actions-toolbar button {
+.actions-toolbar button,
+.actions-toolbar select {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     color: var(--text-secondary);
@@ -134,6 +165,18 @@ header a {
     align-items: center;
     gap: 8px;
 }
+
+.actions-toolbar select {
+    outline: none;
+    color: var(--text-primary);
+    background-color: #1e293b;
+}
+
+.actions-toolbar select option {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
 
 .actions-toolbar button svg {
     opacity: 0.7;
@@ -163,6 +206,46 @@ header a {
     margin: 0 4px;
 }
 
+/* Open Dropdown Wrapper & Popover */
+.open-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.conference-menu-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 280px;
+    background: #0f172a;
+    border: 1px solid var(--accent-color);
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.conference-option-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.conference-option-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--accent-color);
+}
+
+
 .zoom-controls {
     display: flex;
     align-items: center;
@@ -182,19 +265,28 @@ header a {
     opacity: 1;
 }
 
-.editable:hover {
-    outline: 1px dashed var(--accent-color);
-    outline-offset: 4px;
-    cursor: pointer;
+.calendar-event h4[contenteditable="true"],
+.calendar-event .event-subtitle[contenteditable="true"] {
+    outline: none;
     border-radius: 4px;
+    transition: background 0.15s ease;
+    cursor: text;
 }
+
+.calendar-event h4[contenteditable="true"]:focus,
+.calendar-event .event-subtitle[contenteditable="true"]:focus {
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+    padding: 1px 3px;
+}
+
 
 /* Timeline Container */
 .timeline-container {
     position: relative;
-    padding-left: 100px;
-    /* Space for time labels */
+    padding-left: 0;
 }
+
 
 /* The Vertical Line */
 .timeline-axis {
@@ -339,10 +431,9 @@ header a {
 /* Calendar View Styles */
 .calendar-grid {
     position: relative;
-    /* Removed hardcoded height to allow it to grow with injected content */
-    margin-top: 2rem;
-    border-left: 1px solid var(--border-color);
+    margin-top: 0.5rem;
 }
+
 
 .hour-line {
     position: absolute;
@@ -452,28 +543,146 @@ header a {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-.calendar-event h4 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin: 0;
-    line-height: 1.2;
-    white-space: nowrap;
+.event-card-text {
+    outline: none;
+    border-radius: 4px;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+    cursor: text;
     overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.3;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 }
 
-.calendar-event .event-subtitle {
-    opacity: 0.85;
-    font-size: 0.9rem;
-    color: var(--text-primary);
-    font-weight: 400;
-    margin-top: 2px;
-    line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-height: 1em;
+.event-card-text:focus {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+    padding: 2px 4px;
 }
+
+.event-card-text .speaker-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #ffffff;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+.event-card-text .talk-title {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    opacity: 0.9;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+
+/* Calendar Column Headers for Multi-Day View */
+.calendar-column-headers {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-color);
+    padding-top: 6px;
+    padding-bottom: 6px;
+    margin: 0;
+}
+
+.header-time-gutter {
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.header-days-container {
+    display: flex;
+    flex: 1 1 0px;
+    box-sizing: border-box;
+}
+
+.col-header-item {
+    flex: 1 1 0px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    box-sizing: border-box;
+}
+
+/* Color Square Type Selector */
+
+.type-square-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-right: 2px;
+}
+
+.event-color-square {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.event-color-square:hover {
+    transform: scale(1.35);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.type-options-popover {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    min-width: 130px;
+}
+
+.type-square-container:hover .type-options-popover {
+    display: block;
+}
+
+.type-option-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.type-option-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.type-option-item .type-color-box {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+
+
+
 
 .delete-btn {
     position: absolute;

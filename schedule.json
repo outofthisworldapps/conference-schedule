@@ -1,4 +1,10 @@
 {
+    "conference": {
+        "id": "copenhagen2026",
+        "title": "Charting Cosmic Dawn",
+        "subtitle": "Copenhagen April 13-17, 2026 • Conference Schedule",
+        "link": "https://indico.nbi.ku.dk/event/2223/overview"
+    },
     "scheduleData": [
         {
             "day": "Monday, April 13",
