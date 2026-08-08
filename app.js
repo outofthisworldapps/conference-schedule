@@ -845,11 +845,19 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             : `calc((100% - 25px) / ${numCols} - 4px)`;
         const fontScaleCss = isMultiCol ? 'font-size: 0.85rem;' : '';
 
-        const inlineHeaderTime = `<span class="inline-time-badge" contenteditable="true" 
-                                       onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
-                                       onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
-                                       onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
-                                       title="Click to edit start time">${formatTime(actualStart)}</span>`;
+        const inlineHeaderTime = `
+            <span class="inline-time-badge" contenteditable="true" 
+                  onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
+                  onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
+                  onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
+                  title="Click to edit start time">${formatTime(actualStart)}</span>
+            <span style="opacity: 0.5;">–</span>
+            <span class="inline-time-badge" contenteditable="true" 
+                  onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
+                  onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
+                  onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
+                  title="Click to edit end time">${formatTime(actualEnd)}</span>
+        `;
 
         return `
             ${markerHTML}
@@ -871,7 +879,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                             `).join('')}
                         </div>
                     </div>
-                    ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
+                    <span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>
                 </div>
                 <div class="event-card-text" contenteditable="true" 
                      onfocus="handleInlineFocus(event, '${date}', ${index})" 
