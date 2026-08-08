@@ -84,7 +84,9 @@ async function loadConference(fileName) {
             const subLinkEl = document.getElementById('header-subtitle-link');
 
             if (titleEl && data.conference.title) titleEl.textContent = data.conference.title;
-            if (titleLinkEl && data.conference.link) titleLinkEl.href = data.conference.link;
+            if (titleLinkEl && (data.conference.site || data.conference.link)) {
+                titleLinkEl.href = data.conference.site || data.conference.link;
+            }
             if (subEl && data.conference.subtitle) subEl.textContent = data.conference.subtitle;
             if (subLinkEl && data.conference.link) subLinkEl.href = data.conference.link;
             if (data.conference.title) document.title = `${data.conference.title} | ${data.conference.subtitle || 'Conference Schedule'}`;
