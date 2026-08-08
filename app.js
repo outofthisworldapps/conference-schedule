@@ -71,9 +71,12 @@ async function init() {
 }
 
 
+let currentLoadedFile = 'santander2026.json';
+
 async function loadConference(fileName) {
     try {
-        const response = await fetch(fileName);
+        currentLoadedFile = fileName;
+        const response = await fetch(`${fileName}?t=${Date.now()}`);
         const data = await response.json();
         scheduleData = data.scheduleData || [];
 
@@ -113,6 +116,19 @@ async function loadConference(fileName) {
         setTimeout(scrollToEarliestEvent, 100);
     } catch (err) {
         console.error('Failed to load conference JSON:', err);
+    }
+}
+
+async function refreshSpreadsheetData() {
+    const btn = document.getElementById('refresh-sheet-btn');
+    if (btn) btn.classList.add('spinning');
+    
+    try {
+        await loadConference(currentLoadedFile);
+    } finally {
+        setTimeout(() => {
+            if (btn) btn.classList.remove('spinning');
+        }, 500);
     }
 }
 
@@ -175,6 +191,11 @@ function setupEventListeners() {
     }
 
 
+
+    const refreshBtn = document.getElementById('refresh-sheet-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', refreshSpreadsheetData);
+    }
 
     document.getElementById('undo-btn').addEventListener('click', () => history.undo());
     document.getElementById('redo-btn').addEventListener('click', () => history.redo());

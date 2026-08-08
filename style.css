@@ -134,6 +134,33 @@ header a:hover .header-icon {
     transform: translateY(-1px);
 }
 
+.refresh-icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.refresh-icon-btn:hover {
+    color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.refresh-icon-btn.spinning svg {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 h1 {
     font-size: 2rem;
     font-weight: 700;
