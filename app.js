@@ -87,6 +87,7 @@ async function loadConference(fileName) {
             if (titleLinkEl && data.conference.link) titleLinkEl.href = data.conference.link;
             if (subEl && data.conference.subtitle) subEl.textContent = data.conference.subtitle;
             if (subLinkEl && data.conference.link) subLinkEl.href = data.conference.link;
+            if (data.conference.title) document.title = `${data.conference.title} | ${data.conference.subtitle || 'Conference Schedule'}`;
         }
 
         const isWideWindow = window.innerWidth >= 900;
