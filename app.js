@@ -390,6 +390,7 @@ function getEventTimes(event, currentDelay) {
 }
 
 let activeTimeBefore = null;
+let isInlineTimeCanceled = false;
 
 function handleInlineTimeFocus(e, date, index, type) {
     const day = scheduleData.find(d => d.date === date);
@@ -397,6 +398,7 @@ function handleInlineTimeFocus(e, date, index, type) {
     const event = day.events[index];
     if (!event) return;
 
+    isInlineTimeCanceled = false;
     let cumulativeDelayBefore = 0;
     for (let i = 0; i < index; i++) {
         const { newDelay } = getEventTimes(day.events[i], cumulativeDelayBefore);
@@ -437,6 +439,13 @@ function handleInlineTimeBlur(e, date, index, type) {
     const event = day.events[index];
     if (!event) return;
 
+    if (isInlineTimeCanceled) {
+        e.target.innerText = formatTime(activeTimeBefore);
+        activeTimeBefore = null;
+        isInlineTimeCanceled = false;
+        return;
+    }
+
     const rawText = e.target.innerText.trim();
     const newTime = parseAndNormalizeTimeInput(rawText);
 
@@ -467,7 +476,79 @@ function handleInlineTimeBlur(e, date, index, type) {
 
 function handleInlineTimeKeydown(e, date, index, type) {
     e.stopPropagation();
-    if (e.key === 'Enter') {
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        isInlineTimeCanceled = true;
+        e.target.blur();
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        e.target.blur();
+    }
+}
+
+let activeInlineNameBefore = null;
+let activeInlineSubtitleBefore = null;
+let activeInlineHTMLBefore = null;
+let isInlineTextCanceled = false;
+
+function handleInlineFocus(e, date, index) {
+    const day = scheduleData.find(d => d.date === date);
+    if (!day) return;
+    const event = day.events[index];
+    if (!event) return;
+    isInlineTextCanceled = false;
+    activeInlineNameBefore = event.name || "";
+    activeInlineSubtitleBefore = event.subtitle || "";
+    activeInlineHTMLBefore = e.target.innerHTML;
+}
+
+function handleInlineBlur(e, date, index) {
+    const day = scheduleData.find(d => d.date === date);
+    if (!day) return;
+    const event = day.events[index];
+    if (!event) return;
+
+    if (isInlineTextCanceled) {
+        if (activeInlineHTMLBefore !== null) {
+            e.target.innerHTML = activeInlineHTMLBefore;
+        }
+        activeInlineNameBefore = null;
+        activeInlineSubtitleBefore = null;
+        activeInlineHTMLBefore = null;
+        isInlineTextCanceled = false;
+        return;
+    }
+
+    const speakerEl = e.target.querySelector('.speaker-name');
+    const titleEl = e.target.querySelector('.talk-title');
+
+    let newName = speakerEl ? speakerEl.innerText.trim() : "";
+    let newTitle = titleEl ? titleEl.innerText.trim() : "";
+
+    if (!speakerEl && !titleEl) {
+        const text = e.target.innerText.trim();
+        const lines = text.split('\n').filter(Boolean);
+        newName = lines[0] || "";
+        newTitle = lines.slice(1).join(' ') || "";
+    }
+
+    if (newName !== activeInlineNameBefore || newTitle !== activeInlineSubtitleBefore) {
+        history.push();
+        event.name = newName;
+        event.subtitle = newTitle;
+    }
+    activeInlineNameBefore = null;
+    activeInlineSubtitleBefore = null;
+    activeInlineHTMLBefore = null;
+}
+
+function handleInlineKeydown(e, date, index) {
+    e.stopPropagation();
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        isInlineTextCanceled = true;
+        e.target.blur();
+    } else if (e.key === 'Enter' && e.metaKey) {
         e.preventDefault();
         e.target.blur();
     }
