@@ -14,18 +14,25 @@ This repository (`conference-schedule`) contains the static web application for 
 
 ---
 
-## 2. Commit & GitHub Deployment Protocol
+## 2. Commit & Live Deployment Protocol
 
-Whenever completing requested features, fixes, or schedule updates, always commit and push the changes to GitHub according to the portfolio standard:
+Whenever completing requested features, fixes, or schedule updates, always deploy live and commit/push the changes to GitHub according to the portfolio standard:
 
 1. **Verify Code & Data**:
    - Ensure all JSON datasets (`santander2026.json`, `schedule.json`) are valid JSON using `python3 -m json.tool`.
    - Verify zero console errors or broken syntax in `app.js` and `style.css`.
 
-2. **Git Commit & Push**:
+2. **Deploy Live to Firebase Hosting**:
+   - Deploy the updated application assets live:
+     ```bash
+     npx firebase-tools deploy --only hosting
+     ```
+
+3. **Git Commit & Push**:
    - Run the standard commit and push workflow:
      ```bash
      git add -A
      git commit -m "Conference Schedule v$(date '+%Y-%m-%d %H:%M') — <short description of changes>"
      git push
      ```
+
