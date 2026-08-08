@@ -833,6 +833,29 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             </div>
         ` : '';
 
+        let markerHTML = '';
+        if (!isMultiCol) {
+            const endTimeMarkerHTML = showEndTime ? `
+                <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
+                    <span class="inline-time-badge" contenteditable="true" 
+                          onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
+                          onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
+                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
+                          title="Click to edit end time">${formatTime(actualEnd)}</span>
+                </div>` : '';
+            markerHTML = `
+                <div class="calendar-time-marker" style="top: ${top}px;">
+                    ${originalTimeDisplay}
+                    <span class="inline-time-badge" contenteditable="true" 
+                          onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
+                          onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
+                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
+                          title="Click to edit start time">${formatTime(actualStart)}</span>
+                </div>
+                ${endTimeMarkerHTML}
+            `;
+        }
+
         const inlineHeaderTime = `<span class="inline-time-badge" contenteditable="true" 
                                        onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
                                        onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
