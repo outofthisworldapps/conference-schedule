@@ -812,10 +812,19 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
         const originalTimeDisplay = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
 
+        const endTimeMarkerHTML = showEndTime ? `
+            <div class="calendar-time-marker end-time" style="position: absolute; bottom: 2px; right: 6px; left: auto; top: auto;">
+                <span class="inline-time-badge" contenteditable="true" 
+                      onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
+                      onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
+                      onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
+                      title="Click to edit end time">${formatTime(actualEnd)}</span>
+            </div>` : '';
+
         let markerHTML = '';
         if (!isMultiCol) {
             const endTimeGutter = showEndTime ? `
-                <div class="calendar-time-marker end-time">
+                <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
                     <span class="inline-time-badge" contenteditable="true" 
                           onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
                           onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
@@ -845,19 +854,11 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             : `calc((100% - 25px) / ${numCols} - 4px)`;
         const fontScaleCss = isMultiCol ? 'font-size: 0.85rem;' : '';
 
-        const inlineHeaderTime = `
-            <span class="inline-time-badge" contenteditable="true" 
-                  onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
-                  onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
-                  onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
-                  title="Click to edit start time">${formatTime(actualStart)}</span>
-            <span style="opacity: 0.5;">–</span>
-            <span class="inline-time-badge" contenteditable="true" 
-                  onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
-                  onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
-                  onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
-                  title="Click to edit end time">${formatTime(actualEnd)}</span>
-        `;
+        const inlineHeaderTime = `<span class="inline-time-badge" contenteditable="true" 
+                                       onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
+                                       onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
+                                       onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
+                                       title="Click to edit start time">${formatTime(actualStart)}</span>`;
 
         return `
             ${markerHTML}
@@ -879,7 +880,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                             `).join('')}
                         </div>
                     </div>
-                    <span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>
+                    ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
                 </div>
                 <div class="event-card-text" contenteditable="true" 
                      onfocus="handleInlineFocus(event, '${date}', ${index})" 
@@ -888,6 +889,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                     ${displayName ? `<div class="speaker-name">${esc(displayName)}</div>` : ''}
                     ${talkTitle ? `<div class="talk-title">${esc(talkTitle)}</div>` : ''}
                 </div>
+                ${isMultiCol ? endTimeMarkerHTML : ''}
             </div>
 
         `;
