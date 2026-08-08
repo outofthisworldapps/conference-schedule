@@ -812,18 +812,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
         const originalTimeDisplay = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
 
-        const endTimeMarkerHTML = showEndTime ? `
-            <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
-                <span class="inline-time-badge" contenteditable="true" 
-                      onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
-                      onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
-                      onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
-                      title="Click to edit end time">${formatTime(actualEnd)}</span>
-            </div>` : '';
-
-        const inlineCardEndTimeHTML = showEndTime ? `
-            <div class="event-end-time-row" style="display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 4px; font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">
-                <div class="end-time-black-square" style="width: 10px; height: 10px; background: #000; border-radius: 2px; flex-shrink: 0;"></div>
+        const weekEndTimeMarkerHTML = showEndTime ? `
+            <div class="calendar-event-end-marker" style="position: absolute; top: ${top + height + 2}px; left: calc(${leftCss} + 10px); z-index: ${100 + index}; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; font-family: monospace; color: var(--text-primary);">
+                <div class="end-time-black-square" style="width: 10px; height: 10px; background: #000; border: 1px solid var(--border-color); border-radius: 2px; flex-shrink: 0;"></div>
                 <span class="inline-time-badge" contenteditable="true" 
                       onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
                       onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
@@ -834,6 +825,14 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
 
         let markerHTML = '';
         if (!isMultiCol) {
+            const endTimeMarkerHTML = showEndTime ? `
+                <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
+                    <span class="inline-time-badge" contenteditable="true" 
+                          onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
+                          onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
+                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
+                          title="Click to edit end time">${formatTime(actualEnd)}</span>
+                </div>` : '';
             markerHTML = `
                 <div class="calendar-time-marker" style="top: ${top}px;">
                     ${originalTimeDisplay}
@@ -892,8 +891,8 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                     ${displayName ? `<div class="speaker-name">${esc(displayName)}</div>` : ''}
                     ${talkTitle ? `<div class="talk-title">${esc(talkTitle)}</div>` : ''}
                 </div>
-                ${inlineCardEndTimeHTML}
             </div>
+            ${isMultiCol ? weekEndTimeMarkerHTML : ''}
 
         `;
 
