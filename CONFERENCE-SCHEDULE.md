@@ -73,12 +73,18 @@ Each conference dataset (e.g., `santander2026.json`, `schedule.json`) follows th
 
 ---
 
-## 3. In-Place Inline Text Editing & Undo State
+## 3. In-Place Inline Text & Time Editing (Real-Time Schedule Adjustments)
 
-* Speaker names and talk descriptions reside in a single continuous `.event-card-text` container (`contenteditable="true"`).
-* No pop-up `prompt()` dialogs, no red dashed outline boxes, and zero overlapping element boxes.
-* On focus, `handleInlineFocus` snapshots the current event state.
-* On blur or `Cmd+Enter`, `handleInlineBlur` parses the updated `.speaker-name` and `.talk-title` child elements, updates `scheduleData`, and records history for undo/redo (`Cmd+Z` / `Cmd+Y`).
+* **Inline Text & Title Editing**:
+  * Speaker names and talk descriptions reside in a single continuous `.event-card-text` container (`contenteditable="true"`).
+  * On focus, `handleInlineFocus` snapshots the current event state.
+  * On blur or `Cmd+Enter`, `handleInlineBlur` parses the updated speaker name and talk title child elements, updates `scheduleData`, and records history for undo/redo (`Cmd+Z` / `Cmd+Y`).
+
+* **Inline Time Editing (Single-Day & Week 5-Day Views)**:
+  * Event start and end times display as clickable inline elements (`.inline-time-editor`) on every event card in both single-day and 5-day multi-column week views.
+  * Clicking an inline time tag transforms it into an in-place `contenteditable` span without any browser `prompt()` pop-ups.
+  * Pressing `Enter` saves the new `HH:MM` time. Typing `now` (or pressing `Enter` when blank) automatically sets the start time to the current clock time.
+  * **Real-Time Schedule Cascading**: Adjusting an event's start time forward automatically cascades the delay to all subsequent sessions of the day while letting break/meal buffers absorb delays where possible.
 
 ---
 

@@ -389,6 +389,90 @@ function getEventTimes(event, currentDelay) {
     return { actualStart, actualEnd, newDelay };
 }
 
+let activeTimeBefore = null;
+
+function handleInlineTimeFocus(e, date, index, type) {
+    const day = scheduleData.find(d => d.date === date);
+    if (!day) return;
+    const event = day.events[index];
+    if (!event) return;
+
+    let cumulativeDelayBefore = 0;
+    for (let i = 0; i < index; i++) {
+        const { newDelay } = getEventTimes(day.events[i], cumulativeDelayBefore);
+        cumulativeDelayBefore = newDelay;
+    }
+    const { actualStart, actualEnd } = getEventTimes(event, cumulativeDelayBefore);
+    activeTimeBefore = (type === 'end') ? actualEnd : actualStart;
+}
+
+function parseAndNormalizeTimeInput(rawInput) {
+    if (!rawInput) return null;
+    let input = rawInput.trim().toLowerCase();
+    if (input === 'now' || input === '') {
+        const now = new Date();
+        return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+    // Handle 12-hour format e.g. 9:00am, 2:15pm
+    const twelveHourMatch = input.match(/^(\d{1,2}):(\d{2})\s*([ap]m)?$/);
+    if (twelveHourMatch) {
+        let hours = parseInt(twelveHourMatch[1], 10);
+        const minutes = twelveHourMatch[2];
+        const meridiem = twelveHourMatch[3];
+        if (meridiem === 'pm' && hours < 12) hours += 12;
+        if (meridiem === 'am' && hours === 12) hours = 0;
+        return `${String(hours).padStart(2, '0')}:${minutes}`;
+    }
+    // Standard HH:MM
+    if (/^\d{1,2}:\d{2}$/.test(input)) {
+        const parts = input.split(':');
+        return `${String(parseInt(parts[0], 10)).padStart(2, '0')}:${parts[1]}`;
+    }
+    return null;
+}
+
+function handleInlineTimeBlur(e, date, index, type) {
+    const day = scheduleData.find(d => d.date === date);
+    if (!day) return;
+    const event = day.events[index];
+    if (!event) return;
+
+    const rawText = e.target.innerText.trim();
+    const newTime = parseAndNormalizeTimeInput(rawText);
+
+    if (newTime && newTime !== activeTimeBefore) {
+        history.push();
+        let cumulativeDelayBefore = 0;
+        for (let i = 0; i < index; i++) {
+            const { newDelay } = getEventTimes(day.events[i], cumulativeDelayBefore);
+            cumulativeDelayBefore = newDelay;
+        }
+
+        if (type === 'end') {
+            const effectiveDelay = Math.max(cumulativeDelayBefore, event.delay || 0);
+            const newOriginalEnd = addMinutes(newTime, -effectiveDelay);
+            event.end = newOriginalEnd;
+        } else {
+            const newDelay = getMinutesDiff(newTime, event.start);
+            event.delay = newDelay;
+        }
+        renderSchedule();
+        updateNowLine();
+    } else {
+        // Reset text back to previous valid time if invalid input
+        e.target.innerText = formatTime(activeTimeBefore);
+    }
+    activeTimeBefore = null;
+}
+
+function handleInlineTimeKeydown(e, date, index, type) {
+    e.stopPropagation();
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        e.target.blur();
+    }
+}
+
 function editStartTime(date, index) {
     const day = scheduleData.find(d => d.date === date);
     if (!day) return;
@@ -404,74 +488,15 @@ function editStartTime(date, index) {
     const currentActualStart = addMinutes(event.start, cumulativeDelayBefore + (event.delay || 0));
     let newTimeInput = prompt(`Edit start time for "${event.name || event.title}" (Enter HH:MM or leave blank for 'now'):`, currentActualStart);
     
-    if (newTimeInput !== null && (newTimeInput.toLowerCase() === 'now' || newTimeInput.trim() === '')) {
-        const now = new Date();
-        newTimeInput = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    }
-    
-    if (newTimeInput && /^\d{1,2}:\d{2}$/.test(newTimeInput)) {
+    const parsed = parseAndNormalizeTimeInput(newTimeInput);
+    if (parsed) {
         history.push();
-        // Calculate delay relative to ORIGINAL start time to "pin" it
-        const newDelay = getMinutesDiff(newTimeInput, event.start);
+        const newDelay = getMinutesDiff(parsed, event.start);
         event.delay = newDelay;
-        
         renderSchedule();
         updateNowLine();
     }
 }
-
-let activeInlineNameBefore = null;
-let activeInlineSubtitleBefore = null;
-
-function handleInlineFocus(e, date, index) {
-    const day = scheduleData.find(d => d.date === date);
-    if (!day) return;
-    const event = day.events[index];
-    if (!event) return;
-    activeInlineNameBefore = event.name || "";
-    activeInlineSubtitleBefore = event.subtitle || "";
-}
-
-function handleInlineBlur(e, date, index) {
-    const day = scheduleData.find(d => d.date === date);
-    if (!day) return;
-    const event = day.events[index];
-    if (!event) return;
-
-    const speakerEl = e.target.querySelector('.speaker-name');
-    const titleEl = e.target.querySelector('.talk-title');
-
-    let newName = speakerEl ? speakerEl.innerText.trim() : "";
-    let newTitle = titleEl ? titleEl.innerText.trim() : "";
-
-    if (!speakerEl && !titleEl) {
-        const text = e.target.innerText.trim();
-        const lines = text.split('\n').filter(Boolean);
-        newName = lines[0] || "";
-        newTitle = lines.slice(1).join(' ') || "";
-    }
-
-    if (newName !== activeInlineNameBefore || newTitle !== activeInlineSubtitleBefore) {
-        history.push();
-        event.name = newName;
-        event.subtitle = newTitle;
-    }
-    activeInlineNameBefore = null;
-    activeInlineSubtitleBefore = null;
-}
-
-function handleInlineKeydown(e, date, index) {
-    e.stopPropagation();
-    if (e.key === 'Enter' && e.metaKey) {
-        e.preventDefault();
-        e.target.blur();
-    }
-}
-
-
-function editEventName(date, index) {}
-function editEventSubtitle(date, index) {}
-
 
 function editEndTime(date, index) {
     const day = scheduleData.find(d => d.date === date);
@@ -487,15 +512,11 @@ function editEndTime(date, index) {
     const currentActualEnd = addMinutes(event.end || event.start, effectiveDelay);
 
     const newTimeInput = prompt(`Edit end time for "${event.name || event.title}" (HH:MM):`, currentActualEnd);
-    
-    if (newTimeInput && /^\d{1,2}:\d{2}$/.test(newTimeInput)) {
+    const parsed = parseAndNormalizeTimeInput(newTimeInput);
+    if (parsed) {
         history.push();
-        const newDelay = getMinutesDiff(newTimeInput, event.end || event.start);
-        // We want to update the original end time so that originalEnd + effectiveDelay = newTimeInput
-        // originalEnd = newTimeInput - effectiveDelay
-        const newOriginalEnd = addMinutes(newTimeInput, -effectiveDelay);
+        const newOriginalEnd = addMinutes(parsed, -effectiveDelay);
         event.end = newOriginalEnd;
-        
         renderSchedule();
         updateNowLine();
     }
@@ -707,15 +728,27 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const nextEvent = dayData.events[index + 1];
         const showEndTime = nextEvent ? (nextEvent.start !== event.end) : true;
         
+        const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
+        const originalTimeDisplay = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
+
         let markerHTML = '';
         if (!isMultiCol) {
-            const endTimeGutter = showEndTime ? `<div class="calendar-time-marker end-time clickable" style="top: ${top + height}px;" onclick="editEndTime('${date}', ${index})">${formatTime(actualEnd)}</div>` : '';
-            const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
-            const originalTimeDisplay = isShifted ? `<div class="original-time">${formatTime(event.start)}</div>` : '';
+            const endTimeGutter = showEndTime ? `
+                <div class="calendar-time-marker end-time">
+                    <span class="inline-time-badge" contenteditable="true" 
+                          onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
+                          onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
+                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
+                          title="Click to edit end time">${formatTime(actualEnd)}</span>
+                </div>` : '';
             markerHTML = `
-                <div class="calendar-time-marker clickable" style="top: ${top}px;" onclick="editStartTime('${date}', ${index})">
+                <div class="calendar-time-marker" style="top: ${top}px;">
                     ${originalTimeDisplay}
-                    ${formatTime(actualStart)}
+                    <span class="inline-time-badge" contenteditable="true" 
+                          onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
+                          onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
+                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
+                          title="Click to edit start time">${formatTime(actualStart)}</span>
                 </div>
                 ${endTimeGutter}
             `;
@@ -731,6 +764,11 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             : `calc((100% - 25px) / ${numCols} - 4px)`;
         const fontScaleCss = isMultiCol ? 'font-size: 0.85rem;' : '';
 
+        const inlineHeaderTime = `<span class="inline-time-badge" contenteditable="true" 
+                                       onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
+                                       onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
+                                       onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
+                                       title="Click to edit start time">${formatTime(actualStart)}</span>`;
 
         return `
             ${markerHTML}
@@ -752,7 +790,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                             `).join('')}
                         </div>
                     </div>
-                    ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${formatTime(actualStart)}</span>` : ''}
+                    ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
                 </div>
                 <div class="event-card-text" contenteditable="true" 
                      onfocus="handleInlineFocus(event, '${date}', ${index})" 

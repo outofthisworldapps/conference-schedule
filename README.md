@@ -8,7 +8,7 @@ An interactive, responsive static web application for viewing, managing, and edi
 
 * 🗓️ **All Week 5-Day View**: Displays 5 days side-by-side on wide screens with pixel-perfect alignment.
 * 🔀 **Parallel Track Sessions**: Simultaneous overlapping sessions (e.g., Room A vs. Room B) automatically render side-by-side in sub-columns.
-* ✏️ **In-Place Inline Editing**: Click directly on any speaker name or talk title to edit text in place without annoying pop-up dialogs.
+* ⏱️ **Inline Schedule & Time Editing**: Edit start times, end times, speaker names, and talk titles inline in place across both single-day and 5-day week views (supports typing `now` or pressing Enter for live time updates).
 * 🏷️ **Category Color Swatches**: Color-coded category square swatches (Talks, Workshops, Breaks, Meals, TikTalks) with popover category pickers.
 * 📂 **Multi-Conference Selector**: Toggle between different loaded conference datasets via the absolute **Open** dropdown.
 * ⏱️ **Auto-Scroll to Earliest Event**: Automatically scrolls to the first event of the day upon loading.

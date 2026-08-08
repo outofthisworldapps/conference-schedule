@@ -452,24 +452,31 @@ header a {
     font-size: 0.85rem;
     font-weight: 700;
     z-index: 2;
-    pointer-events: none;
 }
 
-.calendar-time-marker.clickable {
-    pointer-events: auto;
+.inline-time-badge {
+    display: inline-block;
     cursor: pointer;
-    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 1px 3px;
+    border-radius: 3px;
+    outline: none;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
-.calendar-time-marker.clickable:hover {
+.inline-time-badge:hover {
+    background: rgba(255, 71, 87, 0.2);
     color: var(--accent-color);
-    transform: scale(1.1);
+}
+
+.inline-time-badge:focus {
+    background: rgba(255, 71, 87, 0.3);
+    color: #fff;
+    box-shadow: 0 0 0 1px var(--accent-color);
 }
 
 .original-time {
-    position: absolute;
-    top: -12px;
-    right: 0;
+    display: inline-block;
+    margin-right: 4px;
     font-size: 0.7rem;
     color: var(--text-secondary);
     opacity: 0.6;
