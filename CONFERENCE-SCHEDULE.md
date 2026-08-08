@@ -1,6 +1,6 @@
 # Conference Schedule — Technical Specification & Operating Mechanics
 
-This document describes the internal data schema, layout mechanics, state management, and dataset conversion scripts for the **Conference Schedule** web application.
+This document describes the internal data schema, layout mechanics, state management, UI components, and dataset conversion scripts for the **Conference Schedule** web application.
 
 ---
 
@@ -50,26 +50,34 @@ Each conference dataset (e.g., `santander2026.json`, `schedule.json`) follows th
 
 ---
 
-## 2. Layout & Positioning Mechanics
+## 2. Layout, Positioning & Component Mechanics
 
-### 5-Day Multi-Column View
-* On viewports `>= 900px`, `selectedDay === 'all'` sets `gutterWidth = 0`.
-* Each of the 5 days occupies an equal `20%` width column (`0%`, `20%`, `40%`, `60%`, `80%`).
-* Timeline headers pin to the top of `<header class="sticky-header">` while the grid timeline scrolls vertically.
+### Pixel-Perfect 5-Day Multi-Column Layout
+* Wide viewports (`>= 900px`) render 5 day columns side-by-side (`0%` to `100%` width), setting `gutterWidth = 0`.
+* Sticky header date labels pin at top inside `<header class="sticky-header">` while the grid body scrolls.
+* Automatically scrolls to the earliest schedule entry of the day on load.
 
 ### Sub-Column Algorithm for Parallel Track Sessions
-* Parallel track sessions (events running concurrently on the same day, such as Room A and Room B) are detected via time overlap math (`item.startM < other.endM && item.endM > other.startM`).
+* Parallel track sessions (simultaneous events running concurrently on the same day, such as Room A and Room B) are detected via time overlap math (`item.startM < other.endM && item.endM > other.startM`).
 * Overlapping events are grouped into clusters and assigned sub-column indices (`subColIdx`) and total cluster columns (`numCols`).
 * Sub-column width per event is `calc((dayWidth / numCols) - gap)` and left offset is `calc(dayLeft + subColIdx * (dayWidth / numCols))`.
+
+### Category Color Swatches & Popover Picker
+* A compact color square swatch (`10px × 10px`) is placed at top-left before the start time tag (`8:45a`, `9:00a`).
+* Hovering or clicking on the color square displays an absolute popover menu (`.type-options-popover`, `z-index: 2000`) to switch event categories.
+
+### Toolbar Dropdown Overlay
+* Clicking the **Open** button toggles an absolute overlay popover (`.conference-menu-popover`, `z-index: 3000`).
+* Action buttons in the toolbar (`Undo`, `Redo`, `Now`, `Open`, `Load`, `Save`, `Zoom`) never shift position when opening the dropdown.
 
 ---
 
 ## 3. In-Place Inline Text Editing & Undo State
 
-* Speaker names and talk descriptions are rendered in a single unified container (`.event-card-text`) with `contenteditable="true"`.
+* Speaker names and talk descriptions reside in a single continuous `.event-card-text` container (`contenteditable="true"`).
+* No pop-up `prompt()` dialogs, no red dashed outline boxes, and zero overlapping element boxes.
 * On focus, `handleInlineFocus` snapshots the current event state.
-* On blur or `Cmd+Enter`, `handleInlineBlur` parses the updated `.speaker-name` and `.talk-title` child elements, updates `scheduleData`, and pushes an entry to `history.push()`.
-* Supports `Cmd+Z` (Undo) and `Cmd+Y` / `Cmd+Shift+Z` (Redo).
+* On blur or `Cmd+Enter`, `handleInlineBlur` parses the updated `.speaker-name` and `.talk-title` child elements, updates `scheduleData`, and records history for undo/redo (`Cmd+Z` / `Cmd+Y`).
 
 ---
 
