@@ -121,14 +121,23 @@ async function loadConference(fileName) {
 
 async function refreshSpreadsheetData() {
     const btn = document.getElementById('refresh-sheet-btn');
-    if (btn) btn.classList.add('spinning');
+    if (btn) {
+        btn.classList.remove('success-green');
+        btn.classList.add('spinning');
+    }
     
     try {
         await loadConference(currentLoadedFile);
-    } finally {
-        setTimeout(() => {
-            if (btn) btn.classList.remove('spinning');
-        }, 500);
+        if (btn) {
+            btn.classList.remove('spinning');
+            btn.classList.add('success-green');
+            setTimeout(() => {
+                btn.classList.remove('success-green');
+            }, 1500);
+        }
+    } catch (err) {
+        if (btn) btn.classList.remove('spinning');
+        console.error('Refresh failed:', err);
     }
 }
 
