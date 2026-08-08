@@ -8,7 +8,7 @@ This repository (`conference-schedule`) contains the static web application for 
 
 * **App Directory**: `/Users/dcoe/apps/conference-schedule`
 * **GitHub Repository**: [https://github.com/outofthisworldapps/conference-schedule](https://github.com/outofthisworldapps/conference-schedule)
-* **Portfolio Reference**: Refer to [APPS.md](file:///Users/dcoe/apps/APPS.md) for master portfolio allocation and deployment standards.
+* **Portfolio Reference**: Refer to [README.md](README.md) for master portfolio allocation and deployment standards.
 * **App Specifications & Mechanics**: Refer to [CONFERENCE-SCHEDULE.md](CONFERENCE-SCHEDULE.md) for complete technical architecture, layout algorithms, data schemas, and UI behavioral rules.
 * **Tech Stack**: Static Web Application (Vanilla HTML5, CSS3, JavaScript ES6+, JSON Datasets).
 
