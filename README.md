@@ -33,5 +33,6 @@ An interactive, responsive static web application for viewing, managing, and edi
 
 ## 📁 Repository Documentation
 
-* [CONFERENCE-SCHEDULE.md](file:///Users/dcoe/apps/conference-schedule/CONFERENCE-SCHEDULE.md) — Detailed technical documentation, layout engine, data schemas, and operating mechanics
-* [AGENTS.md](file:///Users/dcoe/apps/conference-schedule/AGENTS.md) — System rules and guidelines for AI coding assistants
+* [CONFERENCE-SCHEDULE.md](CONFERENCE-SCHEDULE.md) — Detailed technical documentation, layout engine, data schemas, and operating mechanics
+* [AGENTS.md](AGENTS.md) — System rules and guidelines for AI coding assistants
+
