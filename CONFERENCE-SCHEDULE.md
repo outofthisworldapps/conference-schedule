@@ -12,7 +12,7 @@ Each conference dataset (e.g., `santander2026.json`, `schedule.json`) follows th
 {
   "conference": {
     "id": "santander2026",
-    "title": "Gravitational Lensing in Galaxy Clusters",
+    "title": "JWST through Cluster Lenses",
     "subtitle": "Santander, Spain • 10–14 August 2026",
     "site": "https://sites.google.com/view/lensingsolareclipse26",
     "link": "https://docs.google.com/spreadsheets/d/..."
