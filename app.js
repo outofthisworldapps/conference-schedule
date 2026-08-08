@@ -813,7 +813,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const originalTimeDisplay = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
 
         const endTimeMarkerHTML = showEndTime ? `
-            <div class="calendar-time-marker end-time" style="position: absolute; bottom: 2px; right: 6px; left: auto; top: auto;">
+            <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
                 <span class="inline-time-badge" contenteditable="true" 
                       onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
                       onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
@@ -821,16 +821,19 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                       title="Click to edit end time">${formatTime(actualEnd)}</span>
             </div>` : '';
 
+        const inlineCardEndTimeHTML = showEndTime ? `
+            <div class="event-end-time-row" style="display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 4px; font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">
+                <div class="end-time-black-square" style="width: 10px; height: 10px; background: #000; border-radius: 2px; flex-shrink: 0;"></div>
+                <span class="inline-time-badge" contenteditable="true" 
+                      onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
+                      onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
+                      onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
+                      title="Click to edit end time">${formatTime(actualEnd)}</span>
+            </div>
+        ` : '';
+
         let markerHTML = '';
         if (!isMultiCol) {
-            const endTimeGutter = showEndTime ? `
-                <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
-                    <span class="inline-time-badge" contenteditable="true" 
-                          onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
-                          onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
-                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
-                          title="Click to edit end time">${formatTime(actualEnd)}</span>
-                </div>` : '';
             markerHTML = `
                 <div class="calendar-time-marker" style="top: ${top}px;">
                     ${originalTimeDisplay}
@@ -840,7 +843,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                           onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
                           title="Click to edit start time">${formatTime(actualStart)}</span>
                 </div>
-                ${endTimeGutter}
+                ${endTimeMarkerHTML}
             `;
         }
 
@@ -889,7 +892,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                     ${displayName ? `<div class="speaker-name">${esc(displayName)}</div>` : ''}
                     ${talkTitle ? `<div class="talk-title">${esc(talkTitle)}</div>` : ''}
                 </div>
-                ${isMultiCol ? endTimeMarkerHTML : ''}
+                ${inlineCardEndTimeHTML}
             </div>
 
         `;
