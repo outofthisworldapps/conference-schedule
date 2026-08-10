@@ -543,8 +543,15 @@ function handleInlineTimeFocus(e, date, index, type) {
         const sel = window.getSelection();
         if (sel) {
             const range = document.createRange();
-            range.selectNodeContents(e.target);
-            range.collapse(false);
+            const textNode = e.target.firstChild;
+            if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                const offset = Math.max(0, textNode.nodeValue.length - 1);
+                range.setStart(textNode, offset);
+                range.setEnd(textNode, offset);
+            } else {
+                range.selectNodeContents(e.target);
+                range.collapse(false);
+            }
             sel.removeAllRanges();
             sel.addRange(range);
         }
