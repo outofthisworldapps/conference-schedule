@@ -830,8 +830,8 @@ function renderCalendarView() {
     const gridContainer = document.getElementById('calendar-grid');
     const isAllDays = selectedDay === 'all';
     const dayIndex = isAllDays ? -1 : scheduleData.findIndex(d => d.date === selectedDay);
-    const gutterWidth = isAllDays ? 0 : 'clamp(55px, 18vw, 125px)';
-    gridContainer.style.setProperty('--gutter-width', isAllDays ? '0px' : 'clamp(55px, 18vw, 125px)');
+    const gutterWidth = isAllDays ? '0px' : '96px';
+    gridContainer.style.setProperty('--gutter-width', isAllDays ? '0px' : '96px');
 
     const colHeaderHTML = isAllDays ? `
         <div class="calendar-column-headers" style="display: flex; width: 100%; box-sizing: border-box; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--bg-color); padding: 8px 0; margin-top: 6px;">
@@ -1111,7 +1111,7 @@ function updateNowLine() {
                 const rect = nowLine.getBoundingClientRect();
                 // rect.left is the now-line's actual left edge from viewport
                 // Pill needs to land at x=0 (window left), so offset = -rect.left
-                nowLine.style.setProperty('--pill-offset', `${-rect.left}px`);
+                nowLine.style.setProperty('--pill-offset', `${-rect.left + 6}px`);
             });
         }
         

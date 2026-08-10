@@ -558,7 +558,8 @@ header a {
 
 .calendar-time-marker {
     position: absolute;
-    left: calc(-1 * var(--gutter-width) + 58px);
+    right: 100%;
+    margin-right: 4px;
     top: 0;
     transform: translateY(-100%);
     margin-bottom: 2px;
@@ -568,7 +569,7 @@ header a {
     z-index: 15;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end;
     white-space: nowrap;
     line-height: 1;
 }
@@ -970,7 +971,7 @@ header a {
 #calendar-now-line::before {
     content: attr(data-time);
     position: absolute;
-    left: var(--pill-offset, calc(100vw - var(--gutter-width, 125px)));
+    left: var(--pill-offset, calc(100vw - var(--gutter-width, 96px)));
     top: -12px;
     background: var(--accent-color);
     color: white;
