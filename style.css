@@ -687,6 +687,16 @@ header a {
     width: 100%;
 }
 
+.calendar-event.week-mode-card .event-card-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.calendar-event.week-mode-card .event-header-tag {
+    margin-bottom: 2px;
+}
+
 .event-header-tag {
     display: flex;
     align-items: center;

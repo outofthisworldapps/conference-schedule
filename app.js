@@ -830,11 +830,11 @@ function renderCalendarView() {
     const gridContainer = document.getElementById('calendar-grid');
     const isAllDays = selectedDay === 'all';
     const dayIndex = isAllDays ? -1 : scheduleData.findIndex(d => d.date === selectedDay);
-    const gutterWidth = isAllDays ? '0px' : '88px';
-    gridContainer.style.setProperty('--gutter-width', isAllDays ? '0px' : '88px');
+    const gutterWidth = isAllDays ? '48px' : '88px';
+    gridContainer.style.setProperty('--gutter-width', isAllDays ? '48px' : '88px');
 
     const colHeaderHTML = isAllDays ? `
-        <div class="calendar-column-headers" style="display: flex; width: 100%; box-sizing: border-box; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--bg-color); padding: 8px 0; margin-top: 6px;">
+        <div class="calendar-column-headers" style="display: flex; width: 100%; box-sizing: border-box; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--bg-color); padding: 8px 0; padding-left: var(--gutter-width, 48px); margin-top: 6px;">
             ${scheduleData.map((d, i) => `
                 <div class="col-header-item" style="flex: 1; text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text-primary); border-right: ${i < scheduleData.length - 1 ? '1px solid var(--border-color)' : 'none'}; box-sizing: border-box;">
                     ${d.day}
@@ -880,7 +880,7 @@ function renderCalendarView() {
             ${Array.from({length: endHour - startHour + 1}, (_, i) => {
                 const hour = startHour + i;
                 const top = i * hourHeight;
-                const hourTag = isAllDays ? `<span style="position: absolute; left: 8px; top: -10px; font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.3); background: var(--bg-color); padding: 0 4px; z-index: 5;">${hour}:00</span>` : '';
+                const hourTag = isAllDays ? `<span style="position: absolute; left: calc(-1 * var(--gutter-width, 48px) + 6px); top: -10px; font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.4); z-index: 5;">${hour}:00</span>` : '';
                 return `<div class="hour-line" style="top: ${top}px" data-hour="${hour}:00">${hourTag}</div>`;
             }).join('')}
             
@@ -1036,7 +1036,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
 
         return `
             ${markerHTML}
-            <div class="calendar-event ${typeClass}" style="top: ${top}px; height: ${height}px; left: ${leftCss}; width: ${widthCss}; z-index: ${100 + index}; ${fontScaleCss}" 
+            <div class="calendar-event ${typeClass} ${isMultiCol ? 'week-mode-card' : ''}" style="top: ${top}px; height: ${height}px; left: ${leftCss}; width: ${widthCss}; z-index: ${100 + index}; ${fontScaleCss}" 
                  data-start="${actualStart}" data-end="${actualEnd}">
                 <button class="delete-btn" onclick="deleteEvent('${date}', ${index})" title="Delete event">&times;</button>
                 <div class="event-card-content">
