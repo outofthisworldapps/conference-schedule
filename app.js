@@ -1423,7 +1423,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
 
         return `
             ${markerHTML}
-            <div class="calendar-event ${typeClass} ${isMultiCol ? 'week-mode-card' : ''}" style="top: ${top}px; height: ${height}px; left: ${leftCss}; width: ${widthCss}; z-index: ${100 + index}; ${fontScaleCss}" 
+            <div class="calendar-event ${typeClass} ${isMultiCol ? 'week-mode-card' : ''}" style="top: ${top}px; height: ${height}px; min-height: ${height}px; left: ${leftCss}; width: ${widthCss}; z-index: ${100 + index}; ${fontScaleCss}" 
                  data-start="${actualStart}" data-end="${actualEnd}">
                 <button class="delete-btn" onclick="deleteEvent('${date}', ${index})" title="Delete event">&times;</button>
                 <div class="event-card-content">

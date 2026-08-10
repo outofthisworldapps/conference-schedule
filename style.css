@@ -670,11 +670,39 @@ header a {
 }
 
 .calendar-event:hover {
+    height: auto !important;
     overflow: visible;
     z-index: 1000 !important;
     background: #1e1f26;
-    border-color: var(--accent-color);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+.calendar-event.event-talk:hover {
+    border-color: var(--session-color);
+}
+
+.calendar-event.event-long-talk:hover {
+    border-color: var(--long-talk-color);
+}
+
+.calendar-event.event-tiktalk:hover {
+    border-color: var(--tiktalk-color);
+}
+
+.calendar-event.event-break:hover {
+    border-color: var(--break-color);
+}
+
+.calendar-event.event-meal:hover {
+    border-color: var(--meal-color);
+}
+
+.calendar-event.event-social:hover {
+    border-color: var(--social-color);
+}
+
+.calendar-event.event-workshop:hover {
+    border-color: var(--workshop-color);
 }
 
 .event-card-content {
