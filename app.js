@@ -1515,7 +1515,7 @@ function updateNowLine() {
             const height = remainingMins * pixelsPerMinute;
             remainingLine.style.display = 'flex';
             remainingLine.style.height = `${height}px`;
-            remainingLine.setAttribute('data-remaining', `${remainingMins}m remaining`);
+            remainingLine.setAttribute('data-remaining', remainingMins);
         } else {
             remainingLine.style.display = 'none';
         }
