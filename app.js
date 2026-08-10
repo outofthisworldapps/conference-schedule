@@ -71,11 +71,27 @@ async function init() {
 }
 
 
-let currentLoadedFile = 'santander2026.json';
+async function loadAppVersion() {
+    try {
+        const response = await fetch(`version.json?t=${Date.now()}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data && data.version) {
+                const badgeEl = document.getElementById('app-version-badge');
+                if (badgeEl) {
+                    badgeEl.textContent = `v ${data.version}`;
+                }
+            }
+        }
+    } catch (err) {
+        console.warn('Could not load version.json:', err);
+    }
+}
 
 async function loadConference(fileName) {
     try {
         currentLoadedFile = fileName;
+        await loadAppVersion();
         const response = await fetch(`${fileName}?t=${Date.now()}`);
         const data = await response.json();
         scheduleData = data.scheduleData || [];
