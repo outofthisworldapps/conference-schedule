@@ -929,7 +929,7 @@ header a {
 #calendar-now-line::before {
     content: attr(data-time);
     position: absolute;
-    left: calc(100vw - var(--gutter-width, 125px));
+    left: var(--pill-offset, calc(100vw - var(--gutter-width, 125px)));
     top: -12px;
     background: var(--accent-color);
     color: white;
