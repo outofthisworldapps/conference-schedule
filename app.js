@@ -111,16 +111,21 @@ async function loadConference(fileName) {
             if (data.conference.title) document.title = `${data.conference.title} | ${data.conference.subtitle || 'Conference Schedule'}`;
         }
 
-        const isWideWindow = window.innerWidth >= 900;
-        if (isWideWindow) {
-            selectedDay = 'all';
+        const savedDay = localStorage.getItem('cs_selected_day');
+        if (savedDay && (savedDay === 'all' || scheduleData.some(d => d.date === savedDay))) {
+            selectedDay = savedDay;
         } else {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const hasToday = scheduleData.some(d => d.date === todayStr);
-            if (hasToday) {
-                selectedDay = todayStr;
-            } else if (scheduleData.length > 0) {
-                selectedDay = scheduleData[0].date;
+            const isWideWindow = window.innerWidth >= 900;
+            if (isWideWindow) {
+                selectedDay = 'all';
+            } else {
+                const todayStr = new Date().toISOString().split('T')[0];
+                const hasToday = scheduleData.some(d => d.date === todayStr);
+                if (hasToday) {
+                    selectedDay = todayStr;
+                } else if (scheduleData.length > 0) {
+                    selectedDay = scheduleData[0].date;
+                }
             }
         }
 
@@ -1056,6 +1061,9 @@ function scrollToNow() {
 
 function setSelectedDay(date) {
     selectedDay = date;
+    try {
+        localStorage.setItem('cs_selected_day', date);
+    } catch (e) {}
     renderSchedule();
 }
 
