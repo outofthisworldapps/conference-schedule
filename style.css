@@ -554,7 +554,7 @@ header a {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding-right: 3px;
+    padding-right: 0px;
     line-height: 1;
 }
 
