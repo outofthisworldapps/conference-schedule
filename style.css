@@ -109,10 +109,7 @@ body {
     .header-left-brand {
         position: static;
         padding-top: 0.35rem;
-        flex-direction: row;
-        align-items: baseline;
-        justify-content: center;
-        gap: 6px;
+        align-items: center;
         text-align: center;
     }
 }
@@ -546,25 +543,18 @@ header a {
 
 .calendar-time-marker {
     position: absolute;
-    left: -135px;
-    width: 125px;
+    left: -60px;
     top: -10px;
     color: var(--text-primary);
     font-size: 0.85rem;
     font-weight: 700;
     z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    white-space: nowrap;
-    text-align: right;
 }
 
 .inline-time-badge {
     display: inline-block;
     cursor: pointer;
-    padding: 1px 4px;
+    padding: 1px 3px;
     border-radius: 3px;
     outline: none;
     transition: background 0.15s ease, color 0.15s ease;
@@ -583,9 +573,10 @@ header a {
 
 .original-time {
     display: inline-block;
-    font-size: 0.72rem;
+    margin-right: 4px;
+    font-size: 0.7rem;
     color: var(--text-secondary);
-    opacity: 0.55;
+    opacity: 0.6;
     text-decoration: line-through;
     white-space: nowrap;
 }
@@ -917,11 +908,11 @@ header a {
 
 #calendar-now-line {
     position: absolute;
-    left: 0;
+    left: -80px;
     right: 0;
     height: 3px;
     background: var(--accent-color);
-    z-index: 20;
+    z-index: 2;
     pointer-events: none;
     box-shadow: 0 0 20px 2px var(--accent-color);
     /* Stronger glow */
@@ -930,15 +921,14 @@ header a {
 #calendar-now-line::before {
     content: attr(data-time);
     position: absolute;
-    left: -110px;
+    left: -75px;
     top: -12px;
     background: var(--accent-color);
     color: white;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 900;
-    padding: 2px 7px;
+    padding: 2px 6px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(255, 71, 87, 0.6);
 }
 
 /* Day Selection for Calendar */
