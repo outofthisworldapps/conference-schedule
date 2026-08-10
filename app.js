@@ -558,12 +558,18 @@ function handleInlineTimeFocus(e, date, index, type) {
     }, 0);
 }
 
-function parseAndNormalizeTimeInput(rawInput) {
+function parseAndNormalizeTimeInput(rawInput, referenceTime = null) {
     if (!rawInput) return null;
     let input = rawInput.trim().toLowerCase();
     if (input === 'now' || input === '') {
         const now = new Date();
         return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+
+    let isRefPM = false;
+    if (referenceTime) {
+        const [refH] = referenceTime.split(':').map(Number);
+        if (refH >= 12) isRefPM = true;
     }
 
     // Handle standard H:MM or HH:MM with optional meridiem (e.g. 9:02a, 9:02am, 2:15p, 2:15pm)
@@ -572,8 +578,14 @@ function parseAndNormalizeTimeInput(rawInput) {
         let hours = parseInt(twelveHourMatch[1], 10);
         const minutes = twelveHourMatch[2];
         const meridiem = twelveHourMatch[3];
-        if (meridiem && meridiem.startsWith('p') && hours < 12) hours += 12;
-        if (meridiem && meridiem.startsWith('a') && hours === 12) hours = 0;
+        if (meridiem) {
+            if (meridiem.startsWith('p') && hours < 12) hours += 12;
+            if (meridiem.startsWith('a') && hours === 12) hours = 0;
+        } else {
+            if (hours < 12 && (isRefPM || hours <= 7)) {
+                hours += 12;
+            }
+        }
         return `${String(hours).padStart(2, '0')}:${minutes}`;
     }
 
@@ -584,15 +596,25 @@ function parseAndNormalizeTimeInput(rawInput) {
         const meridiem = compactMatch[2];
         let hours = parseInt(digits.length === 3 ? digits.slice(0, 1) : digits.slice(0, 2), 10);
         const minutes = digits.slice(-2);
-        if (meridiem && meridiem.startsWith('p') && hours < 12) hours += 12;
-        if (meridiem && meridiem.startsWith('a') && hours === 12) hours = 0;
+        if (meridiem) {
+            if (meridiem.startsWith('p') && hours < 12) hours += 12;
+            if (meridiem.startsWith('a') && hours === 12) hours = 0;
+        } else {
+            if (hours < 12 && (isRefPM || hours <= 7)) {
+                hours += 12;
+            }
+        }
         return `${String(hours).padStart(2, '0')}:${minutes}`;
     }
 
     // Standard HH:MM
     if (/^\d{1,2}:\d{2}$/.test(input)) {
         const parts = input.split(':');
-        return `${String(parseInt(parts[0], 10)).padStart(2, '0')}:${parts[1]}`;
+        let hours = parseInt(parts[0], 10);
+        if (hours < 12 && (isRefPM || hours <= 7)) {
+            hours += 12;
+        }
+        return `${String(hours).padStart(2, '0')}:${parts[1]}`;
     }
     return null;
 }
@@ -611,7 +633,7 @@ function handleInlineTimeBlur(e, date, index, type) {
     }
 
     const rawText = e.target.innerText.trim();
-    const newTime = parseAndNormalizeTimeInput(rawText);
+    const newTime = parseAndNormalizeTimeInput(rawText, activeTimeBefore);
 
     if (newTime && newTime !== activeTimeBefore) {
         history.push();
@@ -626,8 +648,13 @@ function handleInlineTimeBlur(e, date, index, type) {
             const newOriginalEnd = addMinutes(newTime, -effectiveDelay);
             event.end = newOriginalEnd;
         } else {
-            const newDelay = getMinutesDiff(newTime, event.start);
-            event.delay = newDelay;
+            const targetOriginalStart = addMinutes(newTime, -cumulativeDelayBefore);
+            const currentDuration = getMinutesDiff(event.end || event.start, event.start);
+            event.start = targetOriginalStart;
+            event.delay = 0;
+            if (!isBufferEvent(event)) {
+                event.end = addMinutes(targetOriginalStart, currentDuration);
+            }
         }
         renderSchedule();
         updateNowLine();
@@ -797,7 +824,7 @@ function editStartTime(date, index) {
     const { actualStart } = getEventTimes(event, cumulativeDelayBefore);
     let newTimeInput = prompt(`Edit start time for "${event.name || event.title}" (Enter HH:MM or leave blank for 'now'):`, actualStart);
     
-    const parsed = parseAndNormalizeTimeInput(newTimeInput);
+    const parsed = parseAndNormalizeTimeInput(newTimeInput, actualStart);
     if (parsed) {
         history.push();
         const targetOriginalStart = addMinutes(parsed, -cumulativeDelayBefore);
@@ -826,7 +853,7 @@ function editEndTime(date, index) {
     const currentActualEnd = addMinutes(event.end || event.start, effectiveDelay);
 
     const newTimeInput = prompt(`Edit end time for "${event.name || event.title}" (HH:MM):`, currentActualEnd);
-    const parsed = parseAndNormalizeTimeInput(newTimeInput);
+    const parsed = parseAndNormalizeTimeInput(newTimeInput, currentActualEnd);
     if (parsed) {
         history.push();
         const newOriginalEnd = addMinutes(parsed, -effectiveDelay);
@@ -845,43 +872,38 @@ function deleteEvent(date, index) {
     if (confirm(`Are you sure you want to delete "${event.name || event.title}"?`)) {
         history.push();
         
-        let cumulativeDelayBefore = 0;
-        for (let i = 0; i < index; i++) {
-            const { newDelay } = getEventTimes(day.events[i], cumulativeDelayBefore);
-            cumulativeDelayBefore = newDelay;
-        }
-        const { actualStart, actualEnd } = getEventTimes(event, cumulativeDelayBefore);
-        const deletedDuration = getMinutesDiff(actualEnd, actualStart);
-        const deletedStart = actualStart;
+        const prevBaseEnd = index > 0 
+            ? (day.events[index - 1].end || day.events[index - 1].start) 
+            : event.start;
+        const deletedDuration = getMinutesDiff(event.end || event.start, event.start);
 
         day.events.splice(index, 1);
 
         // Fill freed space by shifting subsequent events or expanding next buffer/break event
         if (index < day.events.length) {
             let i = index;
-            let currentGapToClose = deletedDuration;
-            let firstShiftedStart = deletedStart;
+            let currentBaseStart = prevBaseEnd;
 
             while (i < day.events.length) {
                 const nextEv = day.events[i];
                 if (isBufferEvent(nextEv)) {
                     if (i === index) {
-                        nextEv.start = firstShiftedStart;
+                        nextEv.start = currentBaseStart;
                     } else {
-                        nextEv.start = addMinutes(nextEv.start, -currentGapToClose);
+                        nextEv.start = addMinutes(nextEv.start, -deletedDuration);
                     }
                     nextEv.delay = 0;
                     break;
                 } else {
                     const evDuration = getMinutesDiff(nextEv.end || nextEv.start, nextEv.start);
                     if (i === index) {
-                        nextEv.start = firstShiftedStart;
+                        nextEv.start = currentBaseStart;
                     } else {
-                        nextEv.start = addMinutes(nextEv.start, -currentGapToClose);
+                        nextEv.start = addMinutes(nextEv.start, -deletedDuration);
                     }
                     nextEv.end = addMinutes(nextEv.start, evDuration);
                     nextEv.delay = 0;
-                    firstShiftedStart = nextEv.end;
+                    currentBaseStart = nextEv.end;
                     i++;
                 }
             }
