@@ -1012,8 +1012,8 @@ function updateNowLine() {
                 nowLine.style.width = `calc(${colWidthPercent}% - 4px)`;
             }
         } else {
-            nowLine.style.left = '0';
-            nowLine.style.width = '100%';
+            nowLine.style.left = '120px';
+            nowLine.style.width = 'calc(100% - 125px)';
         }
         
         document.querySelectorAll('.calendar-event').forEach(el => {

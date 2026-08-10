@@ -546,8 +546,8 @@ header a {
 
 .calendar-time-marker {
     position: absolute;
-    left: -115px;
-    width: 105px;
+    left: -135px;
+    width: 125px;
     top: -10px;
     color: var(--text-primary);
     font-size: 0.85rem;
@@ -917,7 +917,7 @@ header a {
 
 #calendar-now-line {
     position: absolute;
-    left: -180px;
+    left: 0;
     right: 0;
     height: 3px;
     background: var(--accent-color);
@@ -930,7 +930,7 @@ header a {
 #calendar-now-line::before {
     content: attr(data-time);
     position: absolute;
-    left: -170px;
+    left: -200px;
     top: -12px;
     background: var(--accent-color);
     color: white;
