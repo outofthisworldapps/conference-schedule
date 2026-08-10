@@ -1013,10 +1013,8 @@ function updateNowLine() {
                 nowLine.style.width = `calc(${colWidthPercent}% - 4px)`;
             }
         } else {
-            const gridEl = document.getElementById('calendar-grid');
-            const gutter = gridEl ? getComputedStyle(gridEl).getPropertyValue('--gutter-width').trim() || '125px' : '125px';
-            nowLine.style.left = `calc(-1 * ${gutter})`;
-            nowLine.style.width = `calc(100% + ${gutter})`;
+            nowLine.style.left = '-100vw';
+            nowLine.style.width = 'calc(100% + 100vw)';
         }
         
         document.querySelectorAll('.calendar-event').forEach(el => {
