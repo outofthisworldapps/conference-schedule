@@ -196,32 +196,44 @@ function scrollToEarliestEvent() {
 }
 
 
-function selectConferenceOption(jsonFile) {
-    loadConference(jsonFile);
-    const menu = document.getElementById('conference-dropdown-menu');
-    if (menu) menu.style.display = 'none';
+async function reloadLatestSchedule() {
+    try {
+        const response = await fetch('/api/latest-schedule');
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            alert(errData.error || 'Failed to reload latest schedule');
+            return;
+        }
+        const data = await response.json();
+        if (data && data.scheduleData) {
+            history.push();
+            scheduleData = data.scheduleData;
+            if (data.conference) {
+                const titleEl = document.getElementById('header-title');
+                const titleLinkEl = document.getElementById('header-title-link');
+                const subEl = document.getElementById('header-subtitle');
+                const subLinkEl = document.getElementById('header-subtitle-link');
+
+                if (titleEl && data.conference.title) titleEl.textContent = data.conference.title;
+                if (titleLinkEl && (data.conference.site || data.conference.link)) {
+                    titleLinkEl.href = data.conference.site || data.conference.link;
+                }
+                if (subEl && data.conference.subtitle) subEl.textContent = data.conference.subtitle;
+                if (subLinkEl && data.conference.link) subLinkEl.href = data.conference.link;
+                if (data.conference.title) document.title = `${data.conference.title} | ${data.conference.subtitle || 'Conference Schedule'}`;
+            }
+            renderSchedule();
+            updateNowLine();
+        } else {
+            alert('Invalid schedule data found in latest downloaded file');
+        }
+    } catch (err) {
+        console.error('Error reloading schedule:', err);
+        alert('Could not reload schedule file.');
+    }
 }
 
 function setupEventListeners() {
-    const openBtn = document.getElementById('open-btn');
-    const menu = document.getElementById('conference-dropdown-menu');
-
-    if (openBtn && menu) {
-        openBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isHidden = menu.style.display === 'none';
-            menu.style.display = isHidden ? 'flex' : 'none';
-        });
-
-        document.addEventListener('click', (e) => {
-            if (menu && !menu.contains(e.target) && e.target !== openBtn) {
-                menu.style.display = 'none';
-            }
-        });
-    }
-
-
-
     const refreshBtn = document.getElementById('refresh-sheet-btn');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', refreshSpreadsheetData);
@@ -230,6 +242,7 @@ function setupEventListeners() {
     document.getElementById('undo-btn').addEventListener('click', () => history.undo());
     document.getElementById('redo-btn').addEventListener('click', () => history.redo());
     document.getElementById('save-btn').addEventListener('click', saveSchedule);
+    document.getElementById('reload-btn').addEventListener('click', reloadLatestSchedule);
     document.getElementById('load-btn').addEventListener('click', () => document.getElementById('file-input').click());
     document.getElementById('file-input').addEventListener('change', loadSchedule);
     document.getElementById('now-btn').addEventListener('click', scrollToNow);
