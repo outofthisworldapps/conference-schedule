@@ -403,6 +403,35 @@ function mergeDelaysFromExisting(parsedDays, existingData) {
     return parsedDays;
 }
 
+function showToastNotification(message, durationMs = 3500) {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-dialog';
+    toast.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>${message}</span>
+    `;
+    container.appendChild(toast);
+    
+    // Trigger animation
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    }, durationMs);
+}
+
 async function refreshSpreadsheetData() {
     const btn = document.getElementById('refresh-sheet-btn');
     if (btn) {
@@ -416,7 +445,8 @@ async function refreshSpreadsheetData() {
         if (!sheetUrl) {
             sheetUrl = 'https://docs.google.com/spreadsheets/d/1p3W5hhR0__uw-OXQKKvQCH5iqJExd2gtVdr9JRnWopk';
         }
-        const csvUrl = sheetUrl.replace(/\/edit.*$/, '').replace(/\/*$/, '') + '/export?format=csv&t=' + Date.now();
+        const cleanSheetUrl = sheetUrl.replace(/\/edit.*$/, '').replace(/\/*$/, '');
+        const csvUrl = cleanSheetUrl + '/export?format=csv&t=' + Date.now();
 
         const resp = await fetch(csvUrl);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -445,6 +475,8 @@ async function refreshSpreadsheetData() {
             btn.classList.add('success-green');
             setTimeout(() => btn.classList.remove('success-green'), 2000);
         }
+
+        showToastNotification(`Reloaded <a href="${cleanSheetUrl}" target="_blank">${cleanSheetUrl}</a>`, 4000);
     } catch (err) {
         if (btn) btn.classList.remove('spinning');
         console.error('Refresh from Google Sheet failed:', err);
