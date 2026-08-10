@@ -1356,6 +1356,11 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         
         const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
         const originalTimeDisplay = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
+        const inlineHeaderTime = `<span class="inline-time-badge" contenteditable="true" 
+              onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
+              onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
+              onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
+              title="Click to edit start time">${formatTime(actualStart)}</span>`;
 
         const [osh, osm] = event.start.split(':').map(Number);
         const origTop = ((osh - startHour) * 60 + osm) * pixelsPerMinute;
