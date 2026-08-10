@@ -558,7 +558,7 @@ header a {
 
 .calendar-time-marker {
     position: absolute;
-    right: 100%;
+    left: calc(-1 * var(--gutter-width) + 58px);
     top: 0;
     transform: translateY(-100%);
     margin-bottom: 2px;
@@ -568,9 +568,7 @@ header a {
     z-index: 15;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    margin-right: 0px;
-    padding-right: 0px;
+    justify-content: flex-start;
     white-space: nowrap;
     line-height: 1;
 }
