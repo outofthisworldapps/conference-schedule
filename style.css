@@ -916,7 +916,7 @@ header a {
 
 #calendar-now-line {
     position: absolute;
-    left: -80px;
+    left: -125px;
     right: 0;
     height: 3px;
     background: var(--accent-color);
@@ -929,7 +929,7 @@ header a {
 #calendar-now-line::before {
     content: attr(data-time);
     position: absolute;
-    left: -75px;
+    left: 0;
     top: -12px;
     background: var(--accent-color);
     color: white;
