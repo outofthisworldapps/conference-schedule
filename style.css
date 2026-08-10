@@ -544,14 +544,15 @@ header a {
 .calendar-time-marker {
     position: absolute;
     left: -60px;
-    top: -17px;
+    top: 0;
+    transform: translateY(-50%);
     color: var(--text-primary);
     font-size: 0.85rem;
     font-weight: 700;
     z-index: 2;
     display: flex;
     align-items: center;
-    height: 24px;
+    line-height: 1;
 }
 
 .inline-time-badge {
