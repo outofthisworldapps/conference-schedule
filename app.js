@@ -1095,18 +1095,8 @@ function updateNowLine() {
         nowLine.style.top = `${top}px`;
         nowLine.setAttribute('data-time', formatTime(timeStr));
 
-        if (isAllDays) {
-            const colIdx = scheduleData.findIndex(d => d.date === todayStr);
-            if (colIdx >= 0) {
-                const colWidthPercent = 100 / scheduleData.length;
-                const colLeftPercent = colIdx * colWidthPercent;
-                nowLine.style.left = `calc(${colLeftPercent}% + 2px)`;
-                nowLine.style.width = `calc(${colWidthPercent}% - 4px)`;
-            }
-        } else {
-            nowLine.style.left = 'calc(-1 * var(--gutter-width, 88px))';
-            nowLine.style.width = 'calc(100% + var(--gutter-width, 88px))';
-        }
+        nowLine.style.left = 'calc(-1 * var(--gutter-width, 48px))';
+        nowLine.style.width = 'calc(100% + var(--gutter-width, 48px))';
         
         document.querySelectorAll('.calendar-event').forEach(el => {
             const [sh, sm] = el.dataset.start.split(':').map(Number);
