@@ -588,9 +588,15 @@ header a {
 }
 
 .inline-time-badge:focus {
-    background: rgba(255, 71, 87, 0.25);
+    background: #18191f;
     color: var(--accent-color);
-    box-shadow: 0 0 0 1px var(--accent-color);
+    box-shadow: 0 0 0 1.5px var(--accent-color);
+    position: relative;
+    z-index: 100 !important;
+}
+
+.calendar-time-marker:has(.inline-time-badge:focus) {
+    z-index: 100 !important;
 }
 
 .original-time {

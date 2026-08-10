@@ -1351,8 +1351,8 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         else if (currentType === 'session') typeClass = duration > 20 ? 'event-long-talk' : 'event-talk';
         else if (currentType === 'long-talk') typeClass = 'event-long-talk';
 
-        const nextEvent = dayData.events[index + 1];
-        const showEndTime = nextEvent ? (nextEvent.start !== event.end) : true;
+        const nextItem = computedItems[index + 1];
+        const showEndTime = nextItem ? (nextItem.actualStart !== actualEnd) : true;
         
         const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
         const originalTimeDisplay = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
