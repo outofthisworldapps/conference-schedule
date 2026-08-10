@@ -178,17 +178,35 @@ header a:hover .header-icon {
     border: none;
     color: var(--text-secondary);
     cursor: pointer;
-    padding: 4px;
+    padding: 3px 6px;
     border-radius: 6px;
     display: inline-flex;
     align-items: center;
+    gap: 4px;
     justify-content: center;
     transition: color 0.3s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.refresh-btn-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.8;
 }
 
 .refresh-icon-btn:hover {
     color: var(--accent-color);
     background: rgba(255, 255, 255, 0.06);
+}
+
+/* JSON button gets a muted green tint so it reads as "local/secondary" */
+.reload-json-btn {
+    color: #74b9a0;
+}
+.reload-json-btn:hover {
+    color: #2ed573;
+    background: rgba(46, 213, 115, 0.08);
 }
 
 .refresh-icon-btn.spinning svg {

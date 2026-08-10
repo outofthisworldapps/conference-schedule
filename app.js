@@ -120,6 +120,8 @@ async function loadConference(fileName, forceRefresh = false) {
         } else {
             const response = await fetch(`${fileName}?t=${Date.now()}`);
             const data = await response.json();
+            // Stash the conference metadata for use by the CSV refresh function.
+            if (data.conference) conferenceConfig = data.conference;
             scheduleData = normalizeEvents(data.scheduleData || []);
             if (data.zoom && !savedZoom) {
                 const jsonZoom = parseInt(data.zoom, 10);
@@ -161,29 +163,246 @@ async function loadConference(fileName, forceRefresh = false) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Google Sheets live-sync
+// ---------------------------------------------------------------------------
+
+// Parse a raw CSV line, respecting double-quoted fields (may contain commas/newlines).
+function parseCSVLine(line) {
+    const fields = [];
+    let cur = '', inQuote = false;
+    for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuote) {
+            if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+            else if (ch === '"') { inQuote = false; }
+            else { cur += ch; }
+        } else {
+            if (ch === '"') { inQuote = true; }
+            else if (ch === ',') { fields.push(cur.trim()); cur = ''; }
+            else { cur += ch; }
+        }
+    }
+    fields.push(cur.trim());
+    return fields;
+}
+
+// Day-header patterns like "MONDAY · 10 August" or "THURSDAY · 13 August — Room A..."
+const DAY_HEADER_RE = /^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)/i;
+const MONTH_NAMES = ['January','February','March','April','May','June',
+                     'July','August','September','October','November','December'];
+
+function parseDayHeader(text) {
+    // Extract day-of-week and "10 August" → date string
+    const m = text.match(/(\d{1,2})\s+(\w+)/);
+    if (!m) return null;
+    const dayNum = parseInt(m[1], 10);
+    const monthIdx = MONTH_NAMES.findIndex(mn => m[2].toLowerCase().startsWith(mn.toLowerCase()));
+    if (monthIdx === -1) return null;
+    // Infer year from conference config (fall back to current year)
+    const year = conferenceConfig ? new Date(conferenceConfig.date || Date.now()).getFullYear() : new Date().getFullYear();
+    const date = new Date(year, monthIdx, dayNum);
+    const yyyy = date.getFullYear();
+    const mm   = String(date.getMonth() + 1).padStart(2, '0');
+    const dd   = String(date.getDate()).padStart(2, '0');
+    // Human-readable day string
+    const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    return {
+        day:  `${dayNames[date.getDay()]}, ${MONTH_NAMES[monthIdx]} ${dayNum}`,
+        date: `${yyyy}-${mm}-${dd}`
+    };
+}
+
+// Map spreadsheet Type column → our internal event type.
+function sheetTypeToEventType(typeVal, speakerVal) {
+    const t = (typeVal || '').toLowerCase();
+    const s = (speakerVal || '').toLowerCase();
+    if (t === 'invited') return 'long-talk';
+    if (t === 'talk')    return 'session';
+    if (t === 'flash')   return 'tiktalk';
+    if (t === 'discussion' || t === 'overview' || t === 'status') return 'workshop';
+    if (t === 'session') return 'session';   // session-header row
+    if (s.includes('coffee') || s.includes('lunch') || s.includes('dinner') || s.includes('buffet') || s.includes('break')) return 'break';
+    if (s.includes('reception') || s.includes('excursion') || s.includes('eclipse') || s.includes('dinner')) return 'social';
+    if (typeVal === '—' || typeVal === '-') {
+        if (s.includes('coffee') || s.includes('lunch') || s.includes('dinner') || s.includes('buffet') || s.includes('open')) return 'break';
+        if (s.includes('reception') || s.includes('excursion') || s.includes('eclipse')) return 'social';
+    }
+    return 'session';
+}
+
+// Normalise a time string like "9:00" → "09:00"
+function normTime(t) {
+    if (!t) return null;
+    const parts = t.trim().split(':');
+    if (parts.length !== 2) return null;
+    return `${String(parseInt(parts[0], 10)).padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+}
+
+// Main CSV → scheduleData parser.
+function parseGoogleSheetCSV(csvText) {
+    // Split into lines while keeping quoted newlines intact.
+    const lines = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < csvText.length; i++) {
+        const ch = csvText[i];
+        if (inQ) {
+            if (ch === '"' && csvText[i+1] === '"') { cur += '"'; i++; }
+            else if (ch === '"') { inQ = false; cur += ch; }
+            else { cur += ch; }
+        } else {
+            if (ch === '"') { inQ = true; cur += ch; }
+            else if (ch === '\n') { lines.push(cur); cur = ''; }
+            else { cur += ch; }
+        }
+    }
+    if (cur) lines.push(cur);
+
+    const days = [];
+    let currentDay = null;
+    let lastTime = null;
+
+    for (const rawLine of lines) {
+        const line = rawLine.replace(/\r$/, '');
+        if (!line.trim()) continue;
+
+        const [timeRaw, durRaw, room, typeCol, speakerCol, titleCol] = parseCSVLine(line);
+
+        // Skip the fixed header rows.
+        if (!timeRaw || timeRaw.toLowerCase() === 'time') continue;
+        if (typeCol === 'Type' || speakerCol === 'Speaker') continue;
+
+        // Day separator row  e.g. "MONDAY · 10 August"
+        if (DAY_HEADER_RE.test(timeRaw)) {
+            const parsed = parseDayHeader(timeRaw);
+            if (parsed) {
+                currentDay = { day: parsed.day, date: parsed.date, events: [] };
+                days.push(currentDay);
+                lastTime = null;
+            }
+            continue;
+        }
+
+        if (!currentDay) continue;
+
+        const startTime = normTime(timeRaw);
+        if (!startTime) continue;
+        lastTime = startTime;
+
+        const durMins = parseInt(durRaw, 10) || 0;
+        const endTime  = durMins > 0 ? addMinutes(startTime, durMins) : startTime;
+
+        // Session-header row: type === "Session" with no meaningful speaker
+        // These describe a block label + chair. Render as a compact session marker.
+        const isSessionHeader = (typeCol === 'Session') && speakerCol && !durRaw;
+
+        let name, subtitle, evType;
+
+        if (isSessionHeader) {
+            // e.g. "S1 · Reionization & High-z Galaxies (1)" with chair in title
+            name     = speakerCol;     // session name
+            subtitle = titleCol;       // chair line
+            evType   = 'session';
+        } else {
+            const rawType = typeCol || '—';
+            evType = sheetTypeToEventType(rawType, speakerCol);
+
+            // Break / social rows: speaker column IS the event name
+            if (evType === 'break' || evType === 'social' || evType === 'meal') {
+                name     = speakerCol || rawType;
+                subtitle = titleCol || '';
+            } else {
+                name     = speakerCol || '';
+                // Prefix room tag for parallel sessions
+                const roomTag = (room && room !== 'Plenary' && room !== '') ? `[${room}] ` : '';
+                subtitle = roomTag + (titleCol || '');
+            }
+        }
+
+        // Skip zero-duration placeholder rows (duration === 0 AND already have a talk at same time)
+        if (durMins === 0 && !isSessionHeader && currentDay.events.some(e => e.start === startTime && e.type !== 'session')) {
+            continue;
+        }
+
+        currentDay.events.push({
+            start:    startTime,
+            end:      endTime,
+            name:     name.trim(),
+            subtitle: subtitle.trim(),
+            type:     evType
+        });
+    }
+
+    return days;
+}
+
+// Pull conferenceConfig from the loaded JSON so the CSV parser can infer the year.
+let conferenceConfig = null;
+
 async function refreshSpreadsheetData() {
     const btn = document.getElementById('refresh-sheet-btn');
     if (btn) {
         btn.classList.remove('success-green');
         btn.classList.add('spinning');
     }
-    
+
     try {
-        // Clear the localStorage cache so we always fetch fresh data from the JSON file.
+        // Read the spreadsheet link from the already-loaded conference config.
+        let sheetUrl = conferenceConfig && conferenceConfig.link;
+        if (!sheetUrl) {
+            // Fall back to santander default
+            sheetUrl = 'https://docs.google.com/spreadsheets/d/1p3W5hhR0__uw-OXQKKvQCH5iqJExd2gtVdr9JRnWopk';
+        }
+        // Convert a regular /spreadsheets/d/<ID> URL to a CSV export URL.
+        const csvUrl = sheetUrl.replace(/\/edit.*$/, '').replace(/\/*$/, '') + '/export?format=csv&t=' + Date.now();
+
+        const resp = await fetch(csvUrl);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const csvText = await resp.text();
+
+        const parsed = parseGoogleSheetCSV(csvText);
+        if (!parsed || parsed.length === 0) throw new Error('No schedule data parsed from sheet');
+
+        scheduleData = parsed;
+
+        // Clear localStorage so the parsed-from-sheet data becomes the working copy.
         const cacheKey = `cs_schedule_data_${currentLoadedFile}`;
         localStorage.removeItem(cacheKey);
 
+        history.undoStack = [];
+        history.redoStack = [];
+        history.updateButtons();
+        renderSchedule();
+        const scrolledToNow = checkAndScrollToNowIfInProgram();
+        if (!scrolledToNow) setTimeout(scrollToEarliestEvent, 100);
+
+        if (btn) {
+            btn.classList.remove('spinning');
+            btn.classList.add('success-green');
+            setTimeout(() => btn.classList.remove('success-green'), 2000);
+        }
+    } catch (err) {
+        if (btn) btn.classList.remove('spinning');
+        console.error('Refresh from Google Sheet failed:', err);
+        alert('Could not fetch from Google Sheets. Check that the sheet is publicly shared (anyone with link can view).');
+    }
+}
+
+async function reloadFromJSON() {
+    const btn = document.getElementById('reload-json-btn');
+    if (btn) btn.classList.add('spinning');
+    try {
+        const cacheKey = `cs_schedule_data_${currentLoadedFile}`;
+        localStorage.removeItem(cacheKey);
         await loadConference(currentLoadedFile, /* forceRefresh= */ true);
         if (btn) {
             btn.classList.remove('spinning');
             btn.classList.add('success-green');
-            setTimeout(() => {
-                btn.classList.remove('success-green');
-            }, 1500);
+            setTimeout(() => btn.classList.remove('success-green'), 1500);
         }
     } catch (err) {
         if (btn) btn.classList.remove('spinning');
-        console.error('Refresh failed:', err);
+        console.error('Reload from JSON failed:', err);
     }
 }
 
@@ -288,9 +507,10 @@ function checkAndScrollToNowIfInProgram() {
 
 function setupEventListeners() {
     const refreshBtn = document.getElementById('refresh-sheet-btn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', refreshSpreadsheetData);
-    }
+    if (refreshBtn) refreshBtn.addEventListener('click', refreshSpreadsheetData);
+
+    const reloadJsonBtn = document.getElementById('reload-json-btn');
+    if (reloadJsonBtn) reloadJsonBtn.addEventListener('click', reloadFromJSON);
 
     document.getElementById('undo-btn').addEventListener('click', () => history.undo());
     document.getElementById('redo-btn').addEventListener('click', () => history.redo());
