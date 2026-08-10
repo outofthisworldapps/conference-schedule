@@ -745,6 +745,7 @@ function getInferredType(event) {
 
 function renderCalendarView() {
     const navContainer = document.getElementById('day-nav-container');
+    const gridContainer = document.getElementById('calendar-grid');
     const isAllDays = selectedDay === 'all';
     const dayIndex = isAllDays ? -1 : scheduleData.findIndex(d => d.date === selectedDay);
     const isSmallScreen = window.innerWidth <= 600;
