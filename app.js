@@ -462,14 +462,14 @@ function parseAndNormalizeTimeInput(rawInput) {
         const now = new Date();
         return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }
-    // Handle 12-hour format e.g. 9:00am, 2:15pm
-    const twelveHourMatch = input.match(/^(\d{1,2}):(\d{2})\s*([ap]m)?$/);
+    // Handle 12-hour format e.g. 9:00a, 9:00am, 2:15p, 2:15pm
+    const twelveHourMatch = input.match(/^(\d{1,2}):(\d{2})\s*([ap](?:m)?)?$/);
     if (twelveHourMatch) {
         let hours = parseInt(twelveHourMatch[1], 10);
         const minutes = twelveHourMatch[2];
         const meridiem = twelveHourMatch[3];
-        if (meridiem === 'pm' && hours < 12) hours += 12;
-        if (meridiem === 'am' && hours === 12) hours = 0;
+        if (meridiem && meridiem.startsWith('p') && hours < 12) hours += 12;
+        if (meridiem && meridiem.startsWith('a') && hours === 12) hours = 0;
         return `${String(hours).padStart(2, '0')}:${minutes}`;
     }
     // Standard HH:MM
