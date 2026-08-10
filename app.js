@@ -650,71 +650,135 @@ function handleInlineTimeKeydown(e, date, index, type) {
     }
 }
 
-let activeInlineNameBefore = null;
-let activeInlineSubtitleBefore = null;
-let activeInlineHTMLBefore = null;
+let activeInlineFieldBefore = null;
+let activeInlineFieldName = null;
 let isInlineTextCanceled = false;
+let isFirstFocus = false;
 
-function handleInlineFocus(e, date, index) {
-    const day = scheduleData.find(d => d.date === date);
-    if (!day) return;
-    const event = day.events[index];
-    if (!event) return;
-    isInlineTextCanceled = false;
-    activeInlineNameBefore = event.name || "";
-    activeInlineSubtitleBefore = event.subtitle || "";
-    activeInlineHTMLBefore = e.target.innerHTML;
+function selectAllText(el) {
+    if (!el) return;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
 }
 
-function handleInlineBlur(e, date, index) {
+function copyTextToClipboard(text) {
+    if (!text) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(err => {
+            console.error('Clipboard copy failed:', err);
+        });
+    } else {
+        try {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        } catch (e) {}
+    }
+}
+
+function handleInlineFocus(e, date, index, field) {
     const day = scheduleData.find(d => d.date === date);
     if (!day) return;
     const event = day.events[index];
     if (!event) return;
 
+    isInlineTextCanceled = false;
+    activeInlineFieldName = field;
+    activeInlineFieldBefore = field === 'name' 
+        ? (event.name || event.title || "") 
+        : (event.subtitle || event.description || "");
+    isFirstFocus = true;
+
+    const el = e.target;
+    const textToCopy = el.innerText.trim();
+    if (textToCopy) {
+        copyTextToClipboard(textToCopy);
+    }
+
+    setTimeout(() => {
+        selectAllText(el);
+    }, 0);
+}
+
+function handleInlineMouseUp(e, date, index, field) {
+    if (isFirstFocus) {
+        isFirstFocus = false;
+        e.preventDefault();
+        selectAllText(e.target);
+    }
+}
+
+function handleInlineBlur(e, date, index, field) {
+    const day = scheduleData.find(d => d.date === date);
+    if (!day) return;
+    const event = day.events[index];
+    if (!event) return;
+
+    isFirstFocus = false;
+
     if (isInlineTextCanceled) {
-        if (activeInlineHTMLBefore !== null) {
-            e.target.innerHTML = activeInlineHTMLBefore;
+        if (activeInlineFieldBefore !== null) {
+            e.target.innerText = activeInlineFieldBefore;
         }
-        activeInlineNameBefore = null;
-        activeInlineSubtitleBefore = null;
-        activeInlineHTMLBefore = null;
+        activeInlineFieldBefore = null;
+        activeInlineFieldName = null;
         isInlineTextCanceled = false;
         return;
     }
 
-    const speakerEl = e.target.querySelector('.speaker-name');
-    const titleEl = e.target.querySelector('.talk-title');
+    const newText = e.target.innerText.trim();
+    const oldText = activeInlineFieldBefore !== null 
+        ? activeInlineFieldBefore 
+        : (field === 'name' ? (event.name || "") : (event.subtitle || ""));
 
-    let newName = speakerEl ? speakerEl.innerText.trim() : "";
-    let newTitle = titleEl ? titleEl.innerText.trim() : "";
-
-    if (!speakerEl && !titleEl) {
-        const text = e.target.innerText.trim();
-        const lines = text.split('\n').filter(Boolean);
-        newName = lines[0] || "";
-        newTitle = lines.slice(1).join(' ') || "";
-    }
-
-    if (newName !== activeInlineNameBefore || newTitle !== activeInlineSubtitleBefore) {
+    if (newText !== oldText) {
         history.push();
-        event.name = newName;
-        event.subtitle = newTitle;
+        if (field === 'name') {
+            event.name = newText;
+        } else if (field === 'subtitle') {
+            event.subtitle = newText;
+        }
+        renderSchedule();
     }
-    activeInlineNameBefore = null;
-    activeInlineSubtitleBefore = null;
-    activeInlineHTMLBefore = null;
+
+    activeInlineFieldBefore = null;
+    activeInlineFieldName = null;
 }
 
-function handleInlineKeydown(e, date, index) {
+function handleInlineKeydown(e, date, index, field) {
     e.stopPropagation();
     if (e.key === 'Escape') {
         e.preventDefault();
         isInlineTextCanceled = true;
         e.target.blur();
-    } else if (e.key === 'Enter' && e.metaKey) {
+    } else if (e.key === 'Enter') {
         e.preventDefault();
         e.target.blur();
+    } else if (e.key === 'Tab') {
+        const card = e.target.closest('.event-card-content') || e.target.closest('.calendar-event');
+        if (card) {
+            if (!e.shiftKey && field === 'name') {
+                const subtitleEl = card.querySelector('.talk-title');
+                if (subtitleEl) {
+                    e.preventDefault();
+                    subtitleEl.focus();
+                }
+            } else if (e.shiftKey && field === 'subtitle') {
+                const nameEl = card.querySelector('.speaker-name');
+                if (nameEl) {
+                    e.preventDefault();
+                    nameEl.focus();
+                }
+            }
+        }
     }
 }
 
@@ -1057,12 +1121,17 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                         </div>
                         ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
                     </div>
-                    <div class="event-card-text" contenteditable="true" 
-                         onfocus="handleInlineFocus(event, '${date}', ${index})" 
-                         onblur="handleInlineBlur(event, '${date}', ${index})" 
-                         onkeydown="handleInlineKeydown(event, '${date}', ${index})">
-                        ${displayName ? `<div class="speaker-name">${esc(displayName)}</div>` : ''}
-                        ${talkTitle ? `<div class="talk-title">${esc(talkTitle)}</div>` : ''}
+                    <div class="event-card-text">
+                        <div class="speaker-name" contenteditable="true" tabindex="0"
+                             onfocus="handleInlineFocus(event, '${date}', ${index}, 'name')" 
+                             onblur="handleInlineBlur(event, '${date}', ${index}, 'name')" 
+                             onkeydown="handleInlineKeydown(event, '${date}', ${index}, 'name')"
+                             onmouseup="handleInlineMouseUp(event, '${date}', ${index}, 'name')">${esc(displayName)}</div>
+                        <div class="talk-title" contenteditable="true" tabindex="0"
+                             onfocus="handleInlineFocus(event, '${date}', ${index}, 'subtitle')" 
+                             onblur="handleInlineBlur(event, '${date}', ${index}, 'subtitle')" 
+                             onkeydown="handleInlineKeydown(event, '${date}', ${index}, 'subtitle')"
+                             onmouseup="handleInlineMouseUp(event, '${date}', ${index}, 'subtitle')">${esc(talkTitle)}</div>
                     </div>
                 </div>
             </div>
@@ -1191,4 +1260,8 @@ window.changeEventType = changeEventType;
 window.handleInlineTimeFocus = handleInlineTimeFocus;
 window.handleInlineTimeBlur = handleInlineTimeBlur;
 window.handleInlineTimeKeydown = handleInlineTimeKeydown;
+window.handleInlineFocus = handleInlineFocus;
+window.handleInlineBlur = handleInlineBlur;
+window.handleInlineKeydown = handleInlineKeydown;
+window.handleInlineMouseUp = handleInlineMouseUp;
 

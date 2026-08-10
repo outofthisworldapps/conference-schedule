@@ -76,9 +76,11 @@ Each conference dataset (e.g., `santander2026.json`, `schedule.json`) follows th
 ## 3. In-Place Inline Text & Time Editing (Real-Time Schedule Adjustments)
 
 * **Inline Text & Title Editing**:
-  * Speaker names and talk descriptions reside in a single continuous `.event-card-text` container (`contenteditable="true"`).
-  * On focus, `handleInlineFocus` snapshots the current event state.
-  * On blur or `Cmd+Enter`, `handleInlineBlur` parses the updated speaker name and talk title child elements, updates `scheduleData`, and records history for undo/redo (`Cmd+Z` / `Cmd+Y`).
+  * Title (`.speaker-name`) and Subtitle (`.talk-title`) are separate, independent `contenteditable` fields with `tabindex="0"`.
+  * Users can `Tab` and `Shift+Tab` seamlessly between Title and Subtitle fields on any event card.
+  * When first clicking or focusing a field, all text within it is automatically highlighted (selected) and copied to the system clipboard.
+  * Pressing `Enter` applies and saves the updated text to `scheduleData` and records history for undo/redo (`Cmd+Z` / `Cmd+Y`).
+  * Pressing `Escape` cancels editing and reverts the field text to whatever it was before.
 
 * **Inline Time Editing (Single-Day & Week 5-Day Views)**:
   * Event start and end times display as clickable inline elements (`.inline-time-editor`) on every event card in both single-day and 5-day multi-column week views.
