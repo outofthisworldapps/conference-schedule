@@ -1104,15 +1104,8 @@ function updateNowLine() {
                 nowLine.style.width = `calc(${colWidthPercent}% - 4px)`;
             }
         } else {
-            nowLine.style.left = '-100vw';
-            nowLine.style.width = 'calc(100% + 100vw)';
-            // Measure actual rendered position and set pill offset precisely
-            requestAnimationFrame(() => {
-                const rect = nowLine.getBoundingClientRect();
-                // rect.left is the now-line's actual left edge from viewport
-                // Pill needs to land at x=0 (window left), so offset = -rect.left
-                nowLine.style.setProperty('--pill-offset', `${-rect.left + 6}px`);
-            });
+            nowLine.style.left = 'calc(-1 * var(--gutter-width, 96px))';
+            nowLine.style.width = 'calc(100% + var(--gutter-width, 96px))';
         }
         
         document.querySelectorAll('.calendar-event').forEach(el => {
