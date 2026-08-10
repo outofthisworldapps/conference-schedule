@@ -1382,6 +1382,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         ` : '';
 
         let markerHTML = '';
+        const eventColor = EVENT_TYPES[currentType]?.color || '#00b894';
+        const durationTagHTML = `<span class="event-duration-left-tag" style="color: ${eventColor};">${duration}</span>`;
+
         if (!isMultiCol) {
             const endTimeMarkerHTML = showEndTime ? `
                 <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
@@ -1398,6 +1401,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             markerHTML = `
                 ${origTimeMarkerHTML}
                 <div class="calendar-time-marker" style="top: ${top}px;">
+                    ${durationTagHTML}
                     <span class="inline-time-badge" contenteditable="true" 
                           onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
                           onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
@@ -1408,19 +1412,10 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             `;
         }
 
-        const inlineHeaderTime = `<span class="inline-time-badge" contenteditable="true" 
-                                       onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
-                                       onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
-                                       onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
-                                       title="Click to edit start time">${formatTime(actualStart)}</span>`;
-
-        const eventColor = EVENT_TYPES[currentType]?.color || '#00b894';
-
         return `
             ${markerHTML}
             <div class="calendar-event ${typeClass} ${isMultiCol ? 'week-mode-card' : ''}" style="top: ${top}px; height: ${height}px; left: ${leftCss}; width: ${widthCss}; z-index: ${100 + index}; ${fontScaleCss}" 
                  data-start="${actualStart}" data-end="${actualEnd}">
-                <div class="event-duration-left-tag" style="color: ${eventColor};">${duration}</div>
                 <button class="delete-btn" onclick="deleteEvent('${date}', ${index})" title="Delete event">&times;</button>
                 <div class="event-card-content">
                     <div class="event-header-tag">
