@@ -748,8 +748,7 @@ function renderCalendarView() {
     const gridContainer = document.getElementById('calendar-grid');
     const isAllDays = selectedDay === 'all';
     const dayIndex = isAllDays ? -1 : scheduleData.findIndex(d => d.date === selectedDay);
-    const isSmallScreen = window.innerWidth <= 600;
-    const gutterWidth = isAllDays ? 0 : (isSmallScreen ? 65 : 125);
+    const gutterWidth = isAllDays ? 0 : 125;
 
     const colHeaderHTML = isAllDays ? `
         <div class="calendar-column-headers" style="display: flex; width: 100%; box-sizing: border-box; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--bg-color); padding: 8px 0; margin-top: 6px;">
@@ -1013,10 +1012,8 @@ function updateNowLine() {
                 nowLine.style.width = `calc(${colWidthPercent}% - 4px)`;
             }
         } else {
-            const isSmallScreen = window.innerWidth <= 600;
-            const currentGutter = isSmallScreen ? 65 : 125;
-            nowLine.style.left = `-${currentGutter}px`;
-            nowLine.style.width = `calc(100% + ${currentGutter}px)`;
+            nowLine.style.left = '-125px';
+            nowLine.style.width = 'calc(100% + 125px)';
         }
         
         document.querySelectorAll('.calendar-event').forEach(el => {

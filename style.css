@@ -1005,6 +1005,10 @@ header a {
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
+    .app-container {
+        padding: 0 0.5rem 2rem;
+    }
+
     .timeline-container {
         padding-left: 60px;
     }
