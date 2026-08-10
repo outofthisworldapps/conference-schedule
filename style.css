@@ -559,10 +559,9 @@ header a {
 .calendar-time-marker {
     position: absolute;
     right: 100%;
-    margin-right: 3px;
+    margin-right: 4px;
     top: 0;
-    transform: translateY(-100%);
-    margin-bottom: 2px;
+    transform: translateY(-50%);
     color: var(--text-primary);
     font-size: 0.8rem;
     font-weight: 700;
@@ -982,7 +981,8 @@ header a {
     content: attr(data-time);
     position: absolute;
     left: 2px;
-    top: -12px;
+    top: 50%;
+    transform: translateY(-50%);
     background: var(--accent-color);
     color: white;
     font-size: 0.7rem;
