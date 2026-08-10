@@ -350,6 +350,21 @@ header a {
     color: var(--text-secondary);
 }
 
+.zoom-slider-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#zoom-value-display {
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--text-secondary);
+    user-select: none;
+    margin-bottom: 2px;
+}
+
 #zoom-slider {
     width: 100px;
     cursor: pointer;

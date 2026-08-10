@@ -93,6 +93,14 @@ async function loadConference(fileName) {
         currentLoadedFile = fileName;
         await loadAppVersion();
         
+        const savedZoom = localStorage.getItem('cs_zoom_level');
+        if (savedZoom) {
+            const parsedZoom = parseInt(savedZoom, 10);
+            if (!isNaN(parsedZoom) && parsedZoom >= 80 && parsedZoom <= 1500) {
+                currentHourHeight = parsedZoom;
+            }
+        }
+
         const localSavedData = loadScheduleFromLocalStorage(fileName);
         if (localSavedData) {
             scheduleData = localSavedData;
@@ -100,6 +108,12 @@ async function loadConference(fileName) {
             const response = await fetch(`${fileName}?t=${Date.now()}`);
             const data = await response.json();
             scheduleData = data.scheduleData || [];
+            if (data.zoom && !savedZoom) {
+                const jsonZoom = parseInt(data.zoom, 10);
+                if (!isNaN(jsonZoom) && jsonZoom >= 80 && jsonZoom <= 1500) {
+                    currentHourHeight = jsonZoom;
+                }
+            }
         }
 
         const savedDay = localStorage.getItem('cs_selected_day');
@@ -192,6 +206,7 @@ function scrollToEarliestEvent() {
 
 function saveScheduleToLocalStorage() {
     try {
+        localStorage.setItem('cs_zoom_level', currentHourHeight);
         if (scheduleData && scheduleData.length > 0) {
             const key = `cs_schedule_data_${currentLoadedFile}`;
             localStorage.setItem(key, JSON.stringify(scheduleData));
@@ -363,7 +378,7 @@ function setupEventListeners() {
             const factor = Math.exp(-e.deltaY * zoomSpeed);
             
             const oldHeight = currentHourHeight;
-            currentHourHeight = Math.min(1500, Math.max(80, currentHourHeight * factor));
+            currentHourHeight = Math.min(1500, Math.max(80, Math.round(currentHourHeight * factor)));
             
             if (oldHeight !== currentHourHeight) {
                 renderSchedule();
@@ -378,7 +393,10 @@ function setupEventListeners() {
 }
 
 function saveSchedule() {
-    const data = { scheduleData: scheduleData };
+    const data = {
+        zoom: Math.round(currentHourHeight),
+        scheduleData: scheduleData
+    };
     const blob = new Blob([JSON.stringify(data, null, 4)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -399,6 +417,12 @@ function loadSchedule(event) {
             if (data.scheduleData) {
                 history.push();
                 scheduleData = data.scheduleData;
+                if (data.zoom) {
+                    const parsedZoom = parseInt(data.zoom, 10);
+                    if (!isNaN(parsedZoom) && parsedZoom >= 80 && parsedZoom <= 1500) {
+                        currentHourHeight = parsedZoom;
+                    }
+                }
                 renderSchedule();
                 updateNowLine();
             }
@@ -417,6 +441,8 @@ function renderSchedule() {
     updateNowLine();
     const slider = document.getElementById('zoom-slider');
     if (slider) slider.value = currentHourHeight;
+    const zoomDisplay = document.getElementById('zoom-value-display');
+    if (zoomDisplay) zoomDisplay.textContent = `${Math.round(currentHourHeight)}px / hr`;
 }
 
 function esc(str) {
