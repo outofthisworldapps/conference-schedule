@@ -897,11 +897,11 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const subWidthPercent = isMultiCol ? (colWidthPercent / numCols) : (100 / numCols);
         const subLeftOffset = isMultiCol 
             ? `calc(${colLeftPercent}% + ${subColIdx} * (${colWidthPercent}% / ${numCols}) + 2px)` 
-            : `calc(20px + ${subColIdx} * ((100% - 25px) / ${numCols}))`;
+            : `calc(120px + ${subColIdx} * ((100% - 125px) / ${numCols}))`;
         const leftCss = subLeftOffset;
         const widthCss = isMultiCol 
             ? `calc(${subWidthPercent}% - 4px)` 
-            : `calc((100% - 25px) / ${numCols} - 4px)`;
+            : `calc((100% - 125px) / ${numCols} - 4px)`;
         const fontScaleCss = isMultiCol ? 'font-size: 0.85rem;' : '';
 
         const weekEndTimeMarkerHTML = showEndTime ? `
