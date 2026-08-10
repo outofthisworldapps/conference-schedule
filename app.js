@@ -117,6 +117,13 @@ async function loadConference(fileName, forceRefresh = false) {
         const localSavedData = forceRefresh ? null : loadScheduleFromLocalStorage(fileName);
         if (localSavedData) {
             scheduleData = localSavedData;
+            // Always ensure conferenceConfig is populated
+            if (!conferenceConfig) {
+                conferenceConfig = {
+                    id: fileName.replace('.json', ''),
+                    link: 'https://docs.google.com/spreadsheets/d/1p3W5hhR0__uw-OXQKKvQCH5iqJExd2gtVdr9JRnWopk'
+                };
+            }
         } else {
             const response = await fetch(`${fileName}?t=${Date.now()}`);
             const data = await response.json();
