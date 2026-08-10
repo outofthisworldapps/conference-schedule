@@ -543,8 +543,7 @@ header a {
 
 .calendar-time-marker {
     position: absolute;
-    left: -123px;
-    width: 120px;
+    right: 100%;
     top: 0;
     transform: translateY(-50%);
     color: var(--text-primary);
@@ -554,7 +553,9 @@ header a {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    margin-right: 0px;
     padding-right: 0px;
+    white-space: nowrap;
     line-height: 1;
 }
 
