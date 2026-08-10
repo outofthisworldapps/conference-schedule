@@ -88,7 +88,20 @@ async function loadAppVersion() {
     }
 }
 
-async function loadConference(fileName) {
+// Normalize events: compute `end` from `start + duration` (minutes) when `end` is absent.
+function normalizeEvents(data) {
+    (data || []).forEach(day => {
+        (day.events || []).forEach(ev => {
+            if (!ev.end && (ev.duration !== undefined || ev.durationMinutes !== undefined)) {
+                const mins = parseInt(ev.duration ?? ev.durationMinutes, 10) || 0;
+                ev.end = addMinutes(ev.start, mins);
+            }
+        });
+    });
+    return data;
+}
+
+async function loadConference(fileName, forceRefresh = false) {
     try {
         currentLoadedFile = fileName;
         await loadAppVersion();
@@ -101,13 +114,13 @@ async function loadConference(fileName) {
             }
         }
 
-        const localSavedData = loadScheduleFromLocalStorage(fileName);
+        const localSavedData = forceRefresh ? null : loadScheduleFromLocalStorage(fileName);
         if (localSavedData) {
             scheduleData = localSavedData;
         } else {
             const response = await fetch(`${fileName}?t=${Date.now()}`);
             const data = await response.json();
-            scheduleData = data.scheduleData || [];
+            scheduleData = normalizeEvents(data.scheduleData || []);
             if (data.zoom && !savedZoom) {
                 const jsonZoom = parseInt(data.zoom, 10);
                 if (!isNaN(jsonZoom) && jsonZoom >= 80 && jsonZoom <= 1500) {
@@ -156,7 +169,11 @@ async function refreshSpreadsheetData() {
     }
     
     try {
-        await loadConference(currentLoadedFile);
+        // Clear the localStorage cache so we always fetch fresh data from the JSON file.
+        const cacheKey = `cs_schedule_data_${currentLoadedFile}`;
+        localStorage.removeItem(cacheKey);
+
+        await loadConference(currentLoadedFile, /* forceRefresh= */ true);
         if (btn) {
             btn.classList.remove('spinning');
             btn.classList.add('success-green');
@@ -495,7 +512,12 @@ function isBufferEvent(event) {
 
 function getEventTimes(event, currentDelay) {
     const originalStart = event.start;
-    const originalEnd = event.end || event.start;
+    // Support events that only carry a duration (minutes) instead of an explicit end time.
+    let originalEnd = event.end;
+    if (!originalEnd) {
+        const durMins = parseInt(event.duration ?? event.durationMinutes ?? 0, 10) || 0;
+        originalEnd = durMins > 0 ? addMinutes(event.start, durMins) : event.start;
+    }
     
     // Treat event.delay as a target delay from the ORIGINAL start time.
     // The event will start at either its manual target time or the cascaded delayed time, whichever is later.
