@@ -534,6 +534,21 @@ function handleInlineTimeFocus(e, date, index, type) {
     }
     const { actualStart, actualEnd } = getEventTimes(event, cumulativeDelayBefore);
     activeTimeBefore = (type === 'end') ? actualEnd : actualStart;
+
+    const now = new Date();
+    const nowStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    e.target.innerText = formatTime(nowStr);
+
+    setTimeout(() => {
+        const sel = window.getSelection();
+        if (sel) {
+            const range = document.createRange();
+            range.selectNodeContents(e.target);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+    }, 0);
 }
 
 function parseAndNormalizeTimeInput(rawInput) {

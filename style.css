@@ -584,13 +584,13 @@ header a {
 }
 
 .inline-time-badge:hover {
-    background: rgba(255, 71, 87, 0.2);
-    color: var(--accent-color);
+    background: rgba(46, 213, 115, 0.2);
+    color: #2ed573;
 }
 
 .inline-time-badge:focus {
-    background: rgba(255, 71, 87, 0.3);
-    color: #fff;
+    background: rgba(255, 71, 87, 0.25);
+    color: var(--accent-color);
     box-shadow: 0 0 0 1px var(--accent-color);
 }
 
