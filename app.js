@@ -793,7 +793,7 @@ function renderCalendarView() {
         scheduleData.map((_, i) => i > 0 ? `<div style="position: absolute; top: 0; bottom: 0; left: ${(i / scheduleData.length) * 100}%; width: 1px; background: rgba(255,255,255,0.08); z-index: 10;"></div>` : '').join('') : '';
 
     gridContainer.innerHTML = `
-        <div style="position: relative; height: ${gridHeight}px; margin-left: ${gutterWidth}px;">
+        <div style="position: relative; height: ${gridHeight}px; margin-left: ${gutterWidth}px; margin-right: 0;">
             ${Array.from({length: endHour - startHour + 1}, (_, i) => {
                 const hour = startHour + i;
                 const top = i * hourHeight;
@@ -901,7 +901,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const leftCss = subLeftOffset;
         const widthCss = isMultiCol 
             ? `calc(${subWidthPercent}% - 4px)` 
-            : `calc((100% / ${numCols}) - 4px)`;
+            : `calc(100% - 4px)`;
         const fontScaleCss = isMultiCol ? 'font-size: 0.85rem;' : '';
 
         const weekEndTimeMarkerHTML = showEndTime ? `
