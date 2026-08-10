@@ -830,8 +830,8 @@ function renderCalendarView() {
     const gridContainer = document.getElementById('calendar-grid');
     const isAllDays = selectedDay === 'all';
     const dayIndex = isAllDays ? -1 : scheduleData.findIndex(d => d.date === selectedDay);
-    const gutterWidth = '0px';
-    gridContainer.style.setProperty('--gutter-width', '0px');
+    const gutterWidth = isAllDays ? '0px' : '68px';
+    gridContainer.style.setProperty('--gutter-width', isAllDays ? '0px' : '68px');
 
     const colHeaderHTML = isAllDays ? `
         <div class="calendar-column-headers" style="display: flex; width: 100%; box-sizing: border-box; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--bg-color); padding: 8px 0; margin-top: 6px;">
@@ -1055,7 +1055,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                                 `).join('')}
                             </div>
                         </div>
-                        <span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>
+                        ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
                     </div>
                     <div class="event-card-text" contenteditable="true" 
                          onfocus="handleInlineFocus(event, '${date}', ${index})" 
@@ -1066,7 +1066,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                     </div>
                 </div>
             </div>
-            ${weekEndTimeMarkerHTML}
+            ${isMultiCol ? weekEndTimeMarkerHTML : ''}
 
         `;
 
@@ -1104,8 +1104,8 @@ function updateNowLine() {
                 nowLine.style.width = `calc(${colWidthPercent}% - 4px)`;
             }
         } else {
-            nowLine.style.left = '0px';
-            nowLine.style.width = '100%';
+            nowLine.style.left = 'calc(-1 * var(--gutter-width, 68px))';
+            nowLine.style.width = 'calc(100% + var(--gutter-width, 68px))';
         }
         
         document.querySelectorAll('.calendar-event').forEach(el => {
