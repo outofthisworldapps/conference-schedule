@@ -1476,13 +1476,24 @@ function updateNowLine() {
         nowLine.style.display = 'block';
         const startHour = 7;
         const hourHeight = currentHourHeight;
-        const top = (nowMinutes - startHour * 60) * (hourHeight / 60);
+        const pixelsPerMinute = hourHeight / 60;
+        const top = (nowMinutes - startHour * 60) * pixelsPerMinute;
         nowLine.style.top = `${top}px`;
         nowLine.setAttribute('data-time', formatTime(timeStr));
 
         nowLine.style.left = 'calc(-1 * var(--gutter-width, 48px))';
         nowLine.style.width = 'calc(100% + var(--gutter-width, 48px))';
         
+        let remainingLine = document.getElementById('calendar-now-remaining-line');
+        if (!remainingLine) {
+            remainingLine = document.createElement('div');
+            remainingLine.id = 'calendar-now-remaining-line';
+            nowLine.appendChild(remainingLine);
+        }
+
+        let currentActiveEndM = null;
+        let activeEventElement = null;
+
         document.querySelectorAll('.calendar-event').forEach(el => {
             const [sh, sm] = el.dataset.start.split(':').map(Number);
             const [eh, em] = el.dataset.end.split(':').map(Number);
@@ -1490,10 +1501,24 @@ function updateNowLine() {
             const emins = eh * 60 + em;
             if (nowMinutes >= smins && nowMinutes < emins) {
                 el.classList.add('current');
+                if (currentActiveEndM === null || emins > currentActiveEndM) {
+                    currentActiveEndM = emins;
+                    activeEventElement = el;
+                }
             } else {
                 el.classList.remove('current');
             }
         });
+
+        if (currentActiveEndM !== null) {
+            const remainingMins = currentActiveEndM - nowMinutes;
+            const height = remainingMins * pixelsPerMinute;
+            remainingLine.style.display = 'flex';
+            remainingLine.style.height = `${height}px`;
+            remainingLine.setAttribute('data-remaining', `${remainingMins}m remaining`);
+        } else {
+            remainingLine.style.display = 'none';
+        }
     } else {
         nowLine.style.display = 'none';
     }

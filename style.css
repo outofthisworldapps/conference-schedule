@@ -1021,6 +1021,28 @@ header a {
     border-radius: 10px;
 }
 
+#calendar-now-remaining-line {
+    position: absolute;
+    top: 3px;
+    left: 22px;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+#calendar-now-remaining-line::after {
+    content: attr(data-remaining);
+    position: absolute;
+    left: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+}
+
 /* Day Selection for Calendar */
 .day-navigation {
     display: flex;
