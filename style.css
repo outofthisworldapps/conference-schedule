@@ -655,7 +655,24 @@ header a {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
+.event-card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+}
+
+.event-header-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
 .event-card-text {
+    flex: 1;
+    min-width: 0;
     outline: none;
     border-radius: 4px;
     transition: background 0.15s ease, box-shadow 0.15s ease;

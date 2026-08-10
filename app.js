@@ -984,29 +984,31 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             <div class="calendar-event ${typeClass}" style="top: ${top}px; height: ${height}px; left: ${leftCss}; width: ${widthCss}; z-index: ${100 + index}; ${fontScaleCss}" 
                  data-start="${actualStart}" data-end="${actualEnd}">
                 <button class="delete-btn" onclick="deleteEvent('${date}', ${index})" title="Delete event">&times;</button>
-                <div class="event-header-tag" style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
-                    <div class="type-square-container">
-                        <div class="event-color-square" 
-                             title="Change event type" 
-                             style="background: ${EVENT_TYPES[currentType]?.color || '#00b894'};">
+                <div class="event-card-content">
+                    <div class="event-header-tag">
+                        <div class="type-square-container">
+                            <div class="event-color-square" 
+                                 title="Change event type" 
+                                 style="background: ${EVENT_TYPES[currentType]?.color || '#00b894'};">
+                            </div>
+                            <div class="type-options-popover">
+                                ${Object.entries(EVENT_TYPES).map(([type, data]) => `
+                                    <div class="type-option-item" onclick="event.stopPropagation(); changeEventType('${date}', ${index}, '${type}')">
+                                        <span class="type-color-box" style="background: ${data.color}"></span>
+                                        <span>${data.label}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
-                        <div class="type-options-popover">
-                            ${Object.entries(EVENT_TYPES).map(([type, data]) => `
-                                <div class="type-option-item" onclick="event.stopPropagation(); changeEventType('${date}', ${index}, '${type}')">
-                                    <span class="type-color-box" style="background: ${data.color}"></span>
-                                    <span>${data.label}</span>
-                                </div>
-                            `).join('')}
-                        </div>
+                        ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
                     </div>
-                    ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
-                </div>
-                <div class="event-card-text" contenteditable="true" 
-                     onfocus="handleInlineFocus(event, '${date}', ${index})" 
-                     onblur="handleInlineBlur(event, '${date}', ${index})" 
-                     onkeydown="handleInlineKeydown(event, '${date}', ${index})">
-                    ${displayName ? `<div class="speaker-name">${esc(displayName)}</div>` : ''}
-                    ${talkTitle ? `<div class="talk-title">${esc(talkTitle)}</div>` : ''}
+                    <div class="event-card-text" contenteditable="true" 
+                         onfocus="handleInlineFocus(event, '${date}', ${index})" 
+                         onblur="handleInlineBlur(event, '${date}', ${index})" 
+                         onkeydown="handleInlineKeydown(event, '${date}', ${index})">
+                        ${displayName ? `<div class="speaker-name">${esc(displayName)}</div>` : ''}
+                        ${talkTitle ? `<div class="talk-title">${esc(talkTitle)}</div>` : ''}
+                    </div>
                 </div>
             </div>
             ${isMultiCol ? weekEndTimeMarkerHTML : ''}
