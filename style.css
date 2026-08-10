@@ -581,12 +581,22 @@ header a {
 
 .original-time {
     display: inline-block;
-    margin-right: 4px;
-    font-size: 0.7rem;
     color: var(--text-secondary);
     opacity: 0.6;
     text-decoration: line-through;
     white-space: nowrap;
+}
+
+.calendar-time-marker .original-time {
+    padding: 1px 3px;
+    margin-right: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.event-header-tag .original-time {
+    margin-right: 4px;
+    font-size: 0.7rem;
 }
 
 .calendar-time-marker.end-time {

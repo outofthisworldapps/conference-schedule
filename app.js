@@ -929,6 +929,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
         const originalTimeDisplay = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
 
+        const [osh, osm] = event.start.split(':').map(Number);
+        const origTop = ((osh - startHour) * 60 + osm) * pixelsPerMinute;
+
         const subWidthPercent = isMultiCol ? (colWidthPercent / numCols) : (100 / numCols);
         const subLeftOffset = isMultiCol 
             ? `calc(${colLeftPercent}% + ${subColIdx} * (${colWidthPercent}% / ${numCols}) + 2px)` 
@@ -960,9 +963,13 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                           onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
                           title="Click to edit end time">${formatTime(actualEnd)}</span>
                 </div>` : '';
+            const origTimeMarkerHTML = isShifted ? `
+                <div class="calendar-time-marker original-time-marker" style="top: ${origTop}px;">
+                    <span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>
+                </div>` : '';
             markerHTML = `
+                ${origTimeMarkerHTML}
                 <div class="calendar-time-marker" style="top: ${top}px;">
-                    ${originalTimeDisplay}
                     <span class="inline-time-badge" contenteditable="true" 
                           onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
                           onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
