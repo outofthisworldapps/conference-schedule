@@ -1052,7 +1052,7 @@ header a {
     }
 
     .timeline-container {
-        padding-left: 60px;
+        padding-left: 0;
     }
 
     .timeline-axis {
