@@ -916,7 +916,7 @@ header a {
 
 #calendar-now-line {
     position: absolute;
-    left: -125px;
+    left: calc(-1 * var(--gutter-width, 125px));
     right: 0;
     height: 3px;
     background: var(--accent-color);

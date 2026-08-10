@@ -748,7 +748,8 @@ function renderCalendarView() {
     const gridContainer = document.getElementById('calendar-grid');
     const isAllDays = selectedDay === 'all';
     const dayIndex = isAllDays ? -1 : scheduleData.findIndex(d => d.date === selectedDay);
-    const gutterWidth = isAllDays ? 0 : 125;
+    const gutterWidth = isAllDays ? 0 : 'clamp(55px, 18vw, 125px)';
+    gridContainer.style.setProperty('--gutter-width', isAllDays ? '0px' : 'clamp(55px, 18vw, 125px)');
 
     const colHeaderHTML = isAllDays ? `
         <div class="calendar-column-headers" style="display: flex; width: 100%; box-sizing: border-box; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--bg-color); padding: 8px 0; margin-top: 6px;">
@@ -793,7 +794,7 @@ function renderCalendarView() {
         scheduleData.map((_, i) => i > 0 ? `<div style="position: absolute; top: 0; bottom: 0; left: ${(i / scheduleData.length) * 100}%; width: 1px; background: rgba(255,255,255,0.08); z-index: 10;"></div>` : '').join('') : '';
 
     gridContainer.innerHTML = `
-        <div style="position: relative; height: ${gridHeight}px; margin-left: ${gutterWidth}px; margin-right: 0;">
+        <div style="position: relative; height: ${gridHeight}px; margin-left: var(--gutter-width, 0px); margin-right: 0;">
             ${Array.from({length: endHour - startHour + 1}, (_, i) => {
                 const hour = startHour + i;
                 const top = i * hourHeight;
@@ -1012,8 +1013,10 @@ function updateNowLine() {
                 nowLine.style.width = `calc(${colWidthPercent}% - 4px)`;
             }
         } else {
-            nowLine.style.left = '-125px';
-            nowLine.style.width = 'calc(100% + 125px)';
+            const gridEl = document.getElementById('calendar-grid');
+            const gutter = gridEl ? getComputedStyle(gridEl).getPropertyValue('--gutter-width').trim() || '125px' : '125px';
+            nowLine.style.left = `calc(-1 * ${gutter})`;
+            nowLine.style.width = `calc(100% + ${gutter})`;
         }
         
         document.querySelectorAll('.calendar-event').forEach(el => {
