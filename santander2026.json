@@ -14,43 +14,50 @@
                 {
                     "start": "08:45",
                     "end": "09:00",
-                    "name": "Welcome / Open",
-                    "subtitle": "",
+                    "name": "Welcome / Opening Remarks",
+                    "subtitle": "Maria Isabel G\u00f3mez-Barreda / D. Luis Mu\u00f1oz / Seiji Fujimoto",
+                    "type": "session"
+                },
+                {
+                    "start": "09:00",
+                    "end": "09:30",
+                    "name": "S1 \u00b7 Reionization & High-z Galaxies (1)",
+                    "subtitle": "Chair: Masami Ouchi",
                     "type": "session"
                 },
                 {
                     "start": "09:00",
                     "end": "09:30",
                     "name": "Hakim Atek",
-                    "subtitle": "[Plenary] Invited Review \u2014 The High-z Universe",
+                    "subtitle": "Invited Review \u2014 The High-z Universe",
                     "type": "long-talk"
                 },
                 {
                     "start": "09:30",
                     "end": "09:45",
                     "name": "Gavin Farley",
-                    "subtitle": "[Plenary] A Systematic Census of Strongly Lensed Population III Galaxy Candidates at z ~ 6\u20137 from JWST VENUS and MUSE",
+                    "subtitle": "A Systematic Census of Strongly Lensed Population III Galaxy Candidates at z ~ 6\u20137 from JWST VENUS and MUSE",
                     "type": "session"
                 },
                 {
                     "start": "09:45",
                     "end": "10:00",
                     "name": "Minami Nakane",
-                    "subtitle": "[Plenary] VENUS: Strongly Lensed Clumpy Galaxy at z~11-12",
+                    "subtitle": "VENUS: Strongly Lensed Clumpy Galaxy at z~11-12",
                     "type": "session"
                 },
                 {
                     "start": "10:00",
                     "end": "10:15",
                     "name": "John Chisholm",
-                    "subtitle": "[Plenary] A GLIMPSE of ionizing photon production in the faintest galaxies",
+                    "subtitle": "A GLIMPSE of ionizing photon production in the faintest galaxies",
                     "type": "session"
                 },
                 {
                     "start": "10:15",
                     "end": "10:30",
                     "name": "Michelle Jecmen",
-                    "subtitle": "[Plenary] A GLIMPSE into the UV Slopes of the Faintest Reionization-Era Galaxies",
+                    "subtitle": "A GLIMPSE into the UV Slopes of the Faintest Reionization-Era Galaxies",
                     "type": "session"
                 },
                 {
@@ -63,50 +70,57 @@
                 {
                     "start": "11:00",
                     "end": "11:15",
+                    "name": "S2 \u00b7 Reionization & High-z Galaxies (2)",
+                    "subtitle": "Chair: Dan Coe",
+                    "type": "session"
+                },
+                {
+                    "start": "11:00",
+                    "end": "11:15",
                     "name": "Emil Rivera-Thorsen",
-                    "subtitle": "[Plenary] Gravitational lenses are unavoidable for understanding Lyman-Continuum escape: The Sunburst Arc and beyond",
+                    "subtitle": "Gravitational lenses are unavoidable for understanding Lyman-Continuum escape: The Sunburst Arc and beyond",
                     "type": "session"
                 },
                 {
                     "start": "11:15",
                     "end": "11:30",
                     "name": "Marusa Bradac",
-                    "subtitle": "[Plenary] Star Formation at the Epoch of Reionization under the Cosmic Microscope",
+                    "subtitle": "Star Formation at the Epoch of Reionization under the Cosmic Microscope",
                     "type": "session"
                 },
                 {
                     "start": "11:30",
                     "end": "11:45",
                     "name": "Giordano Felicioni",
-                    "subtitle": "[Plenary] UV slopes at the Epoch of Reionization",
+                    "subtitle": "UV slopes at the Epoch of Reionization",
                     "type": "session"
                 },
                 {
                     "start": "11:45",
                     "end": "12:00",
                     "name": "Javier \u00c1lvarez-M\u00e1rquez",
-                    "subtitle": "[Plenary] PRISMS. PRImordial galaxy Survey with MIRI Spectroscopy at z~10",
+                    "subtitle": "PRISMS. PRImordial galaxy Survey with MIRI Spectroscopy at z~10",
                     "type": "session"
                 },
                 {
                     "start": "12:00",
                     "end": "12:15",
                     "name": "Ivan Kramarenko",
-                    "subtitle": "[Plenary] Leveraging gravitational lensing in the A2744 field to constrain the faint end of the Ha luminosity function at z=4-5",
+                    "subtitle": "Leveraging gravitational lensing in the A2744 field to constrain the faint end of the Ha luminosity function at z=4-5",
                     "type": "session"
                 },
                 {
                     "start": "12:15",
                     "end": "12:30",
                     "name": "Tiger Hsiao",
-                    "subtitle": "[Plenary] The Faint-End of the Mass-Metallicity Relation at Cosmic Dawn",
+                    "subtitle": "The Faint-End of the Mass-Metallicity Relation at Cosmic Dawn",
                     "type": "session"
                 },
                 {
                     "start": "12:30",
                     "end": "13:00",
-                    "name": "Flash A \u2014 flash-talk session ([3 min + 1 min Q] \u00d7 ~7)",
-                    "subtitle": "[Plenary]",
+                    "name": "",
+                    "subtitle": "Flash A \u2014 flash-talk session ([3 min + 1 min Q] \u00d7 ~7)",
                     "type": "tiktalk"
                 },
                 {
@@ -114,90 +128,125 @@
                     "end": "15:00",
                     "name": "Lunch",
                     "subtitle": "(VENUS internal discussion for VENUS members ~14:00\u201315:00: Data status recup, Overall MSA planning)",
-                    "type": "meal"
+                    "type": "break"
                 },
                 {
                     "start": "15:00",
                     "end": "15:30",
-                    "name": "VENUS + SLICE status",
-                    "subtitle": "[Plenary] VENUS status (12+3) + SLICE status (12+3)",
+                    "name": "S3 \u00b7 Cluster Programs + Resolved Galaxies",
+                    "subtitle": "Chair: Rogier Windhorst",
                     "type": "session"
+                },
+                {
+                    "start": "15:00",
+                    "end": "15:30",
+                    "name": "SLICE + VENUS \noverview, status, initial outcomes",
+                    "subtitle": "SLICE (12+3) / VENUS (12+3)",
+                    "type": "workshop"
                 },
                 {
                     "start": "15:30",
                     "end": "15:45",
-                    "name": "Fengwu Sun",
-                    "subtitle": "[Plenary] Latest Results from JWST Cycle-2 Program MAGNIF",
+                    "name": "Fengwu Sun (move to tomorrow)",
+                    "subtitle": "Latest Results from JWST Cycle-2 Program MAGNIF",
                     "type": "session"
                 },
                 {
                     "start": "15:45",
                     "end": "16:00",
-                    "name": "Ga\u00ebl Noirot",
-                    "subtitle": "[Plenary] Spatially-Resolved Galaxy Properties through Cluster Lenses with JWST NIRISS Wide-Field Slitless Spectroscopy.",
+                    "name": "Marceau Limousin",
+                    "subtitle": "Constructing and Storing Strong Lensing Mass Models",
+                    "type": "session"
+                },
+                {
+                    "start": "15:45",
+                    "end": "16:00",
+                    "name": "Ga\u00ebl Noirot (move to tomorrow)",
+                    "subtitle": "Spatially-Resolved Galaxy Properties through Cluster Lenses with JWST NIRISS Wide-Field Slitless Spectroscopy.",
+                    "type": "session"
+                },
+                {
+                    "start": "16:00",
+                    "end": "16:15",
+                    "name": "Gregor Rihtarsic",
+                    "subtitle": "Advancing strong lens modelling of CANUCS clusters and the Bullet Cluster with JWST imaging and spectroscopy",
                     "type": "session"
                 },
                 {
                     "start": "16:00",
                     "end": "16:15",
                     "name": "Madi VanWyngarden",
-                    "subtitle": "[Plenary] Establishing the Onset of Obscuration: An ALMA & JWST Joint Census of High-z Dusty Star Forming Galaxies",
+                    "subtitle": "Establishing the Onset of Obscuration: An ALMA & JWST Joint Census of High-z Dusty Star Forming Galaxies",
                     "type": "session"
                 },
                 {
                     "start": "16:15",
                     "end": "16:30",
                     "name": "Manuel Solimano",
-                    "subtitle": "[Plenary] JWST resolves ionized outflows in a lensed Lyman Alpha halo at z=3",
+                    "subtitle": "JWST resolves ionized outflows in a lensed Lyman Alpha halo at z=3",
                     "type": "session"
                 },
                 {
                     "start": "16:30",
-                    "end": "16:45",
-                    "name": "Vladan Markov",
-                    "subtitle": "[Plenary] Resolving dust and Ly\u03b1 emission in a lensed galaxy at the epoch of reionization with JWST/CANUCS",
-                    "type": "session"
-                },
-                {
-                    "start": "16:45",
                     "end": "17:00",
                     "name": "Coffee",
                     "subtitle": "",
                     "type": "break"
                 },
                 {
-                    "start": "17:00",
-                    "end": "17:15",
+                    "start": "17:10",
+                    "end": "17:25",
+                    "name": "S4 \u00b7 Little Red Dots / AGN",
+                    "subtitle": "Chair: Chris Willott",
+                    "type": "session"
+                },
+                {
+                    "start": "17:10",
+                    "end": "17:25",
+                    "name": "Vladan Markov",
+                    "subtitle": "Resolving dust and Ly\u03b1 emission in a lensed galaxy at the epoch of reionization with JWST/CANUCS",
+                    "type": "session"
+                },
+                {
+                    "start": "17:25",
+                    "end": "17:40",
                     "name": "Jon Judez",
-                    "subtitle": "[Plenary] Unravelling the parsec-scale structure of high-z galaxies and LRDs with cluster lensing",
+                    "subtitle": "Unravelling the parsec-scale structure of high-z galaxies and LRDs with cluster lensing",
                     "type": "session"
                 },
                 {
-                    "start": "17:15",
-                    "end": "17:30",
+                    "start": "17:40",
+                    "end": "17:55",
                     "name": "Hiroto Yanagisawa",
-                    "subtitle": "[Plenary] Two Little Red Dots Hidden in a Single Galaxy at z~7",
+                    "subtitle": "Two Little Red Dots Hidden in a Single Galaxy at z~7",
                     "type": "session"
                 },
                 {
-                    "start": "17:30",
-                    "end": "17:45",
+                    "start": "17:55",
+                    "end": "18:10",
                     "name": "Miriam Golubchik",
-                    "subtitle": "[Plenary] Strong Lensing Unveils a Little Red Dot and Its Blue Companion at z = 6",
+                    "subtitle": "Strong Lensing Unveils a Little Red Dot and Its Blue Companion at z = 6",
                     "type": "session"
                 },
                 {
-                    "start": "17:45",
-                    "end": "18:00",
+                    "start": "18:10",
+                    "end": "18:25",
                     "name": "Qinyue Fei",
-                    "subtitle": "[Plenary] A Systematic Census of Strongly Lensed LRDs and Their Host Galaxy Properties through 60 VENUS Clusters",
+                    "subtitle": "A Systematic Census of Strongly Lensed LRDs and Their Host Galaxy Properties through VENUS Clusters",
+                    "type": "session"
+                },
+                {
+                    "start": "18:25",
+                    "end": "19:30",
+                    "name": "Close",
+                    "subtitle": "",
                     "type": "session"
                 },
                 {
                     "start": "19:30",
-                    "end": "19:45",
-                    "name": "Welcome reception (Ayto. Santander)",
-                    "subtitle": "Location TBD",
+                    "end": "21:30",
+                    "name": "Welcome reception @ Centro Bot\u00edn",
+                    "subtitle": "~30-40mins walk from the conference venue: https://maps.app.goo.gl/TSpfzPEGRxeZfzQE9",
                     "type": "social"
                 }
             ]
@@ -211,48 +260,55 @@
                     "end": "09:00",
                     "name": "Open",
                     "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "09:00",
+                    "end": "09:30",
+                    "name": "S5 \u00b7 Lensed Supernovae",
+                    "subtitle": "Chair: Armin Rest",
                     "type": "session"
                 },
                 {
                     "start": "09:00",
                     "end": "09:30",
                     "name": "Justin Pierel",
-                    "subtitle": "[Plenary] Invited Review \u2014 Lensed Supernovae",
+                    "subtitle": "Invited Review \u2014 Lensed Supernovae",
                     "type": "long-talk"
                 },
                 {
                     "start": "09:30",
                     "end": "09:45",
-                    "name": "Thomas Moore",
-                    "subtitle": "[Plenary] Outside the Lens: VENUS Discovery of a Superluminous Supernova on the Outskirts of Abell 370",
+                    "name": "David Coulter",
+                    "subtitle": "SN Eos: A Multiply-Imaged, 30x Magnified SN Near the Epoch of Reionization",
                     "type": "session"
                 },
                 {
                     "start": "09:45",
                     "end": "10:00",
-                    "name": "David Coulter",
-                    "subtitle": "[Plenary] SN Eos: A Multiply-Imaged, 30x Magnified SN Near the Epoch of Reionization",
+                    "name": "Conor Larison",
+                    "subtitle": "The VENUS discovery of a strongly lensed supernova with a predicted 70-year reappearance",
                     "type": "session"
                 },
                 {
                     "start": "10:00",
                     "end": "10:15",
-                    "name": "Conor Larison",
-                    "subtitle": "[Plenary] The VENUS discovery of a strongly lensed supernova with a predicted 70-year reappearance",
+                    "name": "Tanja Petrushevska",
+                    "subtitle": "Cluster-lensed supernovae in the era of Roman, Rubin, and JWST",
                     "type": "session"
                 },
                 {
                     "start": "10:15",
                     "end": "10:30",
-                    "name": "Tanja Petrushevska",
-                    "subtitle": "[Plenary] Cluster-lensed supernovae in the era of Roman, Rubin, and JWST",
+                    "name": "Patrick Kamieneski",
+                    "subtitle": "Introducing SN-ECHOES: A JWST Cycle 5 Program to Search for Lensed Supernovae Behind 5 Lensing Clusters",
                     "type": "session"
                 },
                 {
                     "start": "10:30",
                     "end": "10:45",
-                    "name": "Patrick Kamieneski",
-                    "subtitle": "[Plenary] Introducing SN-ECHOES: A JWST Cycle 5 Program to Search for Lensed Supernovae Behind 5 Lensing Clusters",
+                    "name": "Thomas Moore",
+                    "subtitle": "Outside the Lens: VENUS Discovery of a Superluminous Supernova on the Outskirts of Abell 370",
                     "type": "session"
                 },
                 {
@@ -265,50 +321,57 @@
                 {
                     "start": "11:15",
                     "end": "11:30",
+                    "name": "S6 \u00b7 DM & Resolved Galaxies",
+                    "subtitle": "Chair: Maru\u0161a Brada\u010d",
+                    "type": "session"
+                },
+                {
+                    "start": "11:15",
+                    "end": "11:30",
                     "name": "Yoshihisa Asada",
-                    "subtitle": "[Plenary] An ultra-faint galaxy hosting the metal-poor type II supernova at  z=5.13; Witnessing the initial metal enrichment with extremely frequent core-collapse supernovae?",
+                    "subtitle": "An ultra-faint galaxy hosting SN Eos at z=5.13: Initial metal enrichment with extremely frequent CCSNe?",
                     "type": "session"
                 },
                 {
                     "start": "11:30",
                     "end": "11:45",
                     "name": "Nicholas Martis",
-                    "subtitle": "[Plenary] Do Globular Clusters and Intracluster Light Trace Dark Matter in the Bullet Cluster?",
+                    "subtitle": "Do Globular Clusters and Intracluster Light Trace Dark Matter in the Bullet Cluster?",
                     "type": "session"
                 },
                 {
                     "start": "11:45",
                     "end": "12:00",
                     "name": "Felix Vecchi",
-                    "subtitle": "[Plenary] A complete view of Abell 2390 from space with Euclid, Hubble, and James Webb",
+                    "subtitle": "A complete view of Abell 2390 from space with Euclid, Hubble, and James Webb",
                     "type": "session"
                 },
                 {
                     "start": "12:00",
                     "end": "12:15",
                     "name": "Carla Cornil-Ba\u00efotto",
-                    "subtitle": "[Plenary] ALMA and JWST Imaging through a Cosmic Magnifying Glass: Sub-kiloparsec View into Star Formation at z~2.8",
+                    "subtitle": "ALMA and JWST Imaging through a Cosmic Magnifying Glass: Sub-kiloparsec View into Star Formation at z~2.8",
                     "type": "session"
                 },
                 {
                     "start": "12:15",
                     "end": "12:30",
                     "name": "Carmen Blanco Prieto",
-                    "subtitle": "[Plenary] Resolving the First Galaxies: Internal Structure in the Epoch of Reionization with JWST and ALMA",
+                    "subtitle": "Resolving the First Galaxies: Internal Structure in the Epoch of Reionization with JWST and ALMA",
                     "type": "session"
                 },
                 {
                     "start": "12:30",
                     "end": "12:45",
                     "name": "Hideki Umehata",
-                    "subtitle": "[Plenary] ELPIS: Accelerated Metal and Dust Enrichment in a Protocluster Core at z \u2248 8",
+                    "subtitle": "ELPIS: Accelerated Metal and Dust Enrichment in a Protocluster Core at z \u2248 8",
                     "type": "session"
                 },
                 {
                     "start": "12:45",
                     "end": "13:00",
-                    "name": "Flash B \u2014 flash-talk session ([3 min + 1 min Q] \u00d7 ~4)",
-                    "subtitle": "[Plenary]",
+                    "name": "",
+                    "subtitle": "Flash B \u2014 flash-talk session ([3 min + 1 min Q] \u00d7 ~4)",
                     "type": "tiktalk"
                 },
                 {
@@ -316,48 +379,62 @@
                     "end": "15:00",
                     "name": "Lunch",
                     "subtitle": "(VENUS internal discussion for VENUS members ~14:00\u201315:00: Cy5 MSA first cluster - PG004: data processing, distribution plan, key targets, first-round papers)",
-                    "type": "meal"
+                    "type": "break"
+                },
+                {
+                    "start": "15:00",
+                    "end": "15:30",
+                    "name": "S7 \u00b7 Lensed Individual Stars (+ lens modeling)",
+                    "subtitle": "Chair: Jose Diego",
+                    "type": "session"
                 },
                 {
                     "start": "15:00",
                     "end": "15:15",
                     "name": "Hayley Williams",
-                    "subtitle": "[Plenary] Highly magnified individual stars at cosmological distances: nine massive stars detected as transient events in a single galaxy at redshift z=0.94",
+                    "subtitle": "Highly magnified individual stars at cosmological distances: nine massive stars detected as transient events in a single galaxy at redshift z=0.94",
                     "type": "session"
                 },
                 {
                     "start": "15:15",
                     "end": "15:30",
                     "name": "Jos\u00e9 Mar\u00eda Palencia",
-                    "subtitle": "[Plenary] First Statistical Study of Over 100 Gravitationally Magnified Star Events at Redshift z~0.725 with JWST",
+                    "subtitle": "First Statistical Study of Over 100 Gravitationally Magnified Star Events at Redshift z~0.725 with JWST",
                     "type": "session"
                 },
                 {
                     "start": "15:30",
                     "end": "15:45",
                     "name": "Lukas Furtak",
-                    "subtitle": "[Plenary] More red dots -- The detection of caustic-crossing AGB stars in JWST's GLIMPSE",
+                    "subtitle": "More red dots -- The detection of caustic-crossing AGB stars in JWST's GLIMPSE",
                     "type": "session"
                 },
                 {
                     "start": "15:45",
                     "end": "16:00",
                     "name": "Erik Zackrisson",
-                    "subtitle": "[Plenary] Lensed, individual population III stars in VENUS \u2013 how many do we expect and what would they look like? (talk for either the open meeting or the internal VENUS session)",
+                    "subtitle": "Lensed, individual population III stars in VENUS \u2013 how many do we expect and what would they look like? (talk for either the open meeting or the internal VENUS session)",
                     "type": "session"
                 },
                 {
                     "start": "16:00",
                     "end": "16:15",
                     "name": "Gregor Rihtarsic",
-                    "subtitle": "[Plenary] Advancing strong lens modelling of CANUCS clusters and the Bullet Cluster with JWST imaging and spectroscopy",
+                    "subtitle": "Advancing strong lens modelling of CANUCS clusters and the Bullet Cluster with JWST imaging and spectroscopy",
                     "type": "session"
                 },
                 {
                     "start": "16:15",
                     "end": "16:30",
-                    "name": "Catherine Cerny",
-                    "subtitle": "[Plenary] Exploring the `Cosmic Mantis\u2019: A JWST Model of RXJ0437",
+                    "name": "Ga\u00ebl Noirot",
+                    "subtitle": "Spatially-Resolved Galaxy Properties through Cluster Lenses with JWST NIRISS Wide-Field Slitless Spectroscopy.",
+                    "type": "session"
+                },
+                {
+                    "start": "16:15",
+                    "end": "16:30",
+                    "name": "Fengwu Sun",
+                    "subtitle": "Latest Results from JWST Cycle-2 Program MAGNIF",
                     "type": "session"
                 },
                 {
@@ -370,37 +447,58 @@
                 {
                     "start": "17:00",
                     "end": "17:15",
+                    "name": "S8 \u00b7 Lens-Modeling Overviews + Mass Models",
+                    "subtitle": "Chair: Ana Acebron",
+                    "type": "session"
+                },
+                {
+                    "start": "17:00",
+                    "end": "17:15",
                     "name": "Marceau Limousin",
-                    "subtitle": "[Plenary] Constructing and Storing Strong Lensing Mass Models",
+                    "subtitle": "Constructing and Storing Strong Lensing Mass Models",
                     "type": "session"
                 },
                 {
                     "start": "17:15",
                     "end": "17:30",
-                    "name": "Joseph Allingham",
-                    "subtitle": "[Plenary] VENUS: A year of teachings from 60 strong lensing clusters",
+                    "name": "Catherine Cerny",
+                    "subtitle": "Exploring the `Cosmic Mantis\u2019: A JWST Model of RXJ0437",
+                    "type": "session"
+                },
+                {
+                    "start": "17:15",
+                    "end": "17:30",
+                    "name": "Keren Sharon",
+                    "subtitle": "SLICE lens-modeling overview",
                     "type": "session"
                 },
                 {
                     "start": "17:30",
                     "end": "17:45",
-                    "name": "Keren Sharon",
-                    "subtitle": "[Plenary] SLICE lens-modeling overview",
+                    "name": "Joseph Allingham",
+                    "subtitle": "VENUS: A year of teachings from 60 strong lensing clusters",
                     "type": "session"
                 },
                 {
                     "start": "17:45",
                     "end": "18:30",
                     "name": "Co-leads: Dan Coe & Guillaume Mahler",
-                    "subtitle": "[Plenary] Discussion \u2014 HFF-like community lens-modeling effort",
+                    "subtitle": "Discussion \u2014 HFF-like community lens-modeling effort",
                     "type": "workshop"
                 },
                 {
+                    "start": "18:30",
+                    "end": "20:00",
+                    "name": "Close",
+                    "subtitle": "",
+                    "type": "session"
+                },
+                {
                     "start": "20:00",
-                    "end": "20:15",
+                    "end": "22:00",
                     "name": "Conference dinner",
                     "subtitle": "",
-                    "type": "meal"
+                    "type": "break"
                 }
             ]
         },
@@ -413,48 +511,55 @@
                     "end": "09:00",
                     "name": "Open",
                     "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "09:00",
+                    "end": "09:30",
+                    "name": "S9 \u00b7 Cosmic Noon & Environment",
+                    "subtitle": "Chair: Keren Sharon",
                     "type": "session"
                 },
                 {
                     "start": "09:00",
                     "end": "09:30",
                     "name": "Jane Rigby",
-                    "subtitle": "[Plenary] Invited Review \u2014 Cosmic Noon",
+                    "subtitle": "Invited Review \u2014 Cosmic Noon",
                     "type": "long-talk"
                 },
                 {
                     "start": "09:30",
                     "end": "09:45",
                     "name": "Nicholas Foo",
-                    "subtitle": "[Plenary] The Discovery of a Strongly Lensed Protocluster Core Candidate at Cosmic Noon",
+                    "subtitle": "The Discovery of a Strongly Lensed Protocluster Core Candidate at Cosmic Noon",
                     "type": "session"
                 },
                 {
                     "start": "09:45",
                     "end": "10:00",
                     "name": "Gourav Khullar",
-                    "subtitle": "[Plenary] Studying Stochastic Star Formation via the Reddest (and apparently deadest?) Lensed Arcs",
+                    "subtitle": "Studying Stochastic Star Formation via the Reddest (and apparently deadest?) Lensed Arcs",
                     "type": "session"
                 },
                 {
                     "start": "10:00",
                     "end": "10:15",
                     "name": "Vesna Pirc Jev\u0161enak",
-                    "subtitle": "[Plenary] Mass-metallicity relation from cosmic dawn to cosmic noon with CANUCS",
+                    "subtitle": "Mass-metallicity relation from cosmic dawn to cosmic noon with CANUCS",
                     "type": "session"
                 },
                 {
                     "start": "10:15",
                     "end": "10:30",
                     "name": "Mingyu Li",
-                    "subtitle": "[Plenary] LATED: A Photometric Selection Framework for Population III Star Formation from Reionization to Cosmic Noon",
+                    "subtitle": "LATED: A Photometric Selection Framework for Population III Star Formation from Reionization to Cosmic Noon",
                     "type": "session"
                 },
                 {
                     "start": "10:30",
                     "end": "10:45",
                     "name": "Eiichi Egami",
-                    "subtitle": "[Plenary] Dissecting an Exceptionally Luminous Quintuply-Lensed Dusty Star-Forming Galaxy at z=4.69",
+                    "subtitle": "Dissecting an Exceptionally Luminous Quintuply-Lensed Dusty Star-Forming Galaxy at z=4.69",
                     "type": "session"
                 },
                 {
@@ -468,28 +573,28 @@
                     "start": "11:15",
                     "end": "11:30",
                     "name": "Bethan James",
-                    "subtitle": "[Plenary] The Roman Space Telescope: Enabling the Next Era of Gravitational Lensing Science",
+                    "subtitle": "The Roman Space Telescope: Enabling the Next Era of Gravitational Lensing Science",
                     "type": "session"
                 },
                 {
                     "start": "11:30",
                     "end": "11:45",
                     "name": "Rogier Windhorst",
-                    "subtitle": "[Plenary] Lessons from JWST development for future missions \u2014 HWO perspective",
+                    "subtitle": "Lessons from JWST development for future missions \u2014 HWO perspective",
                     "type": "session"
                 },
                 {
                     "start": "11:45",
                     "end": "12:00",
-                    "name": "Co-leads: Jen Lotz, Mathilde Jauzac, Jane Rigby",
-                    "subtitle": "[Plenary] JWST Lensing Surveys Overview: GLASS / UNCOVER / PEARLS / CANUCS / GLIMPSE / MAGNIF / SLICE / VENUS",
-                    "type": "session"
+                    "name": "Co-leads:\nJen Lotz, Mathilde Jauzac, Jane Rigby",
+                    "subtitle": "JWST Lensing Surveys Overview: \nGLASS / UNCOVER / PEARLS / CANUCS / GLIMPSE / MAGNIF / SLICE / VENUS",
+                    "type": "workshop"
                 },
                 {
                     "start": "12:00",
                     "end": "12:45",
-                    "name": "Discussion \u2014 Future Lensing Surveys: past lessons & future directions",
-                    "subtitle": "[Plenary]",
+                    "name": "",
+                    "subtitle": "Discussion \u2014 Future Lensing Surveys: past lessons & future directions",
                     "type": "workshop"
                 },
                 {
@@ -497,14 +602,14 @@
                     "end": "14:30",
                     "name": "Lunch (large buffet)",
                     "subtitle": "",
-                    "type": "meal"
+                    "type": "break"
                 },
                 {
                     "start": "14:30",
-                    "end": "14:45",
+                    "end": "20:30",
                     "name": "Excursion / Solar Eclipse (max ~20:30)",
                     "subtitle": "",
-                    "type": "session"
+                    "type": "social"
                 }
             ]
         },
@@ -513,101 +618,101 @@
             "date": "2026-08-13",
             "events": [
                 {
-                    "start": "09:30",
-                    "end": "11:00",
+                    "start": "09:00",
+                    "end": "09:30",
                     "name": "(Open to external members upon request)",
-                    "subtitle": "[Room A \u2014 VENUS] VENUS short talks: preliminary results & progress reports (~6\u201310 \u00d7 5\u20138 min)",
+                    "subtitle": "[Room A \u2014 VENUS] VENUS short talks: preliminary results & progress reports (9:00)\n- Cy6 proposal pitches, part 1 (10:30)",
                     "type": "workshop"
                 },
                 {
                     "start": "09:30",
                     "end": "11:00",
-                    "name": "SLICE team meeting (agenda TBD \u2014 Guillaume)",
-                    "subtitle": "[Room B \u2014 SLICE]",
+                    "name": "",
+                    "subtitle": "[Room B \u2014 SLICE] SLICE team meeting (agenda TBD \u2014 Guillaume)",
                     "type": "workshop"
                 },
                 {
                     "start": "11:00",
                     "end": "11:30",
                     "name": "Coffee",
-                    "subtitle": "[Both]",
+                    "subtitle": "",
                     "type": "break"
                 },
                 {
                     "start": "11:30",
-                    "end": "13:00",
-                    "name": "VENUS team discussion: WG breakouts \u2014 Cy4 & Cy5 projects and coordination",
-                    "subtitle": "[Room A \u2014 VENUS]",
+                    "end": "11:45",
+                    "name": "",
+                    "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: \n- Cy6 proposal pitches, part 2, coordination",
                     "type": "workshop"
                 },
                 {
                     "start": "11:30",
                     "end": "13:00",
-                    "name": "SLICE team discussion (TBD)",
-                    "subtitle": "[Room B \u2014 SLICE]",
+                    "name": "",
+                    "subtitle": "[Room B \u2014 SLICE] SLICE team discussion (TBD)",
                     "type": "workshop"
                 },
                 {
                     "start": "13:00",
                     "end": "14:00",
                     "name": "Lunch",
-                    "subtitle": "[Both]",
-                    "type": "meal"
+                    "subtitle": "",
+                    "type": "break"
                 },
                 {
                     "start": "14:00",
                     "end": "15:30",
                     "name": "(Open to external members upon request)",
-                    "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: - Cy6 proposal pitch, coordination",
+                    "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: \n- WG breakouts \u2014 Cy4 & Cy5 projects, coordination",
                     "type": "workshop"
                 },
                 {
                     "start": "14:00",
                     "end": "15:30",
-                    "name": "SLICE team discussion (TBD)",
-                    "subtitle": "[Room B \u2014 SLICE]",
+                    "name": "",
+                    "subtitle": "[Room B \u2014 SLICE] SLICE team discussion (TBD)",
                     "type": "workshop"
                 },
                 {
                     "start": "15:30",
                     "end": "16:00",
                     "name": "Coffee",
-                    "subtitle": "[Both]",
+                    "subtitle": "",
                     "type": "break"
                 },
                 {
                     "start": "16:00",
-                    "end": "17:00",
+                    "end": "16:15",
                     "name": "(Open to external members upon request)",
-                    "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: - Len model plan, timeline, coordination",
+                    "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: \n- Lens model plans, timeline, coordination",
                     "type": "workshop"
                 },
                 {
                     "start": "16:00",
                     "end": "17:00",
-                    "name": "SLICE team discussion (TBD)",
-                    "subtitle": "[Room B \u2014 SLICE]",
+                    "name": "",
+                    "subtitle": "[Room B \u2014 SLICE] SLICE team discussion (TBD)",
                     "type": "workshop"
                 },
                 {
                     "start": "17:00",
                     "end": "17:15",
                     "name": "Break  (no coffee station)",
-                    "subtitle": "[Both]",
+                    "subtitle": "",
                     "type": "break"
                 },
                 {
                     "start": "17:15",
-                    "end": "18:15",
-                    "name": "VENUS team discussion: Upcoming programs catch-up: accepted VENUS-related follow-ups & DDTs",
-                    "subtitle": "[Room A \u2014 VENUS]",
+                    "end": "17:30",
+                    "name": "",
+                    "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: \n- Upcoming programs catch-up: accepted follow-ups & DDTs\n- Overflow slot if needed",
                     "type": "workshop"
                 },
                 {
                     "start": "17:15",
                     "end": "18:15",
-                    "name": "SLICE team discussion (TBD)",
-                    "subtitle": "[Room B \u2014 SLICE]",
+                    "name": "",
+                    "subtitle": "[Room B \u2014 SLICE] SLICE team discussion (TBD)",
                     "type": "workshop"
                 }
             ]
@@ -620,29 +725,36 @@
                     "start": "09:30",
                     "end": "10:30",
                     "name": "(Open to external members upon request)",
-                    "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: - Data release, timeline, coordination",
+                    "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: \n- JWST MCT white paper: open working session",
                     "type": "workshop"
                 },
                 {
                     "start": "10:30",
                     "end": "11:00",
                     "name": "Coffee",
-                    "subtitle": "[Both]",
+                    "subtitle": "",
                     "type": "break"
                 },
                 {
                     "start": "11:00",
                     "end": "12:30",
-                    "name": "VENUS team discussion: wrap-up & Action-item lock-in",
-                    "subtitle": "[Room A \u2014 VENUS]",
+                    "name": "",
+                    "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: \n- Data release, timeline, coordination (11:00)\n- Wrap-up & action items (11:45)",
                     "type": "workshop"
                 },
                 {
                     "start": "12:30",
                     "end": "14:00",
                     "name": "Lunch & close",
-                    "subtitle": "[Both]",
-                    "type": "meal"
+                    "subtitle": "",
+                    "type": "break"
+                },
+                {
+                    "start": "14:00",
+                    "end": "15:30",
+                    "name": "Close",
+                    "subtitle": "",
+                    "type": "session"
                 }
             ]
         }

@@ -258,68 +258,102 @@ function parseGoogleSheetCSV(csvText) {
     }
     if (cur) lines.push(cur);
 
-    const days = [];
-    let currentDay = null;
-    let lastTime = null;
-
+    // Pre-pass: collect non-empty data rows and resolve missing durations for parallel tracks.
+    const rawRows = [];
     for (const rawLine of lines) {
         const line = rawLine.replace(/\r$/, '');
         if (!line.trim()) continue;
 
         const [timeRaw, durRaw, room, typeCol, speakerCol, titleCol] = parseCSVLine(line);
 
-        // Skip the fixed header rows.
+        // Skip fixed table header rows
         if (!timeRaw || timeRaw.toLowerCase() === 'time') continue;
         if (typeCol === 'Type' || speakerCol === 'Speaker') continue;
 
-        // Day separator row  e.g. "MONDAY · 10 August"
-        if (DAY_HEADER_RE.test(timeRaw)) {
-            const parsed = parseDayHeader(timeRaw);
+        rawRows.push({ timeRaw, durRaw, room, typeCol, speakerCol, titleCol });
+    }
+
+    // Resolve durations for parallel rows or missing duration entries
+    for (let i = 0; i < rawRows.length; i++) {
+        const r = rawRows[i];
+        if (DAY_HEADER_RE.test(r.timeRaw)) continue;
+        const startTime = normTime(r.timeRaw);
+        if (!startTime) continue;
+
+        let dur = parseInt(r.durRaw, 10) || 0;
+        if (dur === 0) {
+            // Check if another row at the exact same startTime has an explicit duration
+            const sameTimeNeighbor = rawRows.find((other, idx) => idx !== i && normTime(other.timeRaw) === startTime && parseInt(other.durRaw, 10) > 0);
+            if (sameTimeNeighbor) {
+                dur = parseInt(sameTimeNeighbor.durRaw, 10);
+            } else {
+                // Calculate duration to the next distinct start time on the same day
+                let nextTime = null;
+                for (let j = i + 1; j < rawRows.length; j++) {
+                    const nextR = rawRows[j];
+                    if (DAY_HEADER_RE.test(nextR.timeRaw)) break;
+                    const nt = normTime(nextR.timeRaw);
+                    if (nt && nt !== startTime) {
+                        nextTime = nt;
+                        break;
+                    }
+                }
+                if (nextTime) {
+                    dur = getMinutesDiff(nextTime, startTime);
+                }
+            }
+        }
+        r.computedDur = dur;
+    }
+
+    const days = [];
+    let currentDay = null;
+
+    for (const r of rawRows) {
+        // Day separator row e.g. "MONDAY · 10 August" or "THURSDAY · 13 August — Room A..."
+        if (DAY_HEADER_RE.test(r.timeRaw)) {
+            const parsed = parseDayHeader(r.timeRaw);
             if (parsed) {
                 currentDay = { day: parsed.day, date: parsed.date, events: [] };
                 days.push(currentDay);
-                lastTime = null;
             }
             continue;
         }
 
         if (!currentDay) continue;
 
-        const startTime = normTime(timeRaw);
+        const startTime = normTime(r.timeRaw);
         if (!startTime) continue;
-        lastTime = startTime;
 
-        const durMins = parseInt(durRaw, 10) || 0;
-        const endTime  = durMins > 0 ? addMinutes(startTime, durMins) : startTime;
+        const durMins = r.computedDur || 0;
+        const endTime = durMins > 0 ? addMinutes(startTime, durMins) : startTime;
 
         // Session-header row: type === "Session" with no meaningful speaker
-        // These describe a block label + chair. Render as a compact session marker.
-        const isSessionHeader = (typeCol === 'Session') && speakerCol && !durRaw;
+        const isSessionHeader = (r.typeCol === 'Session') && r.speakerCol && !r.durRaw;
 
         let name, subtitle, evType;
 
         if (isSessionHeader) {
-            // e.g. "S1 · Reionization & High-z Galaxies (1)" with chair in title
-            name     = speakerCol;     // session name
-            subtitle = titleCol;       // chair line
+            name     = r.speakerCol;     // session name
+            subtitle = r.titleCol;       // chair line
             evType   = 'session';
         } else {
-            const rawType = typeCol || '—';
-            evType = sheetTypeToEventType(rawType, speakerCol);
+            const rawType = r.typeCol || '—';
+            evType = sheetTypeToEventType(rawType, r.speakerCol);
 
             // Break / social rows: speaker column IS the event name
             if (evType === 'break' || evType === 'social' || evType === 'meal') {
-                name     = speakerCol || rawType;
-                subtitle = titleCol || '';
+                name     = r.speakerCol || rawType;
+                subtitle = r.titleCol || '';
             } else {
-                name     = speakerCol || '';
+                name     = r.speakerCol || '';
                 // Prefix room tag for parallel sessions
-                const roomTag = (room && room !== 'Plenary' && room !== '') ? `[${room}] ` : '';
-                subtitle = roomTag + (titleCol || '');
+                const roomTag = (r.room && r.room !== 'Plenary' && r.room !== '') ? `[${r.room}] ` : '';
+                subtitle = roomTag + (r.titleCol || '');
             }
         }
 
-        // Skip zero-duration placeholder rows (duration === 0 AND already have a talk at same time)
+        // Skip zero-duration placeholder rows if there's already a talk at the same time
         if (durMins === 0 && !isSessionHeader && currentDay.events.some(e => e.start === startTime && e.type !== 'session')) {
             continue;
         }
