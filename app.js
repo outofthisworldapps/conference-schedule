@@ -1445,7 +1445,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const leftCss = subLeftOffset;
         const widthCss = isMultiCol 
             ? `calc(${subWidthPercent}% - 4px)` 
-            : `calc(100% - 4px)`;
+            : `calc(${100 / numCols}% - 4px)`;
         const fontScaleCss = isMultiCol ? 'font-size: 0.85rem;' : '';
 
         const weekEndTimeMarkerHTML = showEndTime ? `
