@@ -196,40 +196,58 @@ function scrollToEarliestEvent() {
 }
 
 
+let lastFileHandle = null;
+
 async function reloadLatestSchedule() {
     try {
-        const response = await fetch('/api/latest-schedule');
-        if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            alert(errData.error || 'Failed to reload latest schedule');
-            return;
-        }
-        const data = await response.json();
-        if (data && data.scheduleData) {
-            history.push();
-            scheduleData = data.scheduleData;
-            if (data.conference) {
-                const titleEl = document.getElementById('header-title');
-                const titleLinkEl = document.getElementById('header-title-link');
-                const subEl = document.getElementById('header-subtitle');
-                const subLinkEl = document.getElementById('header-subtitle-link');
-
-                if (titleEl && data.conference.title) titleEl.textContent = data.conference.title;
-                if (titleLinkEl && (data.conference.site || data.conference.link)) {
-                    titleLinkEl.href = data.conference.site || data.conference.link;
-                }
-                if (subEl && data.conference.subtitle) subEl.textContent = data.conference.subtitle;
-                if (subLinkEl && data.conference.link) subLinkEl.href = data.conference.link;
-                if (data.conference.title) document.title = `${data.conference.title} | ${data.conference.subtitle || 'Conference Schedule'}`;
+        if ('showOpenFilePicker' in window) {
+            const options = {
+                types: [{
+                    description: 'JSON Files',
+                    accept: { 'application/json': ['.json'] }
+                }],
+                multiple: false
+            };
+            let handle = lastFileHandle;
+            if (!handle) {
+                [handle] = await window.showOpenFilePicker(options);
+                lastFileHandle = handle;
             }
-            renderSchedule();
-            updateNowLine();
+            const file = await handle.getFile();
+            const text = await file.text();
+            const data = JSON.parse(text);
+            if (data && data.scheduleData) {
+                history.push();
+                scheduleData = data.scheduleData;
+                if (data.conference) {
+                    const titleEl = document.getElementById('header-title');
+                    const titleLinkEl = document.getElementById('header-title-link');
+                    const subEl = document.getElementById('header-subtitle');
+                    const subLinkEl = document.getElementById('header-subtitle-link');
+
+                    if (titleEl && data.conference.title) titleEl.textContent = data.conference.title;
+                    if (titleLinkEl && (data.conference.site || data.conference.link)) {
+                        titleLinkEl.href = data.conference.site || data.conference.link;
+                    }
+                    if (subEl && data.conference.subtitle) subEl.textContent = data.conference.subtitle;
+                    if (subLinkEl && data.conference.link) subLinkEl.href = data.conference.link;
+                    if (data.conference.title) document.title = `${data.conference.title} | ${data.conference.subtitle || 'Conference Schedule'}`;
+                }
+                renderSchedule();
+                updateNowLine();
+            } else {
+                alert('Invalid schedule data in selected file.');
+            }
         } else {
-            alert('Invalid schedule data found in latest downloaded file');
+            // Fallback for browsers without File System Access API
+            document.getElementById('file-input').click();
         }
     } catch (err) {
+        if (err.name === 'AbortError') return; // User cancelled picker
         console.error('Error reloading schedule:', err);
-        alert('Could not reload schedule file.');
+        // If stored handle failed or permission denied, reset handle and open file picker
+        lastFileHandle = null;
+        document.getElementById('file-input').click();
     }
 }
 
@@ -1127,7 +1145,6 @@ window.editStartTime = editStartTime;
 window.deleteEvent = deleteEvent;
 window.editEndTime = editEndTime;
 window.changeEventType = changeEventType;
-window.selectConferenceOption = selectConferenceOption;
 window.handleInlineTimeFocus = handleInlineTimeFocus;
 window.handleInlineTimeBlur = handleInlineTimeBlur;
 window.handleInlineTimeKeydown = handleInlineTimeKeydown;
