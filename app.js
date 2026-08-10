@@ -339,6 +339,29 @@ function parseGoogleSheetCSV(csvText) {
 // Pull conferenceConfig from the loaded JSON so the CSV parser can infer the year.
 let conferenceConfig = null;
 
+// Carry over delay values from the existing scheduleData into freshly-parsed days.
+// Matches events by (date, originalStart) so any manual time-delays the user
+// added are preserved across a live Google Sheets refresh.
+function mergeDelaysFromExisting(parsedDays, existingData) {
+    // Build a lookup: "2026-08-10|09:00" -> delay (minutes)
+    const delayMap = {};
+    (existingData || []).forEach(day => {
+        (day.events || []).forEach(ev => {
+            if (ev.delay) {
+                delayMap[`${day.date}|${ev.start}`] = ev.delay;
+            }
+        });
+    });
+    // Stamp matching delays onto the freshly parsed events.
+    (parsedDays || []).forEach(day => {
+        (day.events || []).forEach(ev => {
+            const saved = delayMap[`${day.date}|${ev.start}`];
+            if (saved) ev.delay = saved;
+        });
+    });
+    return parsedDays;
+}
+
 async function refreshSpreadsheetData() {
     const btn = document.getElementById('refresh-sheet-btn');
     if (btn) {
@@ -350,10 +373,8 @@ async function refreshSpreadsheetData() {
         // Read the spreadsheet link from the already-loaded conference config.
         let sheetUrl = conferenceConfig && conferenceConfig.link;
         if (!sheetUrl) {
-            // Fall back to santander default
             sheetUrl = 'https://docs.google.com/spreadsheets/d/1p3W5hhR0__uw-OXQKKvQCH5iqJExd2gtVdr9JRnWopk';
         }
-        // Convert a regular /spreadsheets/d/<ID> URL to a CSV export URL.
         const csvUrl = sheetUrl.replace(/\/edit.*$/, '').replace(/\/*$/, '') + '/export?format=csv&t=' + Date.now();
 
         const resp = await fetch(csvUrl);
@@ -363,6 +384,8 @@ async function refreshSpreadsheetData() {
         const parsed = parseGoogleSheetCSV(csvText);
         if (!parsed || parsed.length === 0) throw new Error('No schedule data parsed from sheet');
 
+        // Preserve any delays the user added before overwriting scheduleData.
+        mergeDelaysFromExisting(parsed, scheduleData);
         scheduleData = parsed;
 
         // Clear localStorage so the parsed-from-sheet data becomes the working copy.
@@ -385,24 +408,6 @@ async function refreshSpreadsheetData() {
         if (btn) btn.classList.remove('spinning');
         console.error('Refresh from Google Sheet failed:', err);
         alert('Could not fetch from Google Sheets. Check that the sheet is publicly shared (anyone with link can view).');
-    }
-}
-
-async function reloadFromJSON() {
-    const btn = document.getElementById('reload-json-btn');
-    if (btn) btn.classList.add('spinning');
-    try {
-        const cacheKey = `cs_schedule_data_${currentLoadedFile}`;
-        localStorage.removeItem(cacheKey);
-        await loadConference(currentLoadedFile, /* forceRefresh= */ true);
-        if (btn) {
-            btn.classList.remove('spinning');
-            btn.classList.add('success-green');
-            setTimeout(() => btn.classList.remove('success-green'), 1500);
-        }
-    } catch (err) {
-        if (btn) btn.classList.remove('spinning');
-        console.error('Reload from JSON failed:', err);
     }
 }
 
@@ -509,8 +514,6 @@ function setupEventListeners() {
     const refreshBtn = document.getElementById('refresh-sheet-btn');
     if (refreshBtn) refreshBtn.addEventListener('click', refreshSpreadsheetData);
 
-    const reloadJsonBtn = document.getElementById('reload-json-btn');
-    if (reloadJsonBtn) reloadJsonBtn.addEventListener('click', reloadFromJSON);
 
     document.getElementById('undo-btn').addEventListener('click', () => history.undo());
     document.getElementById('redo-btn').addEventListener('click', () => history.redo());
