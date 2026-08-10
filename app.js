@@ -794,14 +794,19 @@ function editStartTime(date, index) {
         cumulativeDelayBefore = newDelay;
     }
     
-    const currentActualStart = addMinutes(event.start, cumulativeDelayBefore + (event.delay || 0));
-    let newTimeInput = prompt(`Edit start time for "${event.name || event.title}" (Enter HH:MM or leave blank for 'now'):`, currentActualStart);
+    const { actualStart } = getEventTimes(event, cumulativeDelayBefore);
+    let newTimeInput = prompt(`Edit start time for "${event.name || event.title}" (Enter HH:MM or leave blank for 'now'):`, actualStart);
     
     const parsed = parseAndNormalizeTimeInput(newTimeInput);
     if (parsed) {
         history.push();
-        const newDelay = getMinutesDiff(parsed, event.start);
-        event.delay = newDelay;
+        const targetOriginalStart = addMinutes(parsed, -cumulativeDelayBefore);
+        const currentDuration = getMinutesDiff(event.end || event.start, event.start);
+        event.start = targetOriginalStart;
+        event.delay = 0;
+        if (!isBufferEvent(event)) {
+            event.end = addMinutes(targetOriginalStart, currentDuration);
+        }
         renderSchedule();
         updateNowLine();
     }
@@ -835,11 +840,55 @@ function deleteEvent(date, index) {
     const day = scheduleData.find(d => d.date === date);
     if (!day) return;
     const event = day.events[index];
+    if (!event) return;
     
     if (confirm(`Are you sure you want to delete "${event.name || event.title}"?`)) {
         history.push();
+        
+        let cumulativeDelayBefore = 0;
+        for (let i = 0; i < index; i++) {
+            const { newDelay } = getEventTimes(day.events[i], cumulativeDelayBefore);
+            cumulativeDelayBefore = newDelay;
+        }
+        const { actualStart, actualEnd } = getEventTimes(event, cumulativeDelayBefore);
+        const deletedDuration = getMinutesDiff(actualEnd, actualStart);
+        const deletedStart = actualStart;
+
         day.events.splice(index, 1);
+
+        // Fill freed space by shifting subsequent events or expanding next buffer/break event
+        if (index < day.events.length) {
+            let i = index;
+            let currentGapToClose = deletedDuration;
+            let firstShiftedStart = deletedStart;
+
+            while (i < day.events.length) {
+                const nextEv = day.events[i];
+                if (isBufferEvent(nextEv)) {
+                    if (i === index) {
+                        nextEv.start = firstShiftedStart;
+                    } else {
+                        nextEv.start = addMinutes(nextEv.start, -currentGapToClose);
+                    }
+                    nextEv.delay = 0;
+                    break;
+                } else {
+                    const evDuration = getMinutesDiff(nextEv.end || nextEv.start, nextEv.start);
+                    if (i === index) {
+                        nextEv.start = firstShiftedStart;
+                    } else {
+                        nextEv.start = addMinutes(nextEv.start, -currentGapToClose);
+                    }
+                    nextEv.end = addMinutes(nextEv.start, evDuration);
+                    nextEv.delay = 0;
+                    firstShiftedStart = nextEv.end;
+                    i++;
+                }
+            }
+        }
+
         renderSchedule();
+        updateNowLine();
     }
 }
 

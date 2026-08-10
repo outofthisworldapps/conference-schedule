@@ -86,7 +86,7 @@ Each conference dataset (e.g., `santander2026.json`, `schedule.json`) follows th
   * Event start and end times display as clickable inline elements (`.inline-time-editor`) on every event card in both single-day and 5-day multi-column week views.
   * Clicking an inline time tag transforms it into an in-place `contenteditable` span without any browser `prompt()` pop-ups.
   * Pressing `Enter` saves the new `HH:MM` time. Typing `now` (or pressing `Enter` when blank) automatically sets the start time to the current clock time.
-  * **Real-Time Schedule Cascading**: Adjusting an event's start time forward automatically cascades the delay to all subsequent sessions of the day while letting break/meal buffers absorb delays where possible.
+  * **Real-Time Schedule Cascading & Deletion Auto-Expansion**: Adjusting an event's start time forward automatically cascades the delay to all subsequent sessions of the day. Deleting an event automatically shifts subsequent talks up and expands the following break/coffee/meal event to fill the freed time seamlessly without leaving uneditable gaps or "ghost" original time blocks. Manual start time edits directly update event start coordinates without being blocked by prior original start times.
 
 ---
 
