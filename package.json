@@ -1,0 +1,13 @@
+{
+  "name": "conference-schedule",
+  "version": "1.0.0",
+  "description": "Conference Schedule web application",
+  "scripts": {
+    "dev": "npx serve -l 3000 .",
+    "start": "npx serve -l 3000 .",
+    "deploy": "npx firebase-tools deploy --only hosting"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
