@@ -1043,8 +1043,22 @@ header a {
     white-space: nowrap;
 }
 
-.event-duration-left-tag {
+.calendar-duration-marker {
+    position: absolute;
+    right: 100%;
     margin-right: 6px;
+    top: 0;
+    transform: translateY(-50%);
+    z-index: 14;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    white-space: nowrap;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.event-duration-left-tag {
     font-size: 0.65rem;
     font-weight: 400;
     white-space: nowrap;

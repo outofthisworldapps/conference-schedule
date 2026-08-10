@@ -1386,6 +1386,10 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const durationTagHTML = `<span class="event-duration-left-tag" style="color: ${eventColor};">${duration}</span>`;
 
         if (!isMultiCol) {
+            const midTop = top + (height / 2);
+            const durationMarkerHTML = `<div class="calendar-duration-marker" style="top: ${midTop}px;">
+                <span class="event-duration-left-tag" style="color: ${eventColor};">${duration}</span>
+            </div>`;
             const endTimeMarkerHTML = showEndTime ? `
                 <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
                     <span class="inline-time-badge" contenteditable="true" 
@@ -1401,13 +1405,13 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             markerHTML = `
                 ${origTimeMarkerHTML}
                 <div class="calendar-time-marker" style="top: ${top}px;">
-                    ${durationTagHTML}
                     <span class="inline-time-badge" contenteditable="true" 
                           onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
                           onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
                           onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
                           title="Click to edit start time">${formatTime(actualStart)}</span>
                 </div>
+                ${durationMarkerHTML}
                 ${endTimeMarkerHTML}
             `;
         }
