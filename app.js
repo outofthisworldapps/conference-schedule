@@ -483,7 +483,8 @@ function parseAndNormalizeTimeInput(rawInput) {
         const now = new Date();
         return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }
-    // Handle 12-hour format e.g. 9:00a, 9:00am, 2:15p, 2:15pm
+
+    // Handle standard H:MM or HH:MM with optional meridiem (e.g. 9:02a, 9:02am, 2:15p, 2:15pm)
     const twelveHourMatch = input.match(/^(\d{1,2}):(\d{2})\s*([ap](?:m)?)?$/);
     if (twelveHourMatch) {
         let hours = parseInt(twelveHourMatch[1], 10);
@@ -493,6 +494,19 @@ function parseAndNormalizeTimeInput(rawInput) {
         if (meridiem && meridiem.startsWith('a') && hours === 12) hours = 0;
         return `${String(hours).padStart(2, '0')}:${minutes}`;
     }
+
+    // Handle digit-only or digit+meridiem formats without colon (e.g. 902a, 902am, 902, 1430, 215p)
+    const compactMatch = input.match(/^(\d{3,4})\s*([ap](?:m)?)?$/);
+    if (compactMatch) {
+        const digits = compactMatch[1];
+        const meridiem = compactMatch[2];
+        let hours = parseInt(digits.length === 3 ? digits.slice(0, 1) : digits.slice(0, 2), 10);
+        const minutes = digits.slice(-2);
+        if (meridiem && meridiem.startsWith('p') && hours < 12) hours += 12;
+        if (meridiem && meridiem.startsWith('a') && hours === 12) hours = 0;
+        return `${String(hours).padStart(2, '0')}:${minutes}`;
+    }
+
     // Standard HH:MM
     if (/^\d{1,2}:\d{2}$/.test(input)) {
         const parts = input.split(':');
@@ -1090,4 +1104,7 @@ window.deleteEvent = deleteEvent;
 window.editEndTime = editEndTime;
 window.changeEventType = changeEventType;
 window.selectConferenceOption = selectConferenceOption;
+window.handleInlineTimeFocus = handleInlineTimeFocus;
+window.handleInlineTimeBlur = handleInlineTimeBlur;
+window.handleInlineTimeKeydown = handleInlineTimeKeydown;
 
