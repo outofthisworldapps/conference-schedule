@@ -620,8 +620,6 @@ header a {
 
 .calendar-event {
     position: absolute;
-    left: 20px;
-    right: 0;
     background: rgba(18, 19, 24, 0.95);
     border: 1px solid var(--border-color);
     border-left: 4px solid var(--session-color);
