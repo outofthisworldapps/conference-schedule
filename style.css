@@ -1037,10 +1037,21 @@ header a {
     content: attr(data-remaining);
     position: absolute;
     left: 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.85);
     white-space: nowrap;
+}
+
+.event-duration-left-tag {
+    position: absolute;
+    left: -22px;
+    top: 4px;
+    font-size: 0.65rem;
+    font-weight: 400;
+    white-space: nowrap;
+    pointer-events: none;
+    line-height: 1;
 }
 
 /* Day Selection for Calendar */
