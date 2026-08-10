@@ -92,23 +92,14 @@ async function loadConference(fileName) {
     try {
         currentLoadedFile = fileName;
         await loadAppVersion();
-        const response = await fetch(`${fileName}?t=${Date.now()}`);
-        const data = await response.json();
-        scheduleData = data.scheduleData || [];
-
-        if (data.conference) {
-            const titleEl = document.getElementById('header-title');
-            const titleLinkEl = document.getElementById('header-title-link');
-            const subEl = document.getElementById('header-subtitle');
-            const subLinkEl = document.getElementById('header-subtitle-link');
-
-            if (titleEl && data.conference.title) titleEl.textContent = data.conference.title;
-            if (titleLinkEl && (data.conference.site || data.conference.link)) {
-                titleLinkEl.href = data.conference.site || data.conference.link;
-            }
-            if (subEl && data.conference.subtitle) subEl.textContent = data.conference.subtitle;
-            if (subLinkEl && data.conference.link) subLinkEl.href = data.conference.link;
-            if (data.conference.title) document.title = `${data.conference.title} | ${data.conference.subtitle || 'Conference Schedule'}`;
+        
+        const localSavedData = loadScheduleFromLocalStorage(fileName);
+        if (localSavedData) {
+            scheduleData = localSavedData;
+        } else {
+            const response = await fetch(`${fileName}?t=${Date.now()}`);
+            const data = await response.json();
+            scheduleData = data.scheduleData || [];
         }
 
         const savedDay = localStorage.getItem('cs_selected_day');
@@ -129,12 +120,15 @@ async function loadConference(fileName) {
             }
         }
 
-
         history.undoStack = [];
         history.redoStack = [];
         history.updateButtons();
         renderSchedule();
-        setTimeout(scrollToEarliestEvent, 100);
+
+        const scrolledToNow = checkAndScrollToNowIfInProgram();
+        if (!scrolledToNow) {
+            setTimeout(scrollToEarliestEvent, 100);
+        }
     } catch (err) {
         console.error('Failed to load conference JSON:', err);
     }
@@ -196,59 +190,68 @@ function scrollToEarliestEvent() {
 }
 
 
-let lastFileHandle = null;
-
-async function reloadLatestSchedule() {
+function saveScheduleToLocalStorage() {
     try {
-        if ('showOpenFilePicker' in window) {
-            const options = {
-                types: [{
-                    description: 'JSON Files',
-                    accept: { 'application/json': ['.json'] }
-                }],
-                multiple: false
-            };
-            let handle = lastFileHandle;
-            if (!handle) {
-                [handle] = await window.showOpenFilePicker(options);
-                lastFileHandle = handle;
-            }
-            const file = await handle.getFile();
-            const text = await file.text();
-            const data = JSON.parse(text);
-            if (data && data.scheduleData) {
-                history.push();
-                scheduleData = data.scheduleData;
-                if (data.conference) {
-                    const titleEl = document.getElementById('header-title');
-                    const titleLinkEl = document.getElementById('header-title-link');
-                    const subEl = document.getElementById('header-subtitle');
-                    const subLinkEl = document.getElementById('header-subtitle-link');
-
-                    if (titleEl && data.conference.title) titleEl.textContent = data.conference.title;
-                    if (titleLinkEl && (data.conference.site || data.conference.link)) {
-                        titleLinkEl.href = data.conference.site || data.conference.link;
-                    }
-                    if (subEl && data.conference.subtitle) subEl.textContent = data.conference.subtitle;
-                    if (subLinkEl && data.conference.link) subLinkEl.href = data.conference.link;
-                    if (data.conference.title) document.title = `${data.conference.title} | ${data.conference.subtitle || 'Conference Schedule'}`;
-                }
-                renderSchedule();
-                updateNowLine();
-            } else {
-                alert('Invalid schedule data in selected file.');
-            }
-        } else {
-            // Fallback for browsers without File System Access API
-            document.getElementById('file-input').click();
+        if (scheduleData && scheduleData.length > 0) {
+            const key = `cs_schedule_data_${currentLoadedFile}`;
+            localStorage.setItem(key, JSON.stringify(scheduleData));
         }
-    } catch (err) {
-        if (err.name === 'AbortError') return; // User cancelled picker
-        console.error('Error reloading schedule:', err);
-        // If stored handle failed or permission denied, reset handle and open file picker
-        lastFileHandle = null;
-        document.getElementById('file-input').click();
+    } catch (e) {
+        console.warn('Could not save schedule data to localStorage:', e);
     }
+}
+
+function loadScheduleFromLocalStorage(fileName) {
+    try {
+        const key = `cs_schedule_data_${fileName}`;
+        const saved = localStorage.getItem(key);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+            }
+        }
+    } catch (e) {
+        console.warn('Could not load schedule data from localStorage:', e);
+    }
+    return null;
+}
+
+function checkAndScrollToNowIfInProgram() {
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const todayData = scheduleData.find(d => d.date === todayStr);
+    
+    if (!todayData || !todayData.events || todayData.events.length === 0) {
+        return false;
+    }
+
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    
+    let programStart = 24 * 60;
+    let programEnd = 0;
+
+    todayData.events.forEach(e => {
+        if (e.start) {
+            const [sh, sm] = e.start.split(':').map(Number);
+            const startMins = sh * 60 + sm;
+            if (startMins < programStart) programStart = startMins;
+            
+            let endMins = startMins + (e.durationMinutes || 15);
+            if (e.end) {
+                const [eh, em] = e.end.split(':').map(Number);
+                endMins = eh * 60 + em;
+            }
+            if (endMins > programEnd) programEnd = endMins;
+        }
+    });
+
+    if (currentMinutes >= programStart && currentMinutes <= programEnd) {
+        scrollToNow();
+        return true;
+    }
+    
+    return false;
 }
 
 function setupEventListeners() {
@@ -260,7 +263,6 @@ function setupEventListeners() {
     document.getElementById('undo-btn').addEventListener('click', () => history.undo());
     document.getElementById('redo-btn').addEventListener('click', () => history.redo());
     document.getElementById('save-btn').addEventListener('click', saveSchedule);
-    document.getElementById('reload-btn').addEventListener('click', reloadLatestSchedule);
     document.getElementById('load-btn').addEventListener('click', () => document.getElementById('file-input').click());
     document.getElementById('file-input').addEventListener('change', loadSchedule);
     document.getElementById('now-btn').addEventListener('click', scrollToNow);
@@ -410,6 +412,7 @@ function loadSchedule(event) {
 }
 
 function renderSchedule() {
+    saveScheduleToLocalStorage();
     renderCalendarView();
     updateNowLine();
     const slider = document.getElementById('zoom-slider');
