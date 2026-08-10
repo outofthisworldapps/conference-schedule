@@ -830,8 +830,8 @@ function renderCalendarView() {
     const gridContainer = document.getElementById('calendar-grid');
     const isAllDays = selectedDay === 'all';
     const dayIndex = isAllDays ? -1 : scheduleData.findIndex(d => d.date === selectedDay);
-    const gutterWidth = isAllDays ? '0px' : '96px';
-    gridContainer.style.setProperty('--gutter-width', isAllDays ? '0px' : '96px');
+    const gutterWidth = isAllDays ? '0px' : '72px';
+    gridContainer.style.setProperty('--gutter-width', isAllDays ? '0px' : '72px');
 
     const colHeaderHTML = isAllDays ? `
         <div class="calendar-column-headers" style="display: flex; width: 100%; box-sizing: border-box; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--bg-color); padding: 8px 0; margin-top: 6px;">
@@ -1104,8 +1104,8 @@ function updateNowLine() {
                 nowLine.style.width = `calc(${colWidthPercent}% - 4px)`;
             }
         } else {
-            nowLine.style.left = 'calc(-1 * var(--gutter-width, 96px))';
-            nowLine.style.width = 'calc(100% + var(--gutter-width, 96px))';
+            nowLine.style.left = 'calc(-1 * var(--gutter-width, 72px))';
+            nowLine.style.width = 'calc(100% + var(--gutter-width, 72px))';
         }
         
         document.querySelectorAll('.calendar-event').forEach(el => {
