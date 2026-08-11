@@ -1474,9 +1474,14 @@ function renderCalendarView() {
     const isAllDays = selectedDay === 'all';
     const dayIndex = isAllDays ? -1 : scheduleData.findIndex(d => d.date === selectedDay);
     const gutterWidth = isAllDays ? '48px' : '88px';
-    gridContainer.style.setProperty('--gutter-width', isAllDays ? '48px' : '88px');
+    gridContainer.style.setProperty('--gutter-width', gutterWidth);
 
-    const sessionToggleBtnHTML = `
+    const sessionToggleBtnHTML = isAllDays ? `
+        <div class="view-mode-toggle">
+            <button class="toggle-mode-btn ${weekViewMode === 'talks' ? 'active' : ''}" onclick="setWeekViewMode('talks')" title="Show individual talks in weekly grid">Talks</button>
+            <button class="toggle-mode-btn ${weekViewMode === 'sessions' ? 'active' : ''}" onclick="setWeekViewMode('sessions')" title="Show session titles in weekly grid">Sessions</button>
+        </div>
+    ` : `
         <div class="view-mode-toggle">
             <button class="toggle-mode-btn ${showSingleDaySessions ? 'active' : ''}" onclick="toggleSingleDaySessions()" title="${showSingleDaySessions ? 'Collapse Sessions Column' : 'Expand Sessions Column'}">
                 ${showSingleDaySessions ? '&gt;' : '&lt;'}
@@ -1592,12 +1597,11 @@ function renderCalendarView() {
         scheduleData.map((_, i) => i > 0 ? `<div style="position: absolute; top: 0; bottom: 0; left: ${(i / scheduleData.length) * 100}%; width: 1px; background: rgba(255,255,255,0.08); z-index: 10;"></div>` : '').join('') : '';
 
     let sessionsSideColumnHTML = '';
-    if (showSingleDaySessions) {
-        const daysToRender = isAllDays ? scheduleData : scheduleData.filter(d => d.date === selectedDay);
-        const allSessionCards = daysToRender.map(dayData => {
-            if (!dayData || !dayData.events) return '';
+    if (!isAllDays && showSingleDaySessions) {
+        const dayData = scheduleData.find(d => d.date === selectedDay);
+        if (dayData && dayData.events) {
             const trackTimes = computeTrackAwareEventTimes(dayData.events);
-            return dayData.events.map((event, idx) => {
+            const sessionCards = dayData.events.map((event, idx) => {
                 if (!isSessionHeaderEvent(event)) return '';
                 let actualStart = trackTimes[idx].actualStart;
                 if (idx + 1 < dayData.events.length && !isSessionHeaderEvent(dayData.events[idx + 1])) {
@@ -1631,43 +1635,43 @@ function renderCalendarView() {
                 const sSub = event.subtitle || event.description || "";
 
                 const inlineStartTimeBadge = `<span class="inline-time-badge" contenteditable="true" 
-                      onfocus="handleInlineTimeFocus(event, '${dayData.date}', ${idx}, 'start')" 
-                      onblur="handleInlineTimeBlur(event, '${dayData.date}', ${idx}, 'start')" 
-                      onkeydown="handleInlineTimeKeydown(event, '${dayData.date}', ${idx}, 'start')" 
+                      onfocus="handleInlineTimeFocus(event, '${selectedDay}', ${idx}, 'start')" 
+                      onblur="handleInlineTimeBlur(event, '${selectedDay}', ${idx}, 'start')" 
+                      onkeydown="handleInlineTimeKeydown(event, '${selectedDay}', ${idx}, 'start')" 
                       title="Click to edit start time">${formatTime(actualStart)}</span>`;
                 
                 const inlineEndTimeBadge = (endActualStart && endActualStart !== actualStart) ? ` &ndash; <span class="inline-time-badge" contenteditable="true" 
-                      onfocus="handleInlineTimeFocus(event, '${dayData.date}', ${idx}, 'end')" 
-                      onblur="handleInlineTimeBlur(event, '${dayData.date}', ${idx}, 'end')" 
-                      onkeydown="handleInlineTimeKeydown(event, '${dayData.date}', ${idx}, 'end')" 
+                      onfocus="handleInlineTimeFocus(event, '${selectedDay}', ${idx}, 'end')" 
+                      onblur="handleInlineTimeBlur(event, '${selectedDay}', ${idx}, 'end')" 
+                      onkeydown="handleInlineTimeKeydown(event, '${selectedDay}', ${idx}, 'end')" 
                       title="Click to edit end time">${formatTime(endActualStart)}</span>` : '';
 
                 return `
                     <div class="side-session-card" style="top: ${top}px; height: ${heightPx}px; z-index: ${100 + idx};">
                         <div class="side-session-time">${inlineStartTimeBadge}${inlineEndTimeBadge}</div>
                         <div class="side-session-title" contenteditable="true" tabindex="0"
-                             onfocus="handleInlineFocus(event, '${dayData.date}', ${idx}, 'name')" 
-                             onblur="handleInlineBlur(event, '${dayData.date}', ${idx}, 'name')" 
-                             onkeydown="handleInlineKeydown(event, '${dayData.date}', ${idx}, 'name')"
-                             onmouseup="handleInlineMouseUp(event, '${dayData.date}', ${idx}, 'name')">${esc(sName)}</div>
+                             onfocus="handleInlineFocus(event, '${selectedDay}', ${idx}, 'name')" 
+                             onblur="handleInlineBlur(event, '${selectedDay}', ${idx}, 'name')" 
+                             onkeydown="handleInlineKeydown(event, '${selectedDay}', ${idx}, 'name')"
+                             onmouseup="handleInlineMouseUp(event, '${selectedDay}', ${idx}, 'name')">${esc(sName)}</div>
                         <div class="side-session-chair" contenteditable="true" tabindex="0"
-                             onfocus="handleInlineFocus(event, '${dayData.date}', ${idx}, 'subtitle')" 
-                             onblur="handleInlineBlur(event, '${dayData.date}', ${idx}, 'subtitle')" 
-                             onkeydown="handleInlineKeydown(event, '${dayData.date}', ${idx}, 'subtitle')"
-                             onmouseup="handleInlineMouseUp(event, '${dayData.date}', ${idx}, 'subtitle')">${esc(sSub)}</div>
+                             onfocus="handleInlineFocus(event, '${selectedDay}', ${idx}, 'subtitle')" 
+                             onblur="handleInlineBlur(event, '${selectedDay}', ${idx}, 'subtitle')" 
+                             onkeydown="handleInlineKeydown(event, '${selectedDay}', ${idx}, 'subtitle')"
+                             onmouseup="handleInlineMouseUp(event, '${selectedDay}', ${idx}, 'subtitle')">${esc(sSub)}</div>
                     </div>
                 `;
             }).join('');
-        }).join('');
 
-        sessionsSideColumnHTML = `
-            <div class="single-day-sessions-column">
-                <div class="sessions-column-header">Sessions & Chairs</div>
-                <div class="sessions-column-body" style="height: ${gridHeight}px; position: relative;">
-                    ${allSessionCards}
+            sessionsSideColumnHTML = `
+                <div class="single-day-sessions-column">
+                    <div class="sessions-column-header">Sessions & Chairs</div>
+                    <div class="sessions-column-body" style="height: ${gridHeight}px; position: relative;">
+                        ${sessionCards}
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     }
 
     // Generate hour line ticks only up to totalEndM
