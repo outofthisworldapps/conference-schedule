@@ -1722,13 +1722,53 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
     } else {
         // All week view:
         if (weekViewMode === 'sessions') {
-            // Show session headers, breaks, meals, workshops, socials, but omit individual talk events
-            targetEvents = dayData.events.filter(e => {
-                if (isSessionHeaderEvent(e)) return true;
-                const type = getInferredType(e);
-                if (type === 'break' || type === 'meal' || type === 'social' || type === 'workshop') return true;
-                return false;
-            });
+            // Check if dayData has explicit 0-duration session headers
+            const hasExplicitHeaders = dayData.events.some(e => isSessionHeaderEvent(e));
+            if (hasExplicitHeaders) {
+                targetEvents = dayData.events.filter(e => {
+                    if (isSessionHeaderEvent(e)) return true;
+                    const type = getInferredType(e);
+                    return type === 'break' || type === 'meal' || type === 'social' || type === 'workshop';
+                });
+            } else {
+                // Synthesize session blocks for talk clusters between breaks/meals
+                const trackTimes = computeTrackAwareEventTimes(dayData.events);
+                const synthesized = [];
+                let currentSessionTalks = [];
+                let sessionStartIndex = -1;
+
+                const flushSession = () => {
+                    if (currentSessionTalks.length > 0) {
+                        const firstEv = currentSessionTalks[0];
+                        const lastEv = currentSessionTalks[currentSessionTalks.length - 1];
+                        const start = trackTimes[sessionStartIndex].actualStart;
+                        const end = trackTimes[sessionStartIndex + currentSessionTalks.length - 1].actualEnd;
+                        synthesized.push({
+                            name: `Session (${currentSessionTalks.length} Talks)`,
+                            subtitle: `${firstEv.name || 'Talk'} – ${lastEv.name || 'Talk'}`,
+                            start: start,
+                            end: end,
+                            type: 'session',
+                            isSynthesizedSession: true
+                        });
+                        currentSessionTalks = [];
+                        sessionStartIndex = -1;
+                    }
+                };
+
+                dayData.events.forEach((ev, idx) => {
+                    const type = getInferredType(ev);
+                    if (type === 'break' || type === 'meal' || type === 'social' || type === 'workshop') {
+                        flushSession();
+                        synthesized.push(ev);
+                    } else {
+                        if (currentSessionTalks.length === 0) sessionStartIndex = idx;
+                        currentSessionTalks.push(ev);
+                    }
+                });
+                flushSession();
+                targetEvents = synthesized;
+            }
         } else {
             // Default talks mode: omit 0-duration session headers
             targetEvents = dayData.events.filter(e => !isSessionHeaderEvent(e));
