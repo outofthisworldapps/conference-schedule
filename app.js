@@ -246,6 +246,8 @@ function normTime(t) {
     return `${String(parseInt(parts[0], 10)).padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
 }
 
+const ROOM_HEADER_RE = /^Room\s+[A-Z]:/i;
+
 // Main CSV → scheduleData parser.
 function parseGoogleSheetCSV(csvText) {
     // Split into lines while keeping quoted newlines intact.
@@ -280,12 +282,19 @@ function parseGoogleSheetCSV(csvText) {
         rawRows.push({ timeRaw, durRaw, room, typeCol, speakerCol, titleCol });
     }
 
+    const isSessionHeaderRow = r => (r.typeCol === 'Session') && r.speakerCol && !r.durRaw;
+
     // Resolve durations for parallel rows or missing duration entries
     for (let i = 0; i < rawRows.length; i++) {
         const r = rawRows[i];
-        if (DAY_HEADER_RE.test(r.timeRaw)) continue;
+        if (DAY_HEADER_RE.test(r.timeRaw) || ROOM_HEADER_RE.test(r.timeRaw)) continue;
         const startTime = normTime(r.timeRaw);
         if (!startTime) continue;
+
+        if (isSessionHeaderRow(r)) {
+            r.computedDur = 0;
+            continue;
+        }
 
         let dur = parseInt(r.durRaw, 10) || 0;
         if (dur === 0) {
@@ -298,7 +307,8 @@ function parseGoogleSheetCSV(csvText) {
                 let nextTime = null;
                 for (let j = i + 1; j < rawRows.length; j++) {
                     const nextR = rawRows[j];
-                    if (DAY_HEADER_RE.test(nextR.timeRaw)) break;
+                    if (DAY_HEADER_RE.test(nextR.timeRaw) || ROOM_HEADER_RE.test(nextR.timeRaw)) break;
+                    if (isSessionHeaderRow(nextR)) continue;
                     const nt = normTime(nextR.timeRaw);
                     if (nt && nt !== startTime) {
                         nextTime = nt;
@@ -313,66 +323,76 @@ function parseGoogleSheetCSV(csvText) {
         r.computedDur = dur;
     }
 
-    const days = [];
-    let currentDay = null;
+    const daysMap = {};
+    let currentDayDate = null;
+    let currentDayObj = null;
 
     for (const r of rawRows) {
         // Day separator row e.g. "MONDAY · 10 August" or "THURSDAY · 13 August — Room A..."
         if (DAY_HEADER_RE.test(r.timeRaw)) {
             const parsed = parseDayHeader(r.timeRaw);
             if (parsed) {
-                currentDay = { day: parsed.day, date: parsed.date, events: [] };
-                days.push(currentDay);
+                currentDayDate = parsed.date;
+                if (!daysMap[currentDayDate]) {
+                    daysMap[currentDayDate] = { day: parsed.day, date: parsed.date, events: [] };
+                }
+                currentDayObj = daysMap[currentDayDate];
             }
             continue;
         }
 
-        if (!currentDay) continue;
+        // Room block header row (e.g. "Room B: SLICE team meeting") on the same day
+        if (ROOM_HEADER_RE.test(r.timeRaw)) {
+            continue;
+        }
+
+        if (!currentDayObj) continue;
 
         const startTime = normTime(r.timeRaw);
         if (!startTime) continue;
 
+        const isSessionHeader = isSessionHeaderRow(r);
+        if (isSessionHeader) continue; // Skip zero-duration session headers so they don't break delay calculations
+
         const durMins = r.computedDur || 0;
         const endTime = durMins > 0 ? addMinutes(startTime, durMins) : startTime;
 
-        // Session-header row: type === "Session" with no meaningful speaker
-        const isSessionHeader = (r.typeCol === 'Session') && r.speakerCol && !r.durRaw;
+        const rawType = r.typeCol || '—';
+        const evType = sheetTypeToEventType(rawType, r.speakerCol);
 
-        let name, subtitle, evType;
-
-        if (isSessionHeader) {
-            name     = r.speakerCol;     // session name
-            subtitle = r.titleCol;       // chair line
-            evType   = 'session';
+        let name, subtitle;
+        if (evType === 'break' || evType === 'social' || evType === 'meal') {
+            name     = r.speakerCol || rawType;
+            subtitle = r.titleCol || '';
         } else {
-            const rawType = r.typeCol || '—';
-            evType = sheetTypeToEventType(rawType, r.speakerCol);
-
-            // Break / social rows: speaker column IS the event name
-            if (evType === 'break' || evType === 'social' || evType === 'meal') {
-                name     = r.speakerCol || rawType;
-                subtitle = r.titleCol || '';
-            } else {
-                name     = r.speakerCol || '';
-                // Prefix room tag for parallel sessions
-                const roomTag = (r.room && r.room !== 'Plenary' && r.room !== '') ? `[${r.room}] ` : '';
-                subtitle = roomTag + (r.titleCol || '');
-            }
+            name     = r.speakerCol || '';
+            // Prefix room tag for parallel sessions
+            const roomTag = (r.room && r.room !== 'Plenary' && r.room !== '') ? `[${r.room}] ` : '';
+            subtitle = roomTag + (r.titleCol || '');
         }
 
-        // Skip zero-duration placeholder rows if there's already a talk at the same time
-        if (durMins === 0 && !isSessionHeader && currentDay.events.some(e => e.start === startTime && e.type !== 'session')) {
-            continue;
+        const trimmedName = name.trim();
+        const trimmedSub  = subtitle.trim();
+
+        // Avoid duplicate coffee / lunch breaks when room blocks repeat shared breaks
+        if (evType === 'break' || evType === 'meal') {
+            const exists = currentDayObj.events.some(e => e.start === startTime && e.name === trimmedName && e.subtitle === trimmedSub);
+            if (exists) continue;
         }
 
-        currentDay.events.push({
+        currentDayObj.events.push({
             start:    startTime,
             end:      endTime,
-            name:     name.trim(),
-            subtitle: subtitle.trim(),
+            name:     trimmedName,
+            subtitle: trimmedSub,
             type:     evType
         });
     }
+
+    const days = Object.values(daysMap);
+    days.forEach(d => {
+        d.events.sort((a, b) => getMinutesDiff(a.start, b.start));
+    });
 
     return days;
 }

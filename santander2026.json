@@ -21,13 +21,6 @@
                 {
                     "start": "09:00",
                     "end": "09:30",
-                    "name": "S1 \u00b7 Reionization & High-z Galaxies (1)",
-                    "subtitle": "Chair: Masami Ouchi",
-                    "type": "session"
-                },
-                {
-                    "start": "09:00",
-                    "end": "09:30",
                     "name": "Hakim Atek",
                     "subtitle": "Invited Review \u2014 The High-z Universe",
                     "type": "long-talk"
@@ -66,13 +59,6 @@
                     "name": "Coffee",
                     "subtitle": "",
                     "type": "break"
-                },
-                {
-                    "start": "11:00",
-                    "end": "11:15",
-                    "name": "S2 \u00b7 Reionization & High-z Galaxies (2)",
-                    "subtitle": "Chair: Dan Coe",
-                    "type": "session"
                 },
                 {
                     "start": "11:00",
@@ -129,13 +115,6 @@
                     "name": "Lunch",
                     "subtitle": "(VENUS internal discussion for VENUS members ~14:00\u201315:00: Data status recup, Overall MSA planning)",
                     "type": "break"
-                },
-                {
-                    "start": "15:00",
-                    "end": "15:30",
-                    "name": "S3 \u00b7 Cluster Programs + Resolved Galaxies",
-                    "subtitle": "Chair: Rogier Windhorst",
-                    "type": "session"
                 },
                 {
                     "start": "15:00",
@@ -265,13 +244,6 @@
                 {
                     "start": "09:00",
                     "end": "09:30",
-                    "name": "S5 \u00b7 Lensed Supernovae",
-                    "subtitle": "Chair: Armin Rest",
-                    "type": "session"
-                },
-                {
-                    "start": "09:00",
-                    "end": "09:30",
                     "name": "Justin Pierel",
                     "subtitle": "Invited Review \u2014 Lensed Supernovae",
                     "type": "long-talk"
@@ -378,15 +350,8 @@
                     "start": "13:00",
                     "end": "15:00",
                     "name": "Lunch",
-                    "subtitle": "(VENUS internal discussion for VENUS members ~14:00\u201315:00: Cy5 MSA first cluster - PG004: data processing, distribution plan, key targets, first-round papers)",
+                    "subtitle": "(VENUS internal discussion for VENUS members ~14:15\u201314:55: Cy5 MSA first cluster - PG004: data processing, distribution plan, key targets, first-round papers)",
                     "type": "break"
-                },
-                {
-                    "start": "15:00",
-                    "end": "15:30",
-                    "name": "S7 \u00b7 Lensed Individual Stars (+ lens modeling)",
-                    "subtitle": "Chair: Jose Diego",
-                    "type": "session"
                 },
                 {
                     "start": "15:00",
@@ -443,13 +408,6 @@
                     "name": "Coffee",
                     "subtitle": "",
                     "type": "break"
-                },
-                {
-                    "start": "17:00",
-                    "end": "17:15",
-                    "name": "S8 \u00b7 Lens-Modeling Overviews + Mass Models",
-                    "subtitle": "Chair: Ana Acebron",
-                    "type": "session"
                 },
                 {
                     "start": "17:00",
@@ -512,13 +470,6 @@
                     "name": "Open",
                     "subtitle": "",
                     "type": "break"
-                },
-                {
-                    "start": "09:00",
-                    "end": "09:30",
-                    "name": "S9 \u00b7 Cosmic Noon & Environment",
-                    "subtitle": "Chair: Keren Sharon",
-                    "type": "session"
                 },
                 {
                     "start": "09:00",
@@ -619,7 +570,7 @@
             "events": [
                 {
                     "start": "09:00",
-                    "end": "09:30",
+                    "end": "11:00",
                     "name": "(Open to external members upon request)",
                     "subtitle": "[Room A \u2014 VENUS] VENUS short talks: preliminary results & progress reports (9:00)\n- Cy6 proposal pitches, part 1 (10:30)",
                     "type": "workshop"
@@ -640,7 +591,7 @@
                 },
                 {
                     "start": "11:30",
-                    "end": "11:45",
+                    "end": "13:00",
                     "name": "",
                     "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: \n- Cy6 proposal pitches, part 2, coordination",
                     "type": "workshop"
@@ -682,7 +633,7 @@
                 },
                 {
                     "start": "16:00",
-                    "end": "16:15",
+                    "end": "17:00",
                     "name": "(Open to external members upon request)",
                     "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: \n- Lens model plans, timeline, coordination",
                     "type": "workshop"
@@ -703,7 +654,7 @@
                 },
                 {
                     "start": "17:15",
-                    "end": "17:30",
+                    "end": "18:15",
                     "name": "",
                     "subtitle": "[Room A \u2014 VENUS] VENUS team discussion: \n- Upcoming programs catch-up: accepted follow-ups & DDTs\n- Overflow slot if needed",
                     "type": "workshop"
