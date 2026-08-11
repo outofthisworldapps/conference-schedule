@@ -1401,6 +1401,16 @@ function createEventAtTime(date, startTime) {
     editEventName(date, index);
 }
 
+function getInferredType(event) {
+    const displayName = event.name || event.title || "";
+    const lowerName = displayName.toLowerCase();
+    if (event.type && EVENT_TYPES[event.type]) return event.type;
+    if (displayName.includes('TikTalks')) return 'tiktalk';
+    if (lowerName.includes('lunch') || lowerName.includes('dinner') || lowerName.includes('buffet')) return 'meal';
+    if (lowerName.includes('break')) return 'break';
+    return event.type || 'session';
+}
+
 function isSessionHeaderEvent(event) {
     if (!event) return false;
     const durMins = parseInt(event.duration ?? event.durationMinutes ?? (event.start === event.end ? 0 : -1), 10);
