@@ -1900,7 +1900,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         }
 
         // Calculate dynamic gap between speaker name and talk title based on zoom level (currentHourHeight)
-        const textGapPx = Math.max(1, Math.min(16, Math.round(currentHourHeight / 120)));
+        // In tight zoom levels (<=250px/hr), compress gap down to 0px and tighten line-height
+        const textGapPx = Math.max(0, Math.min(16, Math.floor((currentHourHeight - 100) / 80)));
+        const textLineHeight = currentHourHeight <= 250 ? 1.05 : 1.25;
 
         return `
             ${markerHTML}
@@ -1927,7 +1929,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                         </div>
                         ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
                     </div>
-                    <div class="event-card-text" style="gap: ${textGapPx}px;">
+                    <div class="event-card-text" style="gap: ${textGapPx}px; line-height: ${textLineHeight};">
                         <div class="speaker-name" contenteditable="true" tabindex="0"
                              onfocus="handleInlineFocus(event, '${date}', ${trueEventIndex}, 'name')" 
                              onblur="handleInlineBlur(event, '${date}', ${trueEventIndex}, 'name')" 
