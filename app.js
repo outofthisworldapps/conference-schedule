@@ -987,9 +987,11 @@ function handleInlineTimeBlur(e, date, index, type) {
             event.end = newOriginalEnd;
         } else {
             const currentDuration = getMinutesDiff(event.end || event.start, event.start);
-            // Calculate delay relative to original scheduled start time so cascading triggers cleanly downstream
-            const newDelay = getMinutesDiff(newTime, event.start);
-            event.delay = newDelay;
+            // Set base start time relative to incoming cumulative delay so actualStart equals requested newTime exactly
+            const newOriginalStart = addMinutes(newTime, -cumulativeDelayBefore);
+            event.start = newOriginalStart;
+            event.end = addMinutes(newOriginalStart, currentDuration);
+            event.delay = 0;
         }
         renderSchedule();
         updateNowLine();
@@ -1162,8 +1164,11 @@ function editStartTime(date, index) {
     const parsed = parseAndNormalizeTimeInput(newTimeInput, actualStart);
     if (parsed) {
         history.push();
-        const newDelay = getMinutesDiff(parsed, event.start);
-        event.delay = newDelay;
+        const currentDuration = getMinutesDiff(event.end || event.start, event.start);
+        const newOriginalStart = addMinutes(parsed, -cumulativeDelayBefore);
+        event.start = newOriginalStart;
+        event.end = addMinutes(newOriginalStart, currentDuration);
+        event.delay = 0;
         renderSchedule();
         updateNowLine();
     }
