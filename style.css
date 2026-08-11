@@ -109,7 +109,10 @@ body {
     .header-left-brand {
         position: static;
         padding-top: 0.35rem;
+        flex-direction: row;
         align-items: center;
+        justify-content: center;
+        gap: 6px;
         text-align: center;
     }
 }
@@ -1248,7 +1251,7 @@ header a {
 
 .calendar-grid.has-sessions-sidebar .calendar-main-wrapper {
     flex: 1;
-    min-width: 0;
+    min-width: 260px;
 }
 
 /* Side Sessions Column (Single Day View) */

@@ -647,6 +647,16 @@ function setupEventListeners() {
 
         if (!isEditable && !isCmdOrCtrl) {
             const keyLower = e.key.toLowerCase();
+            if (e.key === 'ArrowLeft') {
+                prevDay();
+                e.preventDefault();
+                return;
+            }
+            if (e.key === 'ArrowRight') {
+                nextDay();
+                e.preventDefault();
+                return;
+            }
             if (keyLower === 'w') {
                 setSelectedDay('all');
                 return;
@@ -1473,8 +1483,8 @@ function renderCalendarView() {
         </div>
     ` : `
         <div class="view-mode-toggle">
-            <button class="toggle-mode-btn ${showSingleDaySessions ? 'active' : ''}" onclick="toggleSingleDaySessions()" title="Toggle session names column on right">
-                ${showSingleDaySessions ? 'Hide Sessions' : 'Show Sessions'}
+            <button class="toggle-mode-btn ${showSingleDaySessions ? 'active' : ''}" onclick="toggleSingleDaySessions()" title="${showSingleDaySessions ? 'Collapse Sessions Column' : 'Expand Sessions Column'}">
+                ${showSingleDaySessions ? '&gt;' : '&lt;'}
             </button>
         </div>
     `;
@@ -1489,18 +1499,33 @@ function renderCalendarView() {
         </div>
     ` : '';
 
+    const dayNameAbbrMap = {
+        'Monday': 'Mon',
+        'Tuesday': 'Tue',
+        'Wednesday': 'Wed',
+        'Thursday': 'Thu',
+        'Friday': 'Fri',
+        'Saturday': 'Sat',
+        'Sunday': 'Sun'
+    };
+
     navContainer.innerHTML = `
         <div class="day-navigation">
             <button class="nav-arrow" onclick="prevDay()" ${isAllDays || dayIndex === 0 ? 'disabled' : ''}>&larr;</button>
             <div class="day-tabs">
                 <div class="day-tab ${isAllDays ? 'active' : ''}" onclick="setSelectedDay('all')">
-                    All Week
+                    Week
                 </div>
-                ${scheduleData.map(day => `
+                ${scheduleData.map(day => {
+                    const fullDayName = day.day.split(',')[0].trim();
+                    const dayAbbr = dayNameAbbrMap[fullDayName] || fullDayName.substring(0, 3);
+                    const dayNum = day.day.split(' ')[2] || '';
+                    return `
                     <div class="day-tab ${!isAllDays && day.date === selectedDay ? 'active' : ''}" onclick="setSelectedDay('${day.date}')">
-                        ${day.day.split(',')[0]} ${day.day.split(' ')[2]}
+                        ${dayAbbr} ${dayNum}
                     </div>
-                `).join('')}
+                `;
+                }).join('')}
             </div>
             <button class="nav-arrow" onclick="nextDay()" ${isAllDays || dayIndex === scheduleData.length - 1 ? 'disabled' : ''}>&rarr;</button>
             ${sessionToggleBtnHTML}
@@ -1818,6 +1843,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             `;
         }
 
+        // Calculate dynamic gap between speaker name and talk title based on zoom level (currentHourHeight)
+        const textGapPx = Math.max(1, Math.min(16, Math.round(currentHourHeight / 120)));
+
         return `
             ${markerHTML}
             <div class="calendar-event ${typeClass} ${isMultiCol ? 'week-mode-card' : ''}" style="top: ${top}px; height: ${height}px; min-height: ${height}px; left: ${leftCss}; width: ${widthCss}; z-index: ${100 + index}; ${fontScaleCss}" 
@@ -1843,7 +1871,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                         </div>
                         ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
                     </div>
-                    <div class="event-card-text">
+                    <div class="event-card-text" style="gap: ${textGapPx}px;">
                         <div class="speaker-name" contenteditable="true" tabindex="0"
                              onfocus="handleInlineFocus(event, '${date}', ${trueEventIndex}, 'name')" 
                              onblur="handleInlineBlur(event, '${date}', ${trueEventIndex}, 'name')" 
