@@ -896,6 +896,15 @@ function computeTrackAwareEventTimes(events) {
             const currentDelay = delays[track];
             const { actualStart, actualEnd, newDelay } = getEventTimes(e, currentDelay);
             
+            if (isSessionHeaderEvent(e)) {
+                let sStart = actualStart;
+                if (i + 1 < events.length && !isSessionHeaderEvent(events[i + 1])) {
+                    sStart = getEventTimes(events[i + 1], currentDelay).actualStart;
+                }
+                result.push({ actualStart: sStart, actualEnd: sStart });
+                continue;
+            }
+
             // If this talk is delayed or finishes early (e.g. e.delay !== 0), the event immediately preceding it
             // (e.g. a break or previous talk) adjusted its actualEnd to fill/fit up to actualStart.
             if (e.delay && e.delay !== 0) {
@@ -1514,7 +1523,10 @@ function renderCalendarView() {
             const trackTimes = computeTrackAwareEventTimes(dayData.events);
             const sessionCards = dayData.events.map((event, idx) => {
                 if (!isSessionHeaderEvent(event)) return '';
-                const { actualStart } = trackTimes[idx];
+                let actualStart = trackTimes[idx].actualStart;
+                if (idx + 1 < dayData.events.length && !isSessionHeaderEvent(dayData.events[idx + 1])) {
+                    actualStart = trackTimes[idx + 1].actualStart;
+                }
                 const [sh, sm] = actualStart.split(':').map(Number);
                 const top = ((sh - startHour) * 60 + sm) * pixelsPerMinute;
                 
