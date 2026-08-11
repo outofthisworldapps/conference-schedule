@@ -981,23 +981,30 @@ function getEventTimes(event, currentDelay) {
     }
     
     const manualDelay = event.delay || 0;
-    const effectiveDelay = currentDelay + manualDelay;
-    
-    const actualStart = addMinutes(originalStart, effectiveDelay);
 
-    let actualEnd;
     if (isBufferEvent(event)) {
-        // Break starts at actualStart, but absorbs delay by ending at originalEnd if possible
-        const actStartM = timeToMinutes(actualStart);
-        const origEndM = timeToMinutes(originalEnd);
-        actualEnd = actStartM > origEndM ? actualStart : originalEnd;
+        // Meals, dinners, breaks have fixed scheduled start times and absorb incoming delays.
+        // Incoming delay from preceding talks does NOT delay the start of a meal/buffer event,
+        // unless a preceding talk runs past the buffer event's scheduled end time.
+        const nominalStart = addMinutes(originalStart, manualDelay);
+        const nominalEnd = addMinutes(originalEnd, manualDelay);
+
+        const delayedStartM = timeToMinutes(addMinutes(originalStart, currentDelay + manualDelay));
+        const nominalEndM = timeToMinutes(nominalEnd);
+
+        // If incoming delay pushes start past nominal end, shift start to delayedStart; otherwise keep nominalStart.
+        const actualStart = delayedStartM > nominalEndM ? addMinutes(originalStart, currentDelay + manualDelay) : nominalStart;
+        const actualEnd = timeToMinutes(actualStart) > nominalEndM ? actualStart : nominalEnd;
+        const newDelay = getMinutesDiff(actualEnd, originalEnd);
+        return { actualStart, actualEnd, newDelay };
     } else {
-        // Standard event maintains its duration, shifted by the effective delay
-        actualEnd = addMinutes(originalEnd, effectiveDelay);
+        // Standard event maintains duration, shifted by cumulative delay (currentDelay + manualDelay)
+        const effectiveDelay = currentDelay + manualDelay;
+        const actualStart = addMinutes(originalStart, effectiveDelay);
+        const actualEnd = addMinutes(originalEnd, effectiveDelay);
+        const newDelay = getMinutesDiff(actualEnd, originalEnd);
+        return { actualStart, actualEnd, newDelay };
     }
-    
-    const newDelay = getMinutesDiff(actualEnd, originalEnd);
-    return { actualStart, actualEnd, newDelay };
 }
 
 let activeTimeBefore = null;
