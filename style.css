@@ -631,8 +631,8 @@ header a {
 .calendar-time-marker .original-time {
     padding: 1px 3px;
     margin-right: 0;
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: 0.68rem;
+    font-weight: 600;
 }
 
 .calendar-duration-marker .original-time {
