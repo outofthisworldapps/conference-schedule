@@ -1687,6 +1687,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
     })();
 
     return computedItems.map(({ event, actualStart, actualEnd, index, colIndex: subColIdx, numCols }) => {
+        // Find the true index of this event in dayData.events array
+        const trueEventIndex = dayData.events.indexOf(event);
+
         const [sh, sm] = actualStart.split(':').map(Number);
         const top = ((sh - startHour) * 60 + sm) * pixelsPerMinute;
         const duration = getMinutesDiff(actualEnd, actualStart);
@@ -1714,9 +1717,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
         const originalTimeDisplay = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
         const inlineHeaderTime = `<span class="inline-time-badge" contenteditable="true" 
-              onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
-              onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
-              onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
+              onfocus="handleInlineTimeFocus(event, '${date}', ${trueEventIndex}, 'start')" 
+              onblur="handleInlineTimeBlur(event, '${date}', ${trueEventIndex}, 'start')" 
+              onkeydown="handleInlineTimeKeydown(event, '${date}', ${trueEventIndex}, 'start')" 
               title="Click to edit start time">${formatTime(actualStart)}</span>`;
 
         const [osh, osm] = event.start.split(':').map(Number);
@@ -1736,9 +1739,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             <div class="calendar-event-end-marker" style="position: absolute; top: ${top + height + 2}px; left: calc(${leftCss} + 10px); z-index: ${100 + index}; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; font-family: monospace; color: var(--text-primary);">
                 <div class="end-time-black-square" style="width: 10px; height: 10px; background: #000; border: 1px solid var(--border-color); border-radius: 2px; flex-shrink: 0;"></div>
                 <span class="inline-time-badge" contenteditable="true" 
-                      onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
-                      onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
-                      onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
+                      onfocus="handleInlineTimeFocus(event, '${date}', ${trueEventIndex}, 'end')" 
+                      onblur="handleInlineTimeBlur(event, '${date}', ${trueEventIndex}, 'end')" 
+                      onkeydown="handleInlineTimeKeydown(event, '${date}', ${trueEventIndex}, 'end')" 
                       title="Click to edit end time">${formatTime(actualEnd)}</span>
             </div>
         ` : '';
@@ -1760,9 +1763,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             const endTimeMarkerHTML = showEndTime ? `
                 <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
                     <span class="inline-time-badge" contenteditable="true" 
-                          onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'end')" 
-                          onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'end')" 
-                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'end')" 
+                          onfocus="handleInlineTimeFocus(event, '${date}', ${trueEventIndex}, 'end')" 
+                          onblur="handleInlineTimeBlur(event, '${date}', ${trueEventIndex}, 'end')" 
+                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${trueEventIndex}, 'end')" 
                           title="Click to edit end time">${formatTime(actualEnd)}</span>
                 </div>` : '';
             const origTimeMarkerHTML = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
@@ -1770,9 +1773,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                 <div class="calendar-time-marker" style="top: ${top}px;">
                     ${origTimeMarkerHTML}
                     <span class="inline-time-badge" contenteditable="true" 
-                          onfocus="handleInlineTimeFocus(event, '${date}', ${index}, 'start')" 
-                          onblur="handleInlineTimeBlur(event, '${date}', ${index}, 'start')" 
-                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${index}, 'start')" 
+                          onfocus="handleInlineTimeFocus(event, '${date}', ${trueEventIndex}, 'start')" 
+                          onblur="handleInlineTimeBlur(event, '${date}', ${trueEventIndex}, 'start')" 
+                          onkeydown="handleInlineTimeKeydown(event, '${date}', ${trueEventIndex}, 'start')" 
                           title="Click to edit start time">${formatTime(actualStart)}</span>
                 </div>
                 ${durationMarkerHTML}
@@ -1784,7 +1787,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             ${markerHTML}
             <div class="calendar-event ${typeClass} ${isMultiCol ? 'week-mode-card' : ''}" style="top: ${top}px; height: ${height}px; min-height: ${height}px; left: ${leftCss}; width: ${widthCss}; z-index: ${100 + index}; ${fontScaleCss}" 
                  data-start="${actualStart}" data-end="${actualEnd}">
-                <button class="delete-btn" onclick="deleteEvent('${date}', ${index})" title="Delete event">&times;</button>
+                <button class="delete-btn" onclick="deleteEvent('${date}', ${trueEventIndex})" title="Delete event">&times;</button>
                 <div class="event-card-content">
                     <div class="event-header-tag">
                         <div class="type-square-container">
@@ -1794,7 +1797,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                             </div>
                             <div class="type-options-popover">
                                 ${Object.entries(EVENT_TYPES).map(([type, data]) => `
-                                    <div class="type-option-item" onclick="event.stopPropagation(); changeEventType('${date}', ${index}, '${type}')">
+                                    <div class="type-option-item" onclick="event.stopPropagation(); changeEventType('${date}', ${trueEventIndex}, '${type}')">
                                         <span class="type-color-box" style="background: ${data.color}"></span>
                                         <span>${data.label}</span>
                                     </div>
@@ -1805,15 +1808,15 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                     </div>
                     <div class="event-card-text">
                         <div class="speaker-name" contenteditable="true" tabindex="0"
-                             onfocus="handleInlineFocus(event, '${date}', ${index}, 'name')" 
-                             onblur="handleInlineBlur(event, '${date}', ${index}, 'name')" 
-                             onkeydown="handleInlineKeydown(event, '${date}', ${index}, 'name')"
-                             onmouseup="handleInlineMouseUp(event, '${date}', ${index}, 'name')">${esc(displayName)}</div>
+                             onfocus="handleInlineFocus(event, '${date}', ${trueEventIndex}, 'name')" 
+                             onblur="handleInlineBlur(event, '${date}', ${trueEventIndex}, 'name')" 
+                             onkeydown="handleInlineKeydown(event, '${date}', ${trueEventIndex}, 'name')"
+                             onmouseup="handleInlineMouseUp(event, '${date}', ${trueEventIndex}, 'name')">${esc(displayName)}</div>
                         <div class="talk-title" contenteditable="true" tabindex="0"
-                             onfocus="handleInlineFocus(event, '${date}', ${index}, 'subtitle')" 
-                             onblur="handleInlineBlur(event, '${date}', ${index}, 'subtitle')" 
-                             onkeydown="handleInlineKeydown(event, '${date}', ${index}, 'subtitle')"
-                             onmouseup="handleInlineMouseUp(event, '${date}', ${index}, 'subtitle')">${esc(talkTitle)}</div>
+                             onfocus="handleInlineFocus(event, '${date}', ${trueEventIndex}, 'subtitle')" 
+                             onblur="handleInlineBlur(event, '${date}', ${trueEventIndex}, 'subtitle')" 
+                             onkeydown="handleInlineKeydown(event, '${date}', ${trueEventIndex}, 'subtitle')"
+                             onmouseup="handleInlineMouseUp(event, '${date}', ${trueEventIndex}, 'subtitle')">${esc(talkTitle)}</div>
                     </div>
                 </div>
             </div>
