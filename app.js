@@ -1742,12 +1742,22 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const items = targetEvents.map((event, index) => {
             let { actualStart, actualEnd } = trackTimes[index];
 
-            // In week sessions view mode, extend session header blocks to next event's start time
+            // In week sessions view mode, extend session header blocks to next session/break event's start time
             if (isMultiCol && weekViewMode === 'sessions' && isSessionHeaderEvent(event)) {
+                const fullDayEvents = dayData.events;
+                const fullTrackTimes = computeTrackAwareEventTimes(fullDayEvents);
+                const trueIdxInDay = fullDayEvents.indexOf(event);
                 let nextEventStart = null;
-                for (let j = index + 1; j < targetEvents.length; j++) {
-                    nextEventStart = trackTimes[j].actualStart;
-                    break;
+                if (trueIdxInDay !== -1) {
+                    for (let j = trueIdxInDay + 1; j < fullDayEvents.length; j++) {
+                        const nextEv = fullDayEvents[j];
+                        const type = getInferredType(nextEv);
+                        const isNextSessHeader = isSessionHeaderEvent(nextEv);
+                        if (isNextSessHeader || type === 'break' || type === 'meal' || type === 'social' || type === 'workshop') {
+                            nextEventStart = fullTrackTimes[j].actualStart;
+                            break;
+                        }
+                    }
                 }
                 if (nextEventStart) {
                     actualEnd = nextEventStart;
