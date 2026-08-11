@@ -896,15 +896,11 @@ function computeTrackAwareEventTimes(events) {
             const currentDelay = delays[track];
             const { actualStart, actualEnd, newDelay } = getEventTimes(e, currentDelay);
             
-            // If this talk is delayed relative to incoming track delay (e.g. e.delay > 0),
-            // the previous event on this track ran long and fills the gap up to actualStart.
+            // If this talk is delayed (e.g. e.delay > 0), the event immediately preceding it
+            // (e.g. a break or previous talk) ran long or shifted to fill the gap up to actualStart.
             if (e.delay && e.delay > 0) {
-                // Find previous event on the same track
-                for (let prevIdx = i - 1; prevIdx >= 0; prevIdx--) {
-                    if (eventTrack[prevIdx] === track) {
-                        result[prevIdx].actualEnd = actualStart;
-                        break;
-                    }
+                if (i > 0 && result[i - 1]) {
+                    result[i - 1].actualEnd = actualStart;
                 }
             }
 
