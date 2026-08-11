@@ -659,6 +659,7 @@ header a {
     /* Default */
     border-radius: 4px;
     padding: 4px 10px;
+    box-sizing: border-box;
     overflow: hidden;
     z-index: 5;
     transition: all 0.2s ease;
