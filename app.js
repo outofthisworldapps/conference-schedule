@@ -978,7 +978,9 @@ function getEventTimes(event, currentDelay) {
     let actualEnd;
     if (isBufferEvent(event)) {
         // Break starts at actualStart, but absorbs delay by ending at originalEnd if possible
-        actualEnd = getMinutesDiff(actualStart, originalEnd) > 0 ? actualStart : originalEnd;
+        const actStartM = timeToMinutes(actualStart);
+        const origEndM = timeToMinutes(originalEnd);
+        actualEnd = actStartM > origEndM ? actualStart : originalEnd;
     } else {
         // Standard event maintains its duration, shifted by the effective delay
         actualEnd = addMinutes(originalEnd, effectiveDelay);
