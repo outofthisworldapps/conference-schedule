@@ -1533,8 +1533,51 @@ function renderCalendarView() {
         ${colHeaderHTML}
     `;
 
-    const startHour = 7;
-    const endHour = 22;
+    // Determine earliest event start, latest event end, and first/last talk durations across relevant day(s)
+    let earliestStartM = 7 * 60; // fallback 07:00
+    let latestEndM = 22 * 60;   // fallback 22:00
+    let firstTalkDur = 15;      // default margin minutes
+    let lastTalkDur = 15;
+
+    const targetDays = isAllDays ? scheduleData : scheduleData.filter(d => d.date === selectedDay);
+    if (targetDays.length > 0) {
+        let minStartM = Infinity;
+        let maxEndM = -Infinity;
+        let foundFirstDur = null;
+        let foundLastDur = null;
+
+        targetDays.forEach(day => {
+            if (day.events && day.events.length > 0) {
+                const trackTimes = computeTrackAwareEventTimes(day.events);
+                day.events.forEach((ev, idx) => {
+                    const actualStart = trackTimes[idx]?.actualStart || ev.start;
+                    const actualEnd = trackTimes[idx]?.actualEnd || ev.end || ev.start;
+                    const startM = timeToMinutes(actualStart);
+                    const endM = timeToMinutes(actualEnd);
+                    const dur = Math.max(1, endM - startM);
+
+                    if (startM < minStartM) {
+                        minStartM = startM;
+                        foundFirstDur = dur;
+                    }
+                    if (endM > maxEndM) {
+                        maxEndM = endM;
+                        foundLastDur = dur;
+                    }
+                });
+            }
+        });
+
+        if (minStartM !== Infinity) {
+            firstTalkDur = foundFirstDur || 15;
+            lastTalkDur = foundLastDur || 15;
+            earliestStartM = Math.max(0, minStartM - firstTalkDur);
+            latestEndM = Math.min(24 * 60, maxEndM + lastTalkDur);
+        }
+    }
+
+    const startHour = Math.floor(earliestStartM / 60);
+    const endHour = Math.ceil(latestEndM / 60);
     const hourHeight = currentHourHeight; 
     const gridHeight = (endHour - startHour + 1) * hourHeight;
     const pixelsPerMinute = hourHeight / 60;
@@ -1632,8 +1675,9 @@ function renderCalendarView() {
             ${Array.from({length: endHour - startHour + 1}, (_, i) => {
                 const hour = startHour + i;
                 const top = i * hourHeight;
-                const hourTag = isAllDays ? `<span style="position: absolute; left: calc(-1 * var(--gutter-width, 48px) + 6px); top: -10px; font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.4); z-index: 5;">${hour}:00</span>` : '';
-                return `<div class="hour-line" style="top: ${top}px" data-hour="${hour}:00">${hourTag}</div>`;
+                const hourStr = `${hour < 10 ? '0' + hour : hour}:00`;
+                const hourTag = `<span class="far-left-hour-marker" style="position: absolute; left: calc(-1 * var(--gutter-width, 48px) + 6px); top: -10px; font-size: 0.75rem; font-weight: 600; font-family: monospace; color: var(--text-secondary); opacity: 0.5; z-index: 5;">${hourStr}</span>`;
+                return `<div class="hour-line" style="top: ${top}px" data-hour="${hourStr}">${hourTag}</div>`;
             }).join('')}
             
             ${dividersHTML}
