@@ -826,6 +826,107 @@ function isBufferEvent(event) {
            name.toLowerCase().includes('buffet');
 }
 
+// Compute per-event actual times for an entire day using a track-aware delay cascade.
+// Algorithm:
+//   1. Assign each non-buffer event to a "track" using greedy interval scheduling
+//      (first available track whose last event ended ≤ this event's start).
+//      Buffer events (breaks/lunch) are shared — they receive the max delay from all tracks.
+//   2. Cascade delays independently per track; buffer events merge all tracks' delays.
+// Returns an array of { actualStart, actualEnd } indexed by event order.
+function computeTrackAwareEventTimes(events) {
+    const trackEnds = [];          // original end-minute per track
+    const eventTrack = [];         // track index per event (-1 = shared buffer)
+
+    for (let i = 0; i < events.length; i++) {
+        const e = events[i];
+        const startM = timeToMinutes(e.start);
+        const endM   = timeToMinutes(e.end || e.start);
+        if (isBufferEvent(e)) {
+            eventTrack.push(-1);
+            // After a shared buffer, all tracks logically reset to buffer's original end
+            for (let t = 0; t < trackEnds.length; t++) trackEnds[t] = endM;
+        } else {
+            let assigned = -1;
+            for (let t = 0; t < trackEnds.length; t++) {
+                if (trackEnds[t] <= startM) { assigned = t; break; }
+            }
+            if (assigned === -1) { assigned = trackEnds.length; trackEnds.push(0); }
+            eventTrack.push(assigned);
+            trackEnds[assigned] = endM;
+        }
+    }
+
+    const numTracks = Math.max(trackEnds.length, 1);
+    const delays = new Array(numTracks).fill(0);
+    const result = [];
+
+    for (let i = 0; i < events.length; i++) {
+        const e = events[i];
+        const track = eventTrack[i];
+        if (track === -1) {
+            const maxDelay = delays.reduce((m, d) => Math.max(m, d), 0);
+            const { actualStart, actualEnd, newDelay } = getEventTimes(e, maxDelay);
+            for (let t = 0; t < delays.length; t++) delays[t] = newDelay;
+            result.push({ actualStart, actualEnd });
+        } else {
+            const { actualStart, actualEnd, newDelay } = getEventTimes(e, delays[track]);
+            delays[track] = newDelay;
+            result.push({ actualStart, actualEnd });
+        }
+    }
+    return result;
+}
+
+// Compute the incoming cumulative delay for the event at `upToIndex`, using track-aware cascade.
+// Returns the delay (minutes) that the track-aware cascade would pass to that event.
+function getParallelAwareCumulativeDelay(events, upToIndex) {
+    if (upToIndex <= 0) return 0;
+
+    // Assign tracks (same logic as computeTrackAwareEventTimes)
+    const trackEnds = [];
+    const eventTrack = [];
+    for (let i = 0; i < events.length; i++) {
+        const e = events[i];
+        const startM = timeToMinutes(e.start);
+        const endM   = timeToMinutes(e.end || e.start);
+        if (isBufferEvent(e)) {
+            eventTrack.push(-1);
+            for (let t = 0; t < trackEnds.length; t++) trackEnds[t] = endM;
+        } else {
+            let assigned = -1;
+            for (let t = 0; t < trackEnds.length; t++) {
+                if (trackEnds[t] <= startM) { assigned = t; break; }
+            }
+            if (assigned === -1) { assigned = trackEnds.length; trackEnds.push(0); }
+            eventTrack.push(assigned);
+            trackEnds[assigned] = endM;
+        }
+    }
+
+    const numTracks = Math.max(trackEnds.length, 1);
+    const delays = new Array(numTracks).fill(0);
+
+    for (let i = 0; i < upToIndex; i++) {
+        const e = events[i];
+        const track = eventTrack[i];
+        if (track === -1) {
+            const maxDelay = delays.reduce((m, d) => Math.max(m, d), 0);
+            const { newDelay } = getEventTimes(e, maxDelay);
+            for (let t = 0; t < delays.length; t++) delays[t] = newDelay;
+        } else {
+            const { newDelay } = getEventTimes(e, delays[track]);
+            delays[track] = newDelay;
+        }
+    }
+
+    // The incoming delay for the target event
+    const targetTrack = eventTrack[upToIndex];
+    if (targetTrack === -1) {
+        return delays.reduce((m, d) => Math.max(m, d), 0);
+    }
+    return delays[targetTrack] || 0;
+}
+
 function getEventTimes(event, currentDelay) {
     const originalStart = event.start;
     // Support events that only carry a duration (minutes) instead of an explicit end time.
@@ -865,11 +966,7 @@ function handleInlineTimeFocus(e, date, index, type) {
     if (!event) return;
 
     isInlineTimeCanceled = false;
-    let cumulativeDelayBefore = 0;
-    for (let i = 0; i < index; i++) {
-        const { newDelay } = getEventTimes(day.events[i], cumulativeDelayBefore);
-        cumulativeDelayBefore = newDelay;
-    }
+    const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
     const { actualStart, actualEnd } = getEventTimes(event, cumulativeDelayBefore);
     activeTimeBefore = (type === 'end') ? actualEnd : actualStart;
 
@@ -975,11 +1072,7 @@ function handleInlineTimeBlur(e, date, index, type) {
 
     if (newTime && newTime !== activeTimeBefore) {
         history.push();
-        let cumulativeDelayBefore = 0;
-        for (let i = 0; i < index; i++) {
-            const { newDelay } = getEventTimes(day.events[i], cumulativeDelayBefore);
-            cumulativeDelayBefore = newDelay;
-        }
+        const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
 
         if (type === 'end') {
             const effectiveDelay = Math.max(cumulativeDelayBefore, event.delay || 0);
@@ -1151,12 +1244,7 @@ function editStartTime(date, index) {
     if (!day) return;
     const event = day.events[index];
     
-    let cumulativeDelayBefore = 0;
-    for (let i = 0; i < index; i++) {
-        const e = day.events[i];
-        const { newDelay } = getEventTimes(e, cumulativeDelayBefore);
-        cumulativeDelayBefore = newDelay;
-    }
+    const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
     
     const { actualStart } = getEventTimes(event, cumulativeDelayBefore);
     let newTimeInput = prompt(`Edit start time for "${event.name || event.title}" (Enter HH:MM or leave blank for 'now'):`, actualStart);
@@ -1179,11 +1267,7 @@ function editEndTime(date, index) {
     if (!day) return;
     const event = day.events[index];
     
-    let cumulativeDelayBefore = 0;
-    for (let i = 0; i < index; i++) {
-        const { newDelay } = getEventTimes(day.events[i], cumulativeDelayBefore);
-        cumulativeDelayBefore = newDelay;
-    }
+    const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
     const effectiveDelay = Math.max(cumulativeDelayBefore, event.delay || 0);
     const currentActualEnd = addMinutes(event.end || event.start, effectiveDelay);
 
@@ -1370,18 +1454,17 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
     const dayData = scheduleData.find(d => d.date === date);
     if (!dayData) return '';
 
-    let cumulativeDelay = 0;
     const pixelsPerMinute = hourHeight / 60;
     const isMultiCol = totalCols > 1;
     const colWidthPercent = 100 / totalCols;
     const colLeftPercent = colIndex * colWidthPercent;
 
-    // Calculate parallel session layout columns
+    // Calculate parallel session layout columns, using track-aware delay cascade.
+    // Each parallel track (room) carries its own independent delay; buffer events merge all tracks.
     const computedItems = (function() {
-        let cumulativeDelay = 0;
+        const trackTimes = computeTrackAwareEventTimes(dayData.events);
         const items = dayData.events.map((event, index) => {
-            const { actualStart, actualEnd, newDelay } = getEventTimes(event, cumulativeDelay);
-            cumulativeDelay = newDelay;
+            const { actualStart, actualEnd } = trackTimes[index];
             const startM = timeToMinutes(actualStart);
             const endM = timeToMinutes(actualEnd);
             return { event, actualStart, actualEnd, startM, endM, index };
