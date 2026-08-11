@@ -619,6 +619,12 @@ header a {
     font-weight: 700;
 }
 
+.calendar-duration-marker .original-time {
+    font-size: 0.65rem;
+    font-weight: 400;
+    margin-right: 4px;
+}
+
 .event-header-tag .original-time {
     margin-right: 4px;
     font-size: 0.7rem;

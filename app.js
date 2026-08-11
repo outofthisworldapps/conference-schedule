@@ -1593,7 +1593,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         if (!isMultiCol) {
             const origDuration = getMinutesDiff(event.origEnd || event.end || event.start, event.origStart || event.start);
             const isDurationChanged = duration !== origDuration;
-            const origDurationHTML = isDurationChanged ? `<span class="original-time" style="margin-right: 4px;" title="Original duration: ${origDuration}m">${origDuration}</span>` : '';
+            const origDurationHTML = isDurationChanged ? `<span class="original-time" title="Original duration: ${origDuration}m">${origDuration}</span>` : '';
 
             const midTop = top + (height / 2);
             const durationMarkerHTML = `<div class="calendar-duration-marker" style="top: ${midTop}px;">
