@@ -944,9 +944,8 @@ function getEventTimes(event, currentDelay) {
         originalEnd = durMins > 0 ? addMinutes(originalStart, durMins) : originalStart;
     }
     
-    // Treat event.delay as a target delay from the ORIGINAL start time.
-    const targetDelay = event.delay || 0;
-    const effectiveDelay = Math.max(currentDelay, targetDelay);
+    const manualDelay = event.delay || 0;
+    const effectiveDelay = currentDelay + manualDelay;
     
     const actualStart = addMinutes(originalStart, effectiveDelay);
 
@@ -1088,9 +1087,9 @@ function handleInlineTimeBlur(e, date, index, type) {
             event.origEnd = addMinutes(origStart, Math.max(5, newDuration));
             event.end = event.origEnd;
         } else {
-            const origStart = event.origStart || event.start;
-            const diff = getMinutesDiff(newTime, origStart);
-            event.delay = Math.max(0, diff - cumulativeDelayBefore);
+            const currentActualStart = getEventTimes(event, cumulativeDelayBefore).actualStart;
+            const diff = getMinutesDiff(newTime, currentActualStart);
+            event.delay = (event.delay || 0) + diff;
         }
         renderSchedule();
         updateNowLine();
@@ -1258,9 +1257,9 @@ function editStartTime(date, index) {
     const parsed = parseAndNormalizeTimeInput(newTimeInput, actualStart);
     if (parsed) {
         history.push();
-        const origStart = event.origStart || event.start;
-        const diff = getMinutesDiff(parsed, origStart);
-        event.delay = Math.max(0, diff - cumulativeDelayBefore);
+        const currentActualStart = getEventTimes(event, cumulativeDelayBefore).actualStart;
+        const diff = getMinutesDiff(parsed, currentActualStart);
+        event.delay = (event.delay || 0) + diff;
         renderSchedule();
         updateNowLine();
     }
