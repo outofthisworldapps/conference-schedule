@@ -896,11 +896,16 @@ function computeTrackAwareEventTimes(events) {
             const currentDelay = delays[track];
             const { actualStart, actualEnd, newDelay } = getEventTimes(e, currentDelay);
             
-            // If this talk is delayed (e.g. e.delay > 0), the event immediately preceding it
-            // (e.g. a break or previous talk) ran long or shifted to fill the gap up to actualStart.
-            if (e.delay && e.delay > 0) {
-                if (i > 0 && result[i - 1]) {
-                    result[i - 1].actualEnd = actualStart;
+            // If this talk is delayed or finishes early (e.g. e.delay !== 0), the event immediately preceding it
+            // (e.g. a break or previous talk) adjusted its actualEnd to fill/fit up to actualStart.
+            if (e.delay && e.delay !== 0) {
+                for (let j = i - 1; j >= 0; j--) {
+                    if (eventTrack[j] === track || eventTrack[j] === -1) {
+                        if (result[j]) {
+                            result[j].actualEnd = actualStart;
+                        }
+                        break;
+                    }
                 }
             }
 
@@ -1298,9 +1303,7 @@ function editEndTime(date, index) {
     if (!day) return;
     const event = day.events[index];
     
-    const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
-    const effectiveDelay = Math.max(cumulativeDelayBefore, event.delay || 0);
-    const currentActualEnd = addMinutes(event.origEnd || event.end || event.start, effectiveDelay);
+    const { actualEnd: currentActualEnd } = getEventTimes(event, cumulativeDelayBefore);
 
     const newTimeInput = prompt(`Edit end time for "${event.name || event.title}" (HH:MM):`, currentActualEnd);
     const parsed = parseAndNormalizeTimeInput(newTimeInput, currentActualEnd);
