@@ -1793,10 +1793,13 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                           onkeydown="handleInlineTimeKeydown(event, '${date}', ${trueEventIndex}, 'end')" 
                           title="Click to edit end time">${formatTime(actualEnd)}</span>
                 </div>` : '';
-            const origTimeMarkerHTML = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
+            const origTimeMarkerHTML = isShifted ? `
+                <div class="calendar-time-marker original-time-marker" style="top: ${origTop}px;">
+                    <span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>
+                </div>` : '';
             markerHTML = `
+                ${origTimeMarkerHTML}
                 <div class="calendar-time-marker" style="top: ${top}px;">
-                    ${origTimeMarkerHTML}
                     <span class="inline-time-badge" contenteditable="true" 
                           onfocus="handleInlineTimeFocus(event, '${date}', ${trueEventIndex}, 'start')" 
                           onblur="handleInlineTimeBlur(event, '${date}', ${trueEventIndex}, 'start')" 
