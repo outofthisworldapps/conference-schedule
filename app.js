@@ -1718,7 +1718,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         else if (currentType === 'break') typeClass = 'event-break';
         else if (currentType === 'social') typeClass = 'event-social';
         else if (currentType === 'workshop') typeClass = 'event-workshop';
-        else if (currentType === 'session') typeClass = duration > 20 ? 'event-long-talk' : 'event-talk';
+        else if (currentType === 'session') typeClass = 'event-talk';
         else if (currentType === 'long-talk') typeClass = 'event-long-talk';
 
         const nextItem = computedItems[index + 1];
@@ -1806,12 +1806,14 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                                  style="background: ${EVENT_TYPES[currentType]?.color || '#00b894'};">
                             </div>
                             <div class="type-options-popover">
-                                ${Object.entries(EVENT_TYPES).map(([type, data]) => `
-                                    <div class="type-option-item" onclick="event.stopPropagation(); changeEventType('${date}', ${trueEventIndex}, '${type}')">
-                                        <span class="type-color-box" style="background: ${data.color}"></span>
-                                        <span>${data.label}</span>
-                                    </div>
-                                `).join('')}
+                                <div class="type-options-popover-inner">
+                                    ${Object.entries(EVENT_TYPES).map(([type, data]) => `
+                                        <div class="type-option-item" onclick="event.stopPropagation(); changeEventType('${date}', ${trueEventIndex}, '${type}')">
+                                            <span class="type-color-box" style="background: ${data.color}"></span>
+                                            <span>${data.label}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </div>
                         </div>
                         ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
