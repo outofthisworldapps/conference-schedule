@@ -2,6 +2,9 @@ let currentView = 'calendar';
 let selectedDay = '2026-04-14';
 let scheduleData = [];
 let currentHourHeight = 500;
+let showSingleDaySessions = true;
+let weekViewMode = 'talks'; // 'talks' or 'sessions'
+
 
 const EVENT_TYPES = {
     'session': { label: 'Talk', color: '#54a0ff' },
@@ -112,6 +115,15 @@ async function loadConference(fileName, forceRefresh = false) {
             if (!isNaN(parsedZoom) && parsedZoom >= 80 && parsedZoom <= 1500) {
                 currentHourHeight = parsedZoom;
             }
+        }
+
+        const savedSingleSessions = localStorage.getItem('cs_show_single_sessions');
+        if (savedSingleSessions !== null) {
+            showSingleDaySessions = savedSingleSessions === 'true';
+        }
+        const savedWeekMode = localStorage.getItem('cs_week_view_mode');
+        if (savedWeekMode === 'talks' || savedWeekMode === 'sessions') {
+            weekViewMode = savedWeekMode;
         }
 
         const localSavedData = forceRefresh ? null : loadScheduleFromLocalStorage(fileName);
@@ -352,13 +364,11 @@ function parseGoogleSheetCSV(csvText) {
         if (!startTime) continue;
 
         const isSessionHeader = isSessionHeaderRow(r);
-        if (isSessionHeader) continue; // Skip zero-duration session headers so they don't break delay calculations
-
-        const durMins = r.computedDur || 0;
+        const durMins = isSessionHeader ? 0 : (r.computedDur || 0);
         const endTime = durMins > 0 ? addMinutes(startTime, durMins) : startTime;
 
         const rawType = r.typeCol || '—';
-        const evType = sheetTypeToEventType(rawType, r.speakerCol);
+        const evType = isSessionHeader ? 'session' : sheetTypeToEventType(rawType, r.speakerCol);
 
         let name, subtitle;
         if (evType === 'break' || evType === 'social' || evType === 'meal') {
@@ -553,6 +563,8 @@ function scrollToEarliestEvent() {
 function saveScheduleToLocalStorage() {
     try {
         localStorage.setItem('cs_zoom_level', currentHourHeight);
+        localStorage.setItem('cs_show_single_sessions', showSingleDaySessions);
+        localStorage.setItem('cs_week_view_mode', weekViewMode);
         if (scheduleData && scheduleData.length > 0) {
             const key = `cs_schedule_data_${currentLoadedFile}`;
             localStorage.setItem(key, JSON.stringify(scheduleData));
@@ -1389,14 +1401,30 @@ function createEventAtTime(date, startTime) {
     editEventName(date, index);
 }
 
-function getInferredType(event) {
+function isSessionHeaderEvent(event) {
+    if (!event) return false;
+    const durMins = parseInt(event.duration ?? event.durationMinutes ?? (event.start === event.end ? 0 : -1), 10);
+    if (durMins === 0) return true;
     const displayName = event.name || event.title || "";
-    const lowerName = displayName.toLowerCase();
-    if (event.type && EVENT_TYPES[event.type]) return event.type;
-    if (displayName.includes('TikTalks')) return 'tiktalk';
-    if (lowerName.includes('lunch') || lowerName.includes('dinner') || lowerName.includes('buffet')) return 'meal';
-    if (lowerName.includes('break')) return 'break';
-    return event.type || 'session';
+    const subTitle = event.subtitle || event.description || "";
+    if (displayName.startsWith('S') && (subTitle.includes('Chair') || displayName.includes('·'))) {
+        return true;
+    }
+    return false;
+}
+
+function toggleSingleDaySessions() {
+    showSingleDaySessions = !showSingleDaySessions;
+    saveScheduleToLocalStorage();
+    renderSchedule();
+}
+
+function setWeekViewMode(mode) {
+    if (weekViewMode !== mode) {
+        weekViewMode = mode;
+        saveScheduleToLocalStorage();
+        renderSchedule();
+    }
 }
 
 function renderCalendarView() {
@@ -1406,6 +1434,19 @@ function renderCalendarView() {
     const dayIndex = isAllDays ? -1 : scheduleData.findIndex(d => d.date === selectedDay);
     const gutterWidth = isAllDays ? '48px' : '88px';
     gridContainer.style.setProperty('--gutter-width', isAllDays ? '48px' : '88px');
+
+    const sessionToggleBtnHTML = isAllDays ? `
+        <div class="view-mode-toggle">
+            <button class="toggle-mode-btn ${weekViewMode === 'talks' ? 'active' : ''}" onclick="setWeekViewMode('talks')" title="Show individual talks in weekly grid">Talks</button>
+            <button class="toggle-mode-btn ${weekViewMode === 'sessions' ? 'active' : ''}" onclick="setWeekViewMode('sessions')" title="Show session titles in weekly grid">Sessions</button>
+        </div>
+    ` : `
+        <div class="view-mode-toggle">
+            <button class="toggle-mode-btn ${showSingleDaySessions ? 'active' : ''}" onclick="toggleSingleDaySessions()" title="Toggle session names column on right">
+                ${showSingleDaySessions ? 'Hide Sessions' : 'Show Sessions'}
+            </button>
+        </div>
+    `;
 
     const colHeaderHTML = isAllDays ? `
         <div class="calendar-column-headers" style="display: flex; width: 100%; box-sizing: border-box; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background: var(--bg-color); padding: 8px 0; padding-left: var(--gutter-width, 48px); margin-top: 6px;">
@@ -1431,6 +1472,7 @@ function renderCalendarView() {
                 `).join('')}
             </div>
             <button class="nav-arrow" onclick="nextDay()" ${isAllDays || dayIndex === scheduleData.length - 1 ? 'disabled' : ''}>&rarr;</button>
+            ${sessionToggleBtnHTML}
         </div>
         ${colHeaderHTML}
     `;
@@ -1439,6 +1481,7 @@ function renderCalendarView() {
     const endHour = 22;
     const hourHeight = currentHourHeight; 
     const gridHeight = (endHour - startHour + 1) * hourHeight;
+    const pixelsPerMinute = hourHeight / 60;
     
     gridContainer.style.height = `${gridHeight}px`;
 
@@ -1449,8 +1492,43 @@ function renderCalendarView() {
     const dividersHTML = isAllDays ?
         scheduleData.map((_, i) => i > 0 ? `<div style="position: absolute; top: 0; bottom: 0; left: ${(i / scheduleData.length) * 100}%; width: 1px; background: rgba(255,255,255,0.08); z-index: 10;"></div>` : '').join('') : '';
 
+    let sessionsSideColumnHTML = '';
+    if (!isAllDays && showSingleDaySessions) {
+        const dayData = scheduleData.find(d => d.date === selectedDay);
+        if (dayData && dayData.events) {
+            const trackTimes = computeTrackAwareEventTimes(dayData.events);
+            const sessionCards = dayData.events.map((event, idx) => {
+                if (!isSessionHeaderEvent(event)) return '';
+                const { actualStart } = trackTimes[idx];
+                const [sh, sm] = actualStart.split(':').map(Number);
+                const top = ((sh - startHour) * 60 + sm) * pixelsPerMinute;
+                
+                const sName = event.name || event.title || "";
+                const sSub = event.subtitle || event.description || "";
+
+                return `
+                    <div class="side-session-card" style="top: ${top}px; z-index: ${100 + idx};">
+                        <div class="side-session-time">${formatTime(actualStart)}</div>
+                        <div class="side-session-title">${esc(sName)}</div>
+                        ${sSub ? `<div class="side-session-chair">${esc(sSub)}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            sessionsSideColumnHTML = `
+                <div class="single-day-sessions-column">
+                    <div class="sessions-column-header">Sessions & Chairs</div>
+                    <div class="sessions-column-body" style="height: ${gridHeight}px; position: relative;">
+                        ${sessionCards}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    gridContainer.className = `calendar-grid ${!isAllDays && showSingleDaySessions ? 'has-sessions-sidebar' : ''}`;
     gridContainer.innerHTML = `
-        <div style="position: relative; height: ${gridHeight}px; margin-left: var(--gutter-width, 0px); margin-right: 0;">
+        <div class="calendar-main-wrapper" style="position: relative; height: ${gridHeight}px; margin-left: var(--gutter-width, 0px); margin-right: 0;">
             ${Array.from({length: endHour - startHour + 1}, (_, i) => {
                 const hour = startHour + i;
                 const top = i * hourHeight;
@@ -1464,6 +1542,7 @@ function renderCalendarView() {
             
             ${eventsHTML}
         </div>
+        ${sessionsSideColumnHTML}
     `;
 }
 
@@ -1479,11 +1558,31 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
     const colWidthPercent = 100 / totalCols;
     const colLeftPercent = colIndex * colWidthPercent;
 
+    // Filter events based on view mode
+    let targetEvents = dayData.events;
+    if (!isMultiCol) {
+        // Single day view: omit 0-duration session headers from the main calendar grid
+        targetEvents = dayData.events.filter(e => !isSessionHeaderEvent(e));
+    } else {
+        // All week view:
+        if (weekViewMode === 'sessions') {
+            // Show session headers, breaks, meals, workshops, socials, but omit individual talks
+            targetEvents = dayData.events.filter(e => {
+                if (isSessionHeaderEvent(e)) return true;
+                const type = getInferredType(e);
+                return type === 'break' || type === 'meal' || type === 'social' || type === 'workshop';
+            });
+        } else {
+            // Default talks mode: omit 0-duration session headers
+            targetEvents = dayData.events.filter(e => !isSessionHeaderEvent(e));
+        }
+    }
+
     // Calculate parallel session layout columns, using track-aware delay cascade.
     // Each parallel track (room) carries its own independent delay; buffer events merge all tracks.
     const computedItems = (function() {
-        const trackTimes = computeTrackAwareEventTimes(dayData.events);
-        const items = dayData.events.map((event, index) => {
+        const trackTimes = computeTrackAwareEventTimes(targetEvents);
+        const items = targetEvents.map((event, index) => {
             const { actualStart, actualEnd } = trackTimes[index];
             const startM = timeToMinutes(actualStart);
             const endM = timeToMinutes(actualEnd);
@@ -1535,15 +1634,17 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const [sh, sm] = actualStart.split(':').map(Number);
         const top = ((sh - startHour) * 60 + sm) * pixelsPerMinute;
         const duration = getMinutesDiff(actualEnd, actualStart);
-        const height = duration * pixelsPerMinute;
+        const height = duration > 0 ? duration * pixelsPerMinute : 32;
 
         let displayName = event.name || event.title || "";
         let talkTitle = event.subtitle || event.description || "";
 
         let typeClass = 'event-talk';
         const currentType = getInferredType(event);
+        const isSessHdr = isSessionHeaderEvent(event);
 
-        if (currentType === 'tiktalk') typeClass = 'event-tiktalk';
+        if (isSessHdr) typeClass = 'event-session-header';
+        else if (currentType === 'tiktalk') typeClass = 'event-tiktalk';
         else if (currentType === 'meal') typeClass = 'event-meal';
         else if (currentType === 'break') typeClass = 'event-break';
         else if (currentType === 'social') typeClass = 'event-social';
@@ -1552,7 +1653,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         else if (currentType === 'long-talk') typeClass = 'event-long-talk';
 
         const nextItem = computedItems[index + 1];
-        const showEndTime = nextItem ? (nextItem.actualStart !== actualEnd) : true;
+        const showEndTime = duration > 0 && (nextItem ? (nextItem.actualStart !== actualEnd) : true);
         
         const isShifted = getMinutesDiff(actualStart, event.start) !== 0;
         const originalTimeDisplay = isShifted ? `<span class="original-time" title="Original start time: ${formatTime(event.start)}">${formatTime(event.start)}</span>` : '';
@@ -1823,4 +1924,6 @@ window.handleInlineFocus = handleInlineFocus;
 window.handleInlineBlur = handleInlineBlur;
 window.handleInlineKeydown = handleInlineKeydown;
 window.handleInlineMouseUp = handleInlineMouseUp;
+window.toggleSingleDaySessions = toggleSingleDaySessions;
+window.setWeekViewMode = setWeekViewMode;
 

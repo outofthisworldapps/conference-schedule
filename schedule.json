@@ -1164,7 +1164,9 @@
           "subtitle": "",
           "type": "session",
           "origStart": "15:00",
-          "origEnd": "15:00"
+          "origEnd": "15:00",
+          "duration": 0,
+          "durationMinutes": 0
         }
       ]
     }

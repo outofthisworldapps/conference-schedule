@@ -1173,6 +1173,121 @@ header a {
     color: var(--text-primary);
 }
 
+/* View Mode Toggle Controls */
+.view-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 2px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.toggle-mode-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-mode-btn:hover {
+    color: var(--text-primary);
+}
+
+.toggle-mode-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Calendar Grid with Sessions Sidebar */
+.calendar-grid.has-sessions-sidebar {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+}
+
+.calendar-grid.has-sessions-sidebar .calendar-main-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Side Sessions Column (Single Day View) */
+.single-day-sessions-column {
+    width: 260px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border-color);
+    padding-left: 12px;
+    box-sizing: border-box;
+}
+
+.sessions-column-header {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.side-session-card {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: rgba(84, 160, 255, 0.12);
+    border: 1px solid rgba(84, 160, 255, 0.35);
+    border-left: 3px solid #54a0ff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    box-sizing: border-box;
+    backdrop-filter: var(--glass-blur);
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.side-session-card:hover {
+    background: rgba(84, 160, 255, 0.22);
+    transform: translateX(-2px);
+}
+
+.side-session-time {
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-family: monospace;
+    color: #54a0ff;
+    margin-bottom: 2px;
+}
+
+.side-session-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.25;
+}
+
+.side-session-chair {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    font-style: italic;
+}
+
+/* Event Session Header Card in Weekly Sessions View */
+.event-session-header {
+    background: rgba(84, 160, 255, 0.15) !important;
+    border: 1px solid rgba(84, 160, 255, 0.4) !important;
+    border-left: 3px solid #54a0ff !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
     .app-container {

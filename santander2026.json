@@ -220,12 +220,14 @@
         },
         {
           "start": "17:10",
-          "end": "17:25",
+          "end": "17:10",
           "name": "S4 \u00b7 Little Red Dots / AGN",
           "subtitle": "Chair: Chris Willott",
           "type": "session",
           "origStart": "17:10",
-          "origEnd": "17:25"
+          "origEnd": "17:10",
+          "duration": 0,
+          "durationMinutes": 0
         },
         {
           "start": "17:10",
@@ -370,12 +372,14 @@
         },
         {
           "start": "11:15",
-          "end": "11:30",
+          "end": "11:15",
           "name": "S6 \u00b7 DM & Resolved Galaxies",
           "subtitle": "Chair: Maru\u0161a Brada\u010d",
           "type": "session",
           "origStart": "11:15",
-          "origEnd": "11:30"
+          "origEnd": "11:15",
+          "duration": 0,
+          "durationMinutes": 0
         },
         {
           "start": "11:15",
