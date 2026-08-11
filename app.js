@@ -116,7 +116,7 @@ async function loadConference(fileName, forceRefresh = false) {
 
         const localSavedData = forceRefresh ? null : loadScheduleFromLocalStorage(fileName);
         if (localSavedData) {
-            scheduleData = localSavedData;
+            scheduleData = ensureOrigTimes(localSavedData);
             // Always ensure conferenceConfig is populated
             if (!conferenceConfig) {
                 conferenceConfig = {
@@ -129,7 +129,7 @@ async function loadConference(fileName, forceRefresh = false) {
             const data = await response.json();
             // Stash the conference metadata for use by the CSV refresh function.
             if (data.conference) conferenceConfig = data.conference;
-            scheduleData = normalizeEvents(data.scheduleData || []);
+            scheduleData = ensureOrigTimes(normalizeEvents(data.scheduleData || []));
             if (data.zoom && !savedZoom) {
                 const jsonZoom = parseInt(data.zoom, 10);
                 if (!isNaN(jsonZoom) && jsonZoom >= 80 && jsonZoom <= 1500) {
@@ -381,17 +381,19 @@ function parseGoogleSheetCSV(csvText) {
         }
 
         currentDayObj.events.push({
-            start:    startTime,
-            end:      endTime,
-            name:     trimmedName,
-            subtitle: trimmedSub,
-            type:     evType
+            start:     startTime,
+            end:       endTime,
+            origStart: startTime,
+            origEnd:   endTime,
+            name:      trimmedName,
+            subtitle:  trimmedSub,
+            type:      evType
         });
     }
 
     const days = Object.values(daysMap);
     days.forEach(d => {
-        d.events.sort((a, b) => getMinutesDiff(a.start, b.start));
+        d.events.sort((a, b) => getMinutesDiff(a.origStart || a.start, b.origStart || b.start));
     });
 
     return days;
@@ -400,23 +402,33 @@ function parseGoogleSheetCSV(csvText) {
 // Pull conferenceConfig from the loaded JSON so the CSV parser can infer the year.
 let conferenceConfig = null;
 
+function ensureOrigTimes(data) {
+    (data || []).forEach(day => {
+        (day.events || []).forEach(ev => {
+            if (!ev.origStart) ev.origStart = ev.start;
+            if (!ev.origEnd) ev.origEnd = ev.end || ev.start;
+        });
+    });
+    return data;
+}
+
 // Carry over delay values from the existing scheduleData into freshly-parsed days.
 // Matches events by (date, originalStart) so any manual time-delays the user
 // added are preserved across a live Google Sheets refresh.
 function mergeDelaysFromExisting(parsedDays, existingData) {
-    // Build a lookup: "2026-08-10|09:00" -> delay (minutes)
     const delayMap = {};
     (existingData || []).forEach(day => {
         (day.events || []).forEach(ev => {
+            const key = `${day.date}|${ev.origStart || ev.start}`;
             if (ev.delay) {
-                delayMap[`${day.date}|${ev.start}`] = ev.delay;
+                delayMap[key] = ev.delay;
             }
         });
     });
-    // Stamp matching delays onto the freshly parsed events.
     (parsedDays || []).forEach(day => {
         (day.events || []).forEach(ev => {
-            const saved = delayMap[`${day.date}|${ev.start}`];
+            const key = `${day.date}|${ev.origStart || ev.start}`;
+            const saved = delayMap[key];
             if (saved) ev.delay = saved;
         });
     });
@@ -828,8 +840,8 @@ function isBufferEvent(event) {
 
 // Compute per-event actual times for an entire day using a track-aware delay cascade.
 // Algorithm:
-//   1. Assign each non-buffer event to a "track" using greedy interval scheduling
-//      (first available track whose last event ended ≤ this event's start).
+//   1. Assign each non-buffer event to a "track" using greedy interval scheduling on BASE times (origStart/origEnd)
+//      (first available track whose last event ended ≤ this event's origStart).
 //      Buffer events (breaks/lunch) are shared — they receive the max delay from all tracks.
 //   2. Cascade delays independently per track; buffer events merge all tracks' delays.
 // Returns an array of { actualStart, actualEnd } indexed by event order.
@@ -839,8 +851,8 @@ function computeTrackAwareEventTimes(events) {
 
     for (let i = 0; i < events.length; i++) {
         const e = events[i];
-        const startM = timeToMinutes(e.start);
-        const endM   = timeToMinutes(e.end || e.start);
+        const startM = timeToMinutes(e.origStart || e.start);
+        const endM   = timeToMinutes(e.origEnd || e.end || e.start);
         if (isBufferEvent(e)) {
             eventTrack.push(-1);
             // After a shared buffer, all tracks logically reset to buffer's original end
@@ -878,17 +890,15 @@ function computeTrackAwareEventTimes(events) {
 }
 
 // Compute the incoming cumulative delay for the event at `upToIndex`, using track-aware cascade.
-// Returns the delay (minutes) that the track-aware cascade would pass to that event.
 function getParallelAwareCumulativeDelay(events, upToIndex) {
     if (upToIndex <= 0) return 0;
 
-    // Assign tracks (same logic as computeTrackAwareEventTimes)
     const trackEnds = [];
     const eventTrack = [];
     for (let i = 0; i < events.length; i++) {
         const e = events[i];
-        const startM = timeToMinutes(e.start);
-        const endM   = timeToMinutes(e.end || e.start);
+        const startM = timeToMinutes(e.origStart || e.start);
+        const endM   = timeToMinutes(e.origEnd || e.end || e.start);
         if (isBufferEvent(e)) {
             eventTrack.push(-1);
             for (let t = 0; t < trackEnds.length; t++) trackEnds[t] = endM;
@@ -919,7 +929,6 @@ function getParallelAwareCumulativeDelay(events, upToIndex) {
         }
     }
 
-    // The incoming delay for the target event
     const targetTrack = eventTrack[upToIndex];
     if (targetTrack === -1) {
         return delays.reduce((m, d) => Math.max(m, d), 0);
@@ -928,16 +937,14 @@ function getParallelAwareCumulativeDelay(events, upToIndex) {
 }
 
 function getEventTimes(event, currentDelay) {
-    const originalStart = event.start;
-    // Support events that only carry a duration (minutes) instead of an explicit end time.
-    let originalEnd = event.end;
+    const originalStart = event.origStart || event.start;
+    let originalEnd = event.origEnd || event.end;
     if (!originalEnd) {
         const durMins = parseInt(event.duration ?? event.durationMinutes ?? 0, 10) || 0;
-        originalEnd = durMins > 0 ? addMinutes(event.start, durMins) : event.start;
+        originalEnd = durMins > 0 ? addMinutes(originalStart, durMins) : originalStart;
     }
     
     // Treat event.delay as a target delay from the ORIGINAL start time.
-    // The event will start at either its manual target time or the cascaded delayed time, whichever is later.
     const targetDelay = event.delay || 0;
     const effectiveDelay = Math.max(currentDelay, targetDelay);
     
@@ -1075,16 +1082,15 @@ function handleInlineTimeBlur(e, date, index, type) {
         const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
 
         if (type === 'end') {
-            const effectiveDelay = Math.max(cumulativeDelayBefore, event.delay || 0);
-            const newOriginalEnd = addMinutes(newTime, -effectiveDelay);
-            event.end = newOriginalEnd;
+            const currentActualStart = getEventTimes(event, cumulativeDelayBefore).actualStart;
+            const newDuration = getMinutesDiff(newTime, currentActualStart);
+            const origStart = event.origStart || event.start;
+            event.origEnd = addMinutes(origStart, Math.max(5, newDuration));
+            event.end = event.origEnd;
         } else {
-            const currentDuration = getMinutesDiff(event.end || event.start, event.start);
-            // Set base start time relative to incoming cumulative delay so actualStart equals requested newTime exactly
-            const newOriginalStart = addMinutes(newTime, -cumulativeDelayBefore);
-            event.start = newOriginalStart;
-            event.end = addMinutes(newOriginalStart, currentDuration);
-            event.delay = 0;
+            const origStart = event.origStart || event.start;
+            const diff = getMinutesDiff(newTime, origStart);
+            event.delay = Math.max(0, diff - cumulativeDelayBefore);
         }
         renderSchedule();
         updateNowLine();
@@ -1252,11 +1258,9 @@ function editStartTime(date, index) {
     const parsed = parseAndNormalizeTimeInput(newTimeInput, actualStart);
     if (parsed) {
         history.push();
-        const currentDuration = getMinutesDiff(event.end || event.start, event.start);
-        const newOriginalStart = addMinutes(parsed, -cumulativeDelayBefore);
-        event.start = newOriginalStart;
-        event.end = addMinutes(newOriginalStart, currentDuration);
-        event.delay = 0;
+        const origStart = event.origStart || event.start;
+        const diff = getMinutesDiff(parsed, origStart);
+        event.delay = Math.max(0, diff - cumulativeDelayBefore);
         renderSchedule();
         updateNowLine();
     }
@@ -1269,14 +1273,17 @@ function editEndTime(date, index) {
     
     const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
     const effectiveDelay = Math.max(cumulativeDelayBefore, event.delay || 0);
-    const currentActualEnd = addMinutes(event.end || event.start, effectiveDelay);
+    const currentActualEnd = addMinutes(event.origEnd || event.end || event.start, effectiveDelay);
 
     const newTimeInput = prompt(`Edit end time for "${event.name || event.title}" (HH:MM):`, currentActualEnd);
     const parsed = parseAndNormalizeTimeInput(newTimeInput, currentActualEnd);
     if (parsed) {
         history.push();
-        const newOriginalEnd = addMinutes(parsed, -effectiveDelay);
-        event.end = newOriginalEnd;
+        const currentActualStart = getEventTimes(event, cumulativeDelayBefore).actualStart;
+        const newDuration = getMinutesDiff(parsed, currentActualStart);
+        const origStart = event.origStart || event.start;
+        event.origEnd = addMinutes(origStart, Math.max(5, newDuration));
+        event.end = event.origEnd;
         renderSchedule();
         updateNowLine();
     }
