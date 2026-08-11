@@ -1288,6 +1288,18 @@ header a {
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.25;
+    outline: none;
+    border-radius: 3px;
+    padding: 1px 2px;
+}
+
+.side-session-title:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.side-session-title:focus {
+    background: rgba(84, 160, 255, 0.25);
+    box-shadow: 0 0 0 1.5px #54a0ff;
 }
 
 .side-session-chair {
@@ -1295,6 +1307,18 @@ header a {
     color: var(--text-secondary);
     margin-top: 2px;
     font-style: italic;
+    outline: none;
+    border-radius: 3px;
+    padding: 1px 2px;
+}
+
+.side-session-chair:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.side-session-chair:focus {
+    background: rgba(84, 160, 255, 0.25);
+    box-shadow: 0 0 0 1.5px #54a0ff;
 }
 
 /* Event Session Header Card in Weekly Sessions View */

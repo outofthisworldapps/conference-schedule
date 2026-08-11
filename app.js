@@ -1154,8 +1154,11 @@ function selectAllText(el) {
 
 function copyTextToClipboard(text) {
     if (!text) return;
+    const truncated = text.length > 35 ? text.substring(0, 32) + '...' : text;
     if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(err => {
+        navigator.clipboard.writeText(text).then(() => {
+            showToastNotification(`Copied to clipboard: "${esc(truncated)}"`, 2000);
+        }).catch(err => {
             console.error('Clipboard copy failed:', err);
         });
     } else {
@@ -1168,6 +1171,7 @@ function copyTextToClipboard(text) {
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
+            showToastNotification(`Copied to clipboard: "${esc(truncated)}"`, 2000);
         } catch (e) {}
     }
 }
@@ -1540,8 +1544,16 @@ function renderCalendarView() {
                 return `
                     <div class="side-session-card" style="top: ${top}px; height: ${heightPx}px; z-index: ${100 + idx};">
                         <div class="side-session-time">${formatTime(actualStart)}</div>
-                        <div class="side-session-title">${esc(sName)}</div>
-                        ${sSub ? `<div class="side-session-chair">${esc(sSub)}</div>` : ''}
+                        <div class="side-session-title" contenteditable="true" tabindex="0"
+                             onfocus="handleInlineFocus(event, '${selectedDay}', ${idx}, 'name')" 
+                             onblur="handleInlineBlur(event, '${selectedDay}', ${idx}, 'name')" 
+                             onkeydown="handleInlineKeydown(event, '${selectedDay}', ${idx}, 'name')"
+                             onmouseup="handleInlineMouseUp(event, '${selectedDay}', ${idx}, 'name')">${esc(sName)}</div>
+                        <div class="side-session-chair" contenteditable="true" tabindex="0"
+                             onfocus="handleInlineFocus(event, '${selectedDay}', ${idx}, 'subtitle')" 
+                             onblur="handleInlineBlur(event, '${selectedDay}', ${idx}, 'subtitle')" 
+                             onkeydown="handleInlineKeydown(event, '${selectedDay}', ${idx}, 'subtitle')"
+                             onmouseup="handleInlineMouseUp(event, '${selectedDay}', ${idx}, 'subtitle')">${esc(sSub)}</div>
                     </div>
                 `;
             }).join('');

@@ -67,7 +67,6 @@
                     </button>
                     <div class="divider"></div>
                     <button id="load-btn" title="Load JSON file (Cmd+O)">
-
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -75,6 +74,13 @@
                             <line x1="12" y1="3" x2="12" y2="15" />
                         </svg>
                         Load
+                    </button>
+                    <button id="refresh-sheet-btn" title="Sync live from Google Sheets" class="refresh-icon-btn action-bar-btn">
+                        <svg class="refresh-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21.5 2v6h-6M2.5 22v-6h6"></path>
+                            <path d="M21.51 15a9 9 0 1 1-2.12-9.36L21.5 8"></path>
+                        </svg>
+                        Reload
                     </button>
                     <button id="save-btn" title="Save JSON file (Cmd+S)">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -84,13 +90,6 @@
                             <line x1="12" y1="15" x2="12" y2="3" />
                         </svg>
                         Save
-                    </button>
-                    <button id="refresh-sheet-btn" title="Sync live from Google Sheets" class="refresh-icon-btn action-bar-btn">
-                        <svg class="refresh-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21.5 2v6h-6M2.5 22v-6h6"></path>
-                            <path d="M21.51 15a9 9 0 1 1-2.12-9.36L21.5 8"></path>
-                        </svg>
-                        Sync Sheet
                     </button>
                     <div class="divider"></div>
                     <div class="zoom-controls">
