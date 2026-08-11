@@ -1533,15 +1533,27 @@ function renderCalendarView() {
                 let heightPx = 36;
                 if (endActualStart) {
                     const durMins = getMinutesDiff(endActualStart, actualStart);
-                    if (durMins > 0) heightPx = Math.max(36, durMins * pixelsPerMinute - 4);
+                    if (durMins > 0) heightPx = Math.max(36, durMins * pixelsPerMinute);
                 }
                 
                 const sName = event.name || event.title || "";
                 const sSub = event.subtitle || event.description || "";
 
+                const inlineStartTimeBadge = `<span class="inline-time-badge" contenteditable="true" 
+                      onfocus="handleInlineTimeFocus(event, '${selectedDay}', ${idx}, 'start')" 
+                      onblur="handleInlineTimeBlur(event, '${selectedDay}', ${idx}, 'start')" 
+                      onkeydown="handleInlineTimeKeydown(event, '${selectedDay}', ${idx}, 'start')" 
+                      title="Click to edit start time">${formatTime(actualStart)}</span>`;
+                
+                const inlineEndTimeBadge = (endActualStart && endActualStart !== actualStart) ? ` &ndash; <span class="inline-time-badge" contenteditable="true" 
+                      onfocus="handleInlineTimeFocus(event, '${selectedDay}', ${idx}, 'end')" 
+                      onblur="handleInlineTimeBlur(event, '${selectedDay}', ${idx}, 'end')" 
+                      onkeydown="handleInlineTimeKeydown(event, '${selectedDay}', ${idx}, 'end')" 
+                      title="Click to edit end time">${formatTime(endActualStart)}</span>` : '';
+
                 return `
                     <div class="side-session-card" style="top: ${top}px; height: ${heightPx}px; z-index: ${100 + idx};">
-                        <div class="side-session-time">${formatTime(actualStart)}</div>
+                        <div class="side-session-time">${inlineStartTimeBadge}${inlineEndTimeBadge}</div>
                         <div class="side-session-title" contenteditable="true" tabindex="0"
                              onfocus="handleInlineFocus(event, '${selectedDay}', ${idx}, 'name')" 
                              onblur="handleInlineBlur(event, '${selectedDay}', ${idx}, 'name')" 

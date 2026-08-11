@@ -1244,17 +1244,23 @@ header a {
     border-left: 1px solid var(--border-color);
     padding-left: 12px;
     box-sizing: border-box;
+    position: relative;
 }
 
 .sessions-column-header {
+    position: absolute;
+    bottom: 100%;
+    left: 12px;
+    right: 0;
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-secondary);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     padding-bottom: 4px;
     border-bottom: 1px dashed var(--border-color);
+    white-space: nowrap;
 }
 
 .side-session-card {
