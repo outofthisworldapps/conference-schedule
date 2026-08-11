@@ -881,7 +881,21 @@ function computeTrackAwareEventTimes(events) {
             for (let t = 0; t < delays.length; t++) delays[t] = newDelay;
             result.push({ actualStart, actualEnd });
         } else {
-            const { actualStart, actualEnd, newDelay } = getEventTimes(e, delays[track]);
+            const currentDelay = delays[track];
+            const { actualStart, actualEnd, newDelay } = getEventTimes(e, currentDelay);
+            
+            // If this talk is delayed relative to incoming track delay (e.g. e.delay > 0),
+            // the previous event on this track ran long and fills the gap up to actualStart.
+            if (e.delay && e.delay > 0) {
+                // Find previous event on the same track
+                for (let prevIdx = i - 1; prevIdx >= 0; prevIdx--) {
+                    if (eventTrack[prevIdx] === track) {
+                        result[prevIdx].actualEnd = actualStart;
+                        break;
+                    }
+                }
+            }
+
             delays[track] = newDelay;
             result.push({ actualStart, actualEnd });
         }
@@ -1577,8 +1591,13 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const durationTagHTML = `<span class="event-duration-left-tag" style="color: ${eventColor};">${duration}</span>`;
 
         if (!isMultiCol) {
+            const origDuration = getMinutesDiff(event.origEnd || event.end || event.start, event.origStart || event.start);
+            const isDurationChanged = duration !== origDuration;
+            const origDurationHTML = isDurationChanged ? `<span class="original-time" style="margin-right: 4px;" title="Original duration: ${origDuration}m">${origDuration}</span>` : '';
+
             const midTop = top + (height / 2);
             const durationMarkerHTML = `<div class="calendar-duration-marker" style="top: ${midTop}px;">
+                ${origDurationHTML}
                 <span class="event-duration-left-tag" style="color: ${eventColor};">${duration}</span>
             </div>`;
             const endTimeMarkerHTML = showEndTime ? `
