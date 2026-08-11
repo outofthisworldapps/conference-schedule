@@ -1477,14 +1477,9 @@ function renderCalendarView() {
     gridContainer.style.setProperty('--gutter-width', gutterWidth);
 
     const sessionToggleBtnHTML = isAllDays ? `
-        <div class="view-mode-toggle" style="display: flex; gap: 6px; align-items: center;">
-            <div style="display: inline-flex; align-items: center; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); border-radius: 20px; padding: 2px;">
-                <button class="toggle-mode-btn ${weekViewMode === 'talks' ? 'active' : ''}" onclick="setWeekViewMode('talks')" title="Show individual talks in weekly grid">Talks</button>
-                <button class="toggle-mode-btn ${weekViewMode === 'sessions' ? 'active' : ''}" onclick="setWeekViewMode('sessions')" title="Show session titles in weekly grid">Sessions</button>
-            </div>
-            <button class="toggle-mode-btn ${showSingleDaySessions ? 'active' : ''}" onclick="toggleSingleDaySessions()" title="${showSingleDaySessions ? 'Collapse Side Sessions Column' : 'Expand Side Sessions Column'}" style="border: 1px solid var(--border-color); border-radius: 20px; padding: 4px 10px;">
-                ${showSingleDaySessions ? '&gt;' : '&lt;'}
-            </button>
+        <div class="view-mode-toggle">
+            <button class="toggle-mode-btn ${weekViewMode === 'talks' ? 'active' : ''}" onclick="setWeekViewMode('talks')" title="Show individual talks in weekly grid">Talks</button>
+            <button class="toggle-mode-btn ${weekViewMode === 'sessions' ? 'active' : ''}" onclick="setWeekViewMode('sessions')" title="Show session titles in weekly grid">Sessions</button>
         </div>
     ` : `
         <div class="view-mode-toggle">
@@ -1602,7 +1597,7 @@ function renderCalendarView() {
         scheduleData.map((_, i) => i > 0 ? `<div style="position: absolute; top: 0; bottom: 0; left: ${(i / scheduleData.length) * 100}%; width: 1px; background: rgba(255,255,255,0.08); z-index: 10;"></div>` : '').join('') : '';
 
     let sessionsSideColumnHTML = '';
-    if (showSingleDaySessions) {
+    if (!isAllDays && showSingleDaySessions) {
         const daysToRender = isAllDays ? scheduleData : scheduleData.filter(d => d.date === selectedDay);
         const allSessionCards = daysToRender.map(dayData => {
             if (!dayData || !dayData.events) return '';
