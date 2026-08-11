@@ -1513,11 +1513,32 @@ function renderCalendarView() {
                 const [sh, sm] = actualStart.split(':').map(Number);
                 const top = ((sh - startHour) * 60 + sm) * pixelsPerMinute;
                 
+                // Find next session header or break/meal/social event to compute height
+                let endActualStart = null;
+                for (let j = idx + 1; j < dayData.events.length; j++) {
+                    const nextEv = dayData.events[j];
+                    const type = getInferredType(nextEv);
+                    const isNextSessHeader = isSessionHeaderEvent(nextEv);
+                    if (isNextSessHeader || type === 'break' || type === 'meal' || type === 'social' || type === 'workshop') {
+                        endActualStart = trackTimes[j].actualStart;
+                        break;
+                    }
+                }
+                if (!endActualStart && dayData.events.length > 0) {
+                    endActualStart = trackTimes[dayData.events.length - 1].actualEnd;
+                }
+
+                let heightPx = 36;
+                if (endActualStart) {
+                    const durMins = getMinutesDiff(endActualStart, actualStart);
+                    if (durMins > 0) heightPx = Math.max(36, durMins * pixelsPerMinute - 4);
+                }
+                
                 const sName = event.name || event.title || "";
                 const sSub = event.subtitle || event.description || "";
 
                 return `
-                    <div class="side-session-card" style="top: ${top}px; z-index: ${100 + idx};">
+                    <div class="side-session-card" style="top: ${top}px; height: ${heightPx}px; z-index: ${100 + idx};">
                         <div class="side-session-time">${formatTime(actualStart)}</div>
                         <div class="side-session-title">${esc(sName)}</div>
                         ${sSub ? `<div class="side-session-chair">${esc(sSub)}</div>` : ''}
@@ -1593,12 +1614,25 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
     const computedItems = (function() {
         const trackTimes = computeTrackAwareEventTimes(targetEvents);
         const items = targetEvents.map((event, index) => {
-            const { actualStart, actualEnd } = trackTimes[index];
+            let { actualStart, actualEnd } = trackTimes[index];
+
+            // In week sessions view mode, extend session header blocks to next event's start time
+            if (isMultiCol && weekViewMode === 'sessions' && isSessionHeaderEvent(event)) {
+                let nextEventStart = null;
+                for (let j = index + 1; j < targetEvents.length; j++) {
+                    nextEventStart = trackTimes[j].actualStart;
+                    break;
+                }
+                if (nextEventStart) {
+                    actualEnd = nextEventStart;
+                }
+            }
+
             const startM = timeToMinutes(actualStart);
             const endM = timeToMinutes(actualEnd);
             // Use ORIGINAL times for column layout — delays must not create false overlaps
             const origStartM = timeToMinutes(event.start);
-            const origEndM = timeToMinutes(event.end || event.start);
+            const origEndM = isMultiCol && weekViewMode === 'sessions' && isSessionHeaderEvent(event) ? endM : timeToMinutes(event.end || event.start);
             return { event, actualStart, actualEnd, startM, endM, origStartM, origEndM, index };
         });
 
