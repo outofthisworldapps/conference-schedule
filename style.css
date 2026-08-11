@@ -1148,8 +1148,9 @@ header a {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     gap: 12px;
-    padding: 0.6rem 0;
+    padding: 0.6rem 1rem;
     background: var(--bg-color);
     border-bottom: 1px solid var(--border-color);
     margin-bottom: 0.5rem;
@@ -1184,6 +1185,8 @@ header a {
 
 .day-tabs {
     display: flex;
+    align-items: center;
+    justify-content: center;
     overflow-x: auto;
     gap: 10px;
     padding-bottom: 5px;
@@ -1215,7 +1218,6 @@ header a {
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 2px;
-    margin-left: auto;
     flex-shrink: 0;
 }
 

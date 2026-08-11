@@ -1445,10 +1445,10 @@ function getInferredType(event) {
 function isSessionHeaderEvent(event) {
     if (!event) return false;
     const durMins = parseInt(event.duration ?? event.durationMinutes ?? (event.start === event.end ? 0 : -1), 10);
-    if (durMins === 0) return true;
+    if (durMins === 0 || event.start === event.end) return true;
     const displayName = event.name || event.title || "";
     const subTitle = event.subtitle || event.description || "";
-    if (displayName.startsWith('S') && (subTitle.includes('Chair') || displayName.includes('·'))) {
+    if (/^S\d+/i.test(displayName.trim()) || displayName.includes('·') || subTitle.includes('Chair:') || displayName.toLowerCase().includes('session')) {
         return true;
     }
     return false;
@@ -1722,11 +1722,12 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
     } else {
         // All week view:
         if (weekViewMode === 'sessions') {
-            // Show session headers, breaks, meals, workshops, socials, but omit individual talks
+            // Show session headers, breaks, meals, workshops, socials, but omit individual talk events
             targetEvents = dayData.events.filter(e => {
                 if (isSessionHeaderEvent(e)) return true;
                 const type = getInferredType(e);
-                return type === 'break' || type === 'meal' || type === 'social' || type === 'workshop';
+                if (type === 'break' || type === 'meal' || type === 'social' || type === 'workshop') return true;
+                return false;
             });
         } else {
             // Default talks mode: omit 0-duration session headers
