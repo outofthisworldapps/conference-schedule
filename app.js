@@ -1448,7 +1448,7 @@ function isSessionHeaderEvent(event) {
     if (durMins === 0 || event.start === event.end) return true;
     const displayName = event.name || event.title || "";
     const subTitle = event.subtitle || event.description || "";
-    if (/^S\d+/i.test(displayName.trim()) || displayName.includes('·') || subTitle.includes('Chair:') || displayName.toLowerCase().includes('session')) {
+    if (/^S\d+/i.test(displayName.trim()) || (displayName.includes('·') && subTitle.includes('Chair')) || subTitle.includes('Chair:')) {
         return true;
     }
     return false;
@@ -1788,13 +1788,17 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
         const items = targetEvents.map((event, index) => {
             let { actualStart, actualEnd } = trackTimes[index];
 
-            // In week sessions view mode, extend session header blocks to next session/break event's start time
+            // In week sessions view mode, extend session header blocks to cover the session duration up to next session/break event's start time
             if (isMultiCol && weekViewMode === 'sessions' && isSessionHeaderEvent(event)) {
                 const fullDayEvents = dayData.events;
                 const fullTrackTimes = computeTrackAwareEventTimes(fullDayEvents);
                 const trueIdxInDay = fullDayEvents.indexOf(event);
-                let nextEventStart = null;
                 if (trueIdxInDay !== -1) {
+                    // Check if immediate next event shares start time and has delay
+                    if (trueIdxInDay + 1 < fullDayEvents.length) {
+                        actualStart = fullTrackTimes[trueIdxInDay + 1].actualStart;
+                    }
+                    let nextEventStart = null;
                     for (let j = trueIdxInDay + 1; j < fullDayEvents.length; j++) {
                         const nextEv = fullDayEvents[j];
                         const type = getInferredType(nextEv);
@@ -1804,9 +1808,9 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                             break;
                         }
                     }
-                }
-                if (nextEventStart) {
-                    actualEnd = nextEventStart;
+                    if (nextEventStart) {
+                        actualEnd = nextEventStart;
+                    }
                 }
             }
 
