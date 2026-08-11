@@ -1899,13 +1899,14 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             `;
         }
 
-        // In tight zoom levels or short cards (<36px height), render title and subtitle side-by-side (row layout)
+        // In tight zoom levels or short cards (<36px height), render title and subtitle inline next to each other
         const isInlineRowLayout = height < 36 || currentHourHeight <= 180;
         const textGapPx = isInlineRowLayout ? 6 : Math.max(0, Math.min(16, Math.floor((currentHourHeight - 100) / 80)));
-        const textLineHeight = isInlineRowLayout ? 1.1 : (currentHourHeight <= 250 ? 1.05 : 1.25);
-        const textFlexDirection = isInlineRowLayout ? 'row' : 'column';
-        const textFlexWrap = isInlineRowLayout ? 'nowrap' : 'normal';
-        const textAlignItems = isInlineRowLayout ? 'baseline' : 'stretch';
+        const textLineHeight = isInlineRowLayout ? 1.15 : (currentHourHeight <= 250 ? 1.05 : 1.25);
+        const textContainerDisplay = isInlineRowLayout ? 'block' : 'flex';
+        const speakerNameDisplay = isInlineRowLayout ? 'inline' : 'block';
+        const speakerNameWhiteSpace = isInlineRowLayout ? 'nowrap' : 'normal';
+        const talkTitleDisplay = isInlineRowLayout ? 'inline' : 'block';
 
         return `
             ${markerHTML}
@@ -1932,13 +1933,13 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
                         </div>
                         ${isMultiCol ? `<span style="font-size: 0.75rem; opacity: 0.85; font-weight: 700; font-family: monospace;">${originalTimeDisplay}${inlineHeaderTime}</span>` : ''}
                     </div>
-                    <div class="event-card-text" style="flex-direction: ${textFlexDirection}; flex-wrap: ${textFlexWrap}; align-items: ${textAlignItems}; gap: ${textGapPx}px; line-height: ${textLineHeight};">
-                        <div class="speaker-name" contenteditable="true" tabindex="0"
+                    <div class="event-card-text" style="display: ${textContainerDisplay}; flex-direction: column; gap: ${textGapPx}px; line-height: ${textLineHeight};">
+                        <div class="speaker-name" style="display: ${speakerNameDisplay}; white-space: ${speakerNameWhiteSpace}; margin-right: ${isInlineRowLayout ? '6px' : '0'};" contenteditable="true" tabindex="0"
                              onfocus="handleInlineFocus(event, '${date}', ${trueEventIndex}, 'name')" 
                              onblur="handleInlineBlur(event, '${date}', ${trueEventIndex}, 'name')" 
                              onkeydown="handleInlineKeydown(event, '${date}', ${trueEventIndex}, 'name')"
                              onmouseup="handleInlineMouseUp(event, '${date}', ${trueEventIndex}, 'name')">${esc(displayName)}${isInlineRowLayout && talkTitle ? ':' : ''}</div>
-                        <div class="talk-title" contenteditable="true" tabindex="0"
+                        <div class="talk-title" style="display: ${talkTitleDisplay};" contenteditable="true" tabindex="0"
                              onfocus="handleInlineFocus(event, '${date}', ${trueEventIndex}, 'subtitle')" 
                              onblur="handleInlineBlur(event, '${date}', ${trueEventIndex}, 'subtitle')" 
                              onkeydown="handleInlineKeydown(event, '${date}', ${trueEventIndex}, 'subtitle')"
