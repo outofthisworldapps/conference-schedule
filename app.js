@@ -1534,15 +1534,15 @@ function renderCalendarView() {
     `;
 
     // Determine earliest event start, latest event end, and first/last talk durations across relevant day(s)
-    let earliestStartM = 7 * 60; // fallback 07:00
-    let latestEndM = 22 * 60;   // fallback 22:00
+    let minStartM = 7 * 60; // fallback 07:00
+    let maxEndM = 22 * 60;   // fallback 22:00
     let firstTalkDur = 15;      // default margin minutes
     let lastTalkDur = 15;
 
     const targetDays = isAllDays ? scheduleData : scheduleData.filter(d => d.date === selectedDay);
     if (targetDays.length > 0) {
-        let minStartM = Infinity;
-        let maxEndM = -Infinity;
+        let foundMinStartM = Infinity;
+        let foundMaxEndM = -Infinity;
         let foundFirstDur = null;
         let foundLastDur = null;
 
@@ -1556,31 +1556,36 @@ function renderCalendarView() {
                     const endM = timeToMinutes(actualEnd);
                     const dur = Math.max(1, endM - startM);
 
-                    if (startM < minStartM) {
-                        minStartM = startM;
+                    if (startM < foundMinStartM) {
+                        foundMinStartM = startM;
                         foundFirstDur = dur;
                     }
-                    if (endM > maxEndM) {
-                        maxEndM = endM;
+                    if (endM > foundMaxEndM) {
+                        foundMaxEndM = endM;
                         foundLastDur = dur;
                     }
                 });
             }
         });
 
-        if (minStartM !== Infinity) {
+        if (foundMinStartM !== Infinity) {
             firstTalkDur = foundFirstDur || 15;
             lastTalkDur = foundLastDur || 15;
-            earliestStartM = Math.max(0, minStartM - firstTalkDur);
-            latestEndM = Math.min(24 * 60, maxEndM + lastTalkDur);
+            minStartM = foundMinStartM;
+            maxEndM = foundMaxEndM;
         }
     }
 
-    const startHour = Math.floor(earliestStartM / 60);
-    const endHour = Math.ceil(latestEndM / 60);
+    // Grid start is bounded by start of earliest event minus first talk duration (or start hour)
+    const totalStartM = Math.max(0, minStartM - firstTalkDur);
+    // Grid end extends to latest event end plus last talk duration (or max scheduled hour + last talk duration)
+    const totalEndM = Math.min(24 * 60, maxEndM + lastTalkDur);
+
+    const startHour = Math.floor(totalStartM / 60);
+    const endHour = Math.ceil(totalEndM / 60);
     const hourHeight = currentHourHeight; 
-    const gridHeight = (endHour - startHour + 1) * hourHeight;
     const pixelsPerMinute = hourHeight / 60;
+    const gridHeight = Math.max(100, (totalEndM - startHour * 60) * pixelsPerMinute);
     
     gridContainer.style.height = `${gridHeight}px`;
 
@@ -1669,14 +1674,18 @@ function renderCalendarView() {
         }
     }
 
+    // Generate hour line ticks only up to totalEndM
+    const hourLinesCount = Math.floor((totalEndM - startHour * 60) / 60) + 1;
+
     gridContainer.className = `calendar-grid ${!isAllDays && showSingleDaySessions ? 'has-sessions-sidebar' : ''}`;
     gridContainer.innerHTML = `
         <div class="calendar-main-wrapper" style="position: relative; height: ${gridHeight}px; margin-left: var(--gutter-width, 0px); margin-right: 0;">
-            ${Array.from({length: endHour - startHour + 1}, (_, i) => {
+            ${Array.from({length: hourLinesCount}, (_, i) => {
                 const hour = startHour + i;
                 const top = i * hourHeight;
-                const period = hour < 12 ? 'a' : 'p';
-                const displayH = hour % 12 || 12;
+                if (hour * 60 > totalEndM) return '';
+                const period = (hour % 24) < 12 ? 'a' : 'p';
+                const displayH = (hour % 12) || 12;
                 const hourAbbrStr = `${displayH}${period}`;
                 const hourStr = `${hour < 10 ? '0' + hour : hour}:00`;
                 const hourTag = `<span class="far-left-hour-marker" style="position: absolute; left: calc(-1 * var(--gutter-width, 48px) + 6px); top: -10px; font-size: 0.75rem; font-weight: 600; font-family: monospace; color: var(--text-secondary); opacity: 0.5; z-index: 5;">${hourAbbrStr}</span>`;
