@@ -1675,8 +1675,11 @@ function renderCalendarView() {
             ${Array.from({length: endHour - startHour + 1}, (_, i) => {
                 const hour = startHour + i;
                 const top = i * hourHeight;
+                const period = hour < 12 ? 'a' : 'p';
+                const displayH = hour % 12 || 12;
+                const hourAbbrStr = `${displayH}${period}`;
                 const hourStr = `${hour < 10 ? '0' + hour : hour}:00`;
-                const hourTag = `<span class="far-left-hour-marker" style="position: absolute; left: calc(-1 * var(--gutter-width, 48px) + 6px); top: -10px; font-size: 0.75rem; font-weight: 600; font-family: monospace; color: var(--text-secondary); opacity: 0.5; z-index: 5;">${hourStr}</span>`;
+                const hourTag = `<span class="far-left-hour-marker" style="position: absolute; left: calc(-1 * var(--gutter-width, 48px) + 6px); top: -10px; font-size: 0.75rem; font-weight: 600; font-family: monospace; color: var(--text-secondary); opacity: 0.5; z-index: 5;">${hourAbbrStr}</span>`;
                 return `<div class="hour-line" style="top: ${top}px" data-hour="${hourStr}">${hourTag}</div>`;
             }).join('')}
             
