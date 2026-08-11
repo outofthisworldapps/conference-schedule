@@ -1467,14 +1467,21 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             const { actualStart, actualEnd } = trackTimes[index];
             const startM = timeToMinutes(actualStart);
             const endM = timeToMinutes(actualEnd);
-            return { event, actualStart, actualEnd, startM, endM, index };
+            // Use ORIGINAL times for column layout — delays must not create false overlaps
+            const origStartM = timeToMinutes(event.start);
+            const origEndM = timeToMinutes(event.end || event.start);
+            return { event, actualStart, actualEnd, startM, endM, origStartM, origEndM, index };
         });
 
+        // Overlap = overlap at ORIGINAL scheduled times only.
+        // This ensures sequentially-scheduled talks (David → Conor) always stay full-width,
+        // even if a delay causes David to run into Conor's time slot.
+        // Thursday's Room A/B events overlap in original schedule → parallel columns.
         items.forEach(item => {
             item.overlapping = items.filter(other =>
                 other.index !== item.index &&
-                item.startM < other.endM &&
-                item.endM > other.startM
+                item.origStartM < other.origEndM &&
+                item.origEndM > other.origStartM
             );
         });
 
@@ -1763,6 +1770,15 @@ function prevDay() {
         setSelectedDay(scheduleData[currentIndex - 1].date);
     }
 }
+
+// Load version from version.json so the timestamp is never hardcoded in index.html
+fetch('version.json?_=' + Date.now())
+    .then(r => r.json())
+    .then(data => {
+        const badge = document.getElementById('app-version-badge');
+        if (badge && data.version) badge.textContent = 'v ' + data.version;
+    })
+    .catch(() => {});
 
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('resize', () => {
