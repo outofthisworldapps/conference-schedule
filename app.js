@@ -527,7 +527,7 @@ async function refreshSpreadsheetData() {
 }
 
 function scrollToEarliestEvent() {
-    const startHour = 7;
+    const { startHour } = getCalendarBounds();
     const hourHeight = currentHourHeight;
     let earliestMinutes = 24 * 60;
     
@@ -711,7 +711,7 @@ function setupEventListeners() {
         const y = e.clientY - rect.top;
         
         const hourHeight = currentHourHeight;
-        const startHour = 7;
+        const { startHour } = getCalendarBounds();
         const minutesPerPixel = 60 / hourHeight;
         
         const minutesSinceStart = y * minutesPerPixel;
@@ -1468,6 +1468,59 @@ function setWeekViewMode(mode) {
     }
 }
 
+function getCalendarBounds() {
+    let minStartM = 7 * 60; // fallback 07:00
+    let maxEndM = 22 * 60;   // fallback 22:00
+    let firstTalkDur = 15;      // default margin minutes
+    let lastTalkDur = 15;
+
+    const isAllDays = selectedDay === 'all';
+    const targetDays = isAllDays ? scheduleData : scheduleData.filter(d => d.date === selectedDay);
+    if (targetDays && targetDays.length > 0) {
+        let foundMinStartM = Infinity;
+        let foundMaxEndM = -Infinity;
+        let foundFirstDur = null;
+        let foundLastDur = null;
+
+        targetDays.forEach(day => {
+            if (day.events && day.events.length > 0) {
+                const trackTimes = computeTrackAwareEventTimes(day.events);
+                day.events.forEach((ev, idx) => {
+                    const actualStart = trackTimes[idx]?.actualStart || ev.start;
+                    const actualEnd = trackTimes[idx]?.actualEnd || ev.end || ev.start;
+                    const startM = timeToMinutes(actualStart);
+                    const endM = timeToMinutes(actualEnd);
+                    const dur = Math.max(1, endM - startM);
+
+                    if (startM < foundMinStartM) {
+                        foundMinStartM = startM;
+                        foundFirstDur = dur;
+                    }
+                    if (endM > foundMaxEndM) {
+                        foundMaxEndM = endM;
+                        foundLastDur = dur;
+                    }
+                });
+            }
+        });
+
+        if (foundMinStartM !== Infinity) {
+            firstTalkDur = foundFirstDur || 15;
+            lastTalkDur = foundLastDur || 15;
+            minStartM = foundMinStartM;
+            maxEndM = foundMaxEndM;
+        }
+    }
+
+    const totalStartM = Math.max(0, minStartM - firstTalkDur);
+    const totalEndM = Math.min(24 * 60, maxEndM + lastTalkDur);
+
+    const startHour = Math.floor(totalStartM / 60);
+    const endHour = Math.ceil(totalEndM / 60);
+
+    return { minStartM, maxEndM, firstTalkDur, lastTalkDur, totalStartM, totalEndM, startHour, endHour };
+}
+
 function renderCalendarView() {
     const navContainer = document.getElementById('day-nav-container');
     const gridContainer = document.getElementById('calendar-grid');
@@ -1533,56 +1586,7 @@ function renderCalendarView() {
         ${colHeaderHTML}
     `;
 
-    // Determine earliest event start, latest event end, and first/last talk durations across relevant day(s)
-    let minStartM = 7 * 60; // fallback 07:00
-    let maxEndM = 22 * 60;   // fallback 22:00
-    let firstTalkDur = 15;      // default margin minutes
-    let lastTalkDur = 15;
-
-    const targetDays = isAllDays ? scheduleData : scheduleData.filter(d => d.date === selectedDay);
-    if (targetDays.length > 0) {
-        let foundMinStartM = Infinity;
-        let foundMaxEndM = -Infinity;
-        let foundFirstDur = null;
-        let foundLastDur = null;
-
-        targetDays.forEach(day => {
-            if (day.events && day.events.length > 0) {
-                const trackTimes = computeTrackAwareEventTimes(day.events);
-                day.events.forEach((ev, idx) => {
-                    const actualStart = trackTimes[idx]?.actualStart || ev.start;
-                    const actualEnd = trackTimes[idx]?.actualEnd || ev.end || ev.start;
-                    const startM = timeToMinutes(actualStart);
-                    const endM = timeToMinutes(actualEnd);
-                    const dur = Math.max(1, endM - startM);
-
-                    if (startM < foundMinStartM) {
-                        foundMinStartM = startM;
-                        foundFirstDur = dur;
-                    }
-                    if (endM > foundMaxEndM) {
-                        foundMaxEndM = endM;
-                        foundLastDur = dur;
-                    }
-                });
-            }
-        });
-
-        if (foundMinStartM !== Infinity) {
-            firstTalkDur = foundFirstDur || 15;
-            lastTalkDur = foundLastDur || 15;
-            minStartM = foundMinStartM;
-            maxEndM = foundMaxEndM;
-        }
-    }
-
-    // Grid start is bounded by start of earliest event minus first talk duration (or start hour)
-    const totalStartM = Math.max(0, minStartM - firstTalkDur);
-    // Grid end extends to latest event end plus last talk duration (or max scheduled hour + last talk duration)
-    const totalEndM = Math.min(24 * 60, maxEndM + lastTalkDur);
-
-    const startHour = Math.floor(totalStartM / 60);
-    const endHour = Math.ceil(totalEndM / 60);
+    const { startHour, totalEndM } = getCalendarBounds();
     const hourHeight = currentHourHeight; 
     const pixelsPerMinute = hourHeight / 60;
     const gridHeight = Math.max(100, (totalEndM - startHour * 60) * pixelsPerMinute);
@@ -2026,7 +2030,7 @@ function updateNowLine() {
 
     if ((isAllDays && isTodayInSchedule) || selectedDay === todayStr) {
         nowLine.style.display = 'block';
-        const startHour = 7;
+        const { startHour } = getCalendarBounds();
         const hourHeight = currentHourHeight;
         const pixelsPerMinute = hourHeight / 60;
         const top = (nowMinutes - startHour * 60) * pixelsPerMinute;
