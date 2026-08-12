@@ -1006,9 +1006,14 @@ function getEventTimes(event, currentDelay) {
         const actualStartM = Math.max(nominalStartM, delayedStartM);
         const actualStart = addMinutes('00:00', actualStartM);
 
-        // End at nominalEnd (absorbs delay to keep schedule on time), or actualStart if talks ran past nominalEnd
-        const actualEndM = Math.max(actualStartM, nominalEndM);
-        const actualEnd = addMinutes('00:00', actualEndM);
+        let actualEnd;
+        if (event.customDuration !== undefined && event.customDuration !== null) {
+            actualEnd = addMinutes(actualStart, event.customDuration);
+        } else {
+            // Default: absorb delay to keep schedule on time by ending at nominalEnd
+            const actualEndM = Math.max(actualStartM, nominalEndM);
+            actualEnd = addMinutes('00:00', actualEndM);
+        }
 
         const newDelay = getMinutesDiff(actualEnd, originalEnd);
         return { actualStart, actualEnd, newDelay };
@@ -1016,7 +1021,12 @@ function getEventTimes(event, currentDelay) {
         // Standard event maintains duration, shifted by cumulative delay (currentDelay + manualDelay)
         const effectiveDelay = currentDelay + manualDelay;
         const actualStart = addMinutes(originalStart, effectiveDelay);
-        const actualEnd = addMinutes(originalEnd, effectiveDelay);
+        let actualEnd;
+        if (event.customDuration !== undefined && event.customDuration !== null) {
+            actualEnd = addMinutes(actualStart, event.customDuration);
+        } else {
+            actualEnd = addMinutes(originalEnd, effectiveDelay);
+        }
         const newDelay = getMinutesDiff(actualEnd, originalEnd);
         return { actualStart, actualEnd, newDelay };
     }
@@ -1186,6 +1196,16 @@ function handleInlineDurationFocus(e, date, index) {
     const { actualStart, actualEnd } = getEventTimes(event, cumulativeDelayBefore);
     activeDurationBefore = getMinutesDiff(actualEnd, actualStart);
 
+    const origStart = event.origStart || event.start;
+    const origEnd = event.origEnd || event.end || origStart;
+    const origDuration = getMinutesDiff(origEnd, origStart);
+
+    const fillVal = (event.customDuration !== undefined && event.customDuration !== null) 
+        ? event.customDuration 
+        : (origDuration > 0 ? origDuration : activeDurationBefore);
+
+    e.target.innerText = fillVal;
+
     setTimeout(() => {
         selectAllText(e.target);
     }, 0);
@@ -1198,7 +1218,9 @@ function handleInlineDurationBlur(e, date, index) {
     if (!event) return;
 
     if (isInlineDurationCanceled) {
-        e.target.innerText = activeDurationBefore;
+        const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
+        const { actualStart, actualEnd } = getEventTimes(event, cumulativeDelayBefore);
+        e.target.innerText = getMinutesDiff(actualEnd, actualStart);
         activeDurationBefore = null;
         isInlineDurationCanceled = false;
         return;
@@ -1207,23 +1229,30 @@ function handleInlineDurationBlur(e, date, index) {
     const rawText = e.target.innerText.trim();
     const newDur = parseInt(rawText, 10);
 
-    if (!isNaN(newDur) && newDur >= 0 && newDur !== activeDurationBefore) {
+    if (!isNaN(newDur) && newDur >= 0) {
         history.push();
         const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
         const { actualStart } = getEventTimes(event, cumulativeDelayBefore);
-        const newActualEnd = addMinutes(actualStart, newDur);
-        const manualDelay = event.delay || 0;
+        
+        const origStart = event.origStart || event.start;
+        const origEnd = event.origEnd || event.end || origStart;
+        const autoShortenedDuration = Math.max(0, getMinutesDiff(origEnd, actualStart));
 
-        // Calculate target origEnd so that actualEnd equals newActualEnd
-        event.origEnd = addMinutes(newActualEnd, -(cumulativeDelayBefore + manualDelay));
-        event.end = event.origEnd;
+        if (isBufferEvent(event) && newDur === autoShortenedDuration) {
+            delete event.customDuration;
+        } else {
+            event.customDuration = newDur;
+        }
+
         event.duration = newDur;
         event.durationMinutes = newDur;
 
         renderSchedule();
         updateNowLine();
     } else {
-        e.target.innerText = activeDurationBefore;
+        const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
+        const { actualStart, actualEnd } = getEventTimes(event, cumulativeDelayBefore);
+        e.target.innerText = getMinutesDiff(actualEnd, actualStart);
     }
     activeDurationBefore = null;
 }
