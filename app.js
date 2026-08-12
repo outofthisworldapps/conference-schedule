@@ -991,30 +991,11 @@ function getEventTimes(event, currentDelay) {
     }
     
     const manualDelay = event.delay || 0;
-
-    if (isBufferEvent(event)) {
-        // Meals, dinners, breaks have fixed scheduled start times and absorb incoming delays.
-        // Incoming delay from preceding talks does NOT delay the start of a meal/buffer event,
-        // unless a preceding talk runs past the buffer event's scheduled end time.
-        const nominalStart = addMinutes(originalStart, manualDelay);
-        const nominalEnd = addMinutes(originalEnd, manualDelay);
-
-        const delayedStartM = timeToMinutes(addMinutes(originalStart, currentDelay + manualDelay));
-        const nominalEndM = timeToMinutes(nominalEnd);
-
-        // If incoming delay pushes start past nominal end, shift start to delayedStart; otherwise keep nominalStart.
-        const actualStart = delayedStartM > nominalEndM ? addMinutes(originalStart, currentDelay + manualDelay) : nominalStart;
-        const actualEnd = timeToMinutes(actualStart) > nominalEndM ? actualStart : nominalEnd;
-        const newDelay = getMinutesDiff(actualEnd, originalEnd);
-        return { actualStart, actualEnd, newDelay };
-    } else {
-        // Standard event maintains duration, shifted by cumulative delay (currentDelay + manualDelay)
-        const effectiveDelay = currentDelay + manualDelay;
-        const actualStart = addMinutes(originalStart, effectiveDelay);
-        const actualEnd = addMinutes(originalEnd, effectiveDelay);
-        const newDelay = getMinutesDiff(actualEnd, originalEnd);
-        return { actualStart, actualEnd, newDelay };
-    }
+    const effectiveDelay = currentDelay + manualDelay;
+    const actualStart = addMinutes(originalStart, effectiveDelay);
+    const actualEnd = addMinutes(originalEnd, effectiveDelay);
+    const newDelay = getMinutesDiff(actualEnd, originalEnd);
+    return { actualStart, actualEnd, newDelay };
 }
 
 let activeTimeBefore = null;
@@ -1160,6 +1141,69 @@ function handleInlineTimeKeydown(e, date, index, type) {
     if (e.key === 'Escape') {
         e.preventDefault();
         isInlineTimeCanceled = true;
+        e.target.blur();
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        e.target.blur();
+    }
+}
+
+let activeDurationBefore = null;
+let isInlineDurationCanceled = false;
+
+function handleInlineDurationFocus(e, date, index) {
+    const day = scheduleData.find(d => d.date === date);
+    if (!day) return;
+    const event = day.events[index];
+    if (!event) return;
+
+    isInlineDurationCanceled = false;
+    const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
+    const { actualStart, actualEnd } = getEventTimes(event, cumulativeDelayBefore);
+    activeDurationBefore = getMinutesDiff(actualEnd, actualStart);
+
+    setTimeout(() => {
+        selectAllText(e.target);
+    }, 0);
+}
+
+function handleInlineDurationBlur(e, date, index) {
+    const day = scheduleData.find(d => d.date === date);
+    if (!day) return;
+    const event = day.events[index];
+    if (!event) return;
+
+    if (isInlineDurationCanceled) {
+        e.target.innerText = activeDurationBefore;
+        activeDurationBefore = null;
+        isInlineDurationCanceled = false;
+        return;
+    }
+
+    const rawText = e.target.innerText.trim();
+    const newDur = parseInt(rawText, 10);
+
+    if (!isNaN(newDur) && newDur > 0 && newDur !== activeDurationBefore) {
+        history.push();
+        const origStart = event.origStart || event.start;
+        event.origEnd = addMinutes(origStart, newDur);
+        event.end = event.origEnd;
+        event.duration = newDur;
+        event.durationMinutes = newDur;
+
+        renderSchedule();
+        updateNowLine();
+    } else {
+        e.target.innerText = activeDurationBefore;
+    }
+    activeDurationBefore = null;
+}
+
+function handleInlineDurationKeydown(e, date, index) {
+    e.stopPropagation();
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        isInlineDurationCanceled = true;
         e.target.blur();
     } else if (e.key === 'Enter') {
         e.preventDefault();
@@ -1921,7 +1965,12 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
 
         let markerHTML = '';
         const eventColor = EVENT_TYPES[currentType]?.color || '#00b894';
-        const durationTagHTML = `<span class="event-duration-left-tag" style="color: ${eventColor};">${duration}</span>`;
+        const durationTagHTML = `<span class="event-duration-left-tag" contenteditable="true" 
+              onfocus="handleInlineDurationFocus(event, '${date}', ${trueEventIndex})" 
+              onblur="handleInlineDurationBlur(event, '${date}', ${trueEventIndex})" 
+              onkeydown="handleInlineDurationKeydown(event, '${date}', ${trueEventIndex})" 
+              title="Click to edit duration (minutes)" 
+              style="color: ${eventColor};">${duration}</span>`;
 
         if (!isMultiCol) {
             const origDuration = getMinutesDiff(event.origEnd || event.end || event.start, event.origStart || event.start);
@@ -1931,7 +1980,7 @@ function renderCalendarEvents(date, startHour, hourHeight, colIndex = 0, totalCo
             const midTop = top + (height / 2);
             const durationMarkerHTML = `<div class="calendar-duration-marker" style="top: ${midTop}px;">
                 ${origDurationHTML}
-                <span class="event-duration-left-tag" style="color: ${eventColor};">${duration}</span>
+                ${durationTagHTML}
             </div>`;
             const endTimeMarkerHTML = showEndTime ? `
                 <div class="calendar-time-marker end-time" style="top: ${top + height}px;">
@@ -2166,6 +2215,9 @@ window.changeEventType = changeEventType;
 window.handleInlineTimeFocus = handleInlineTimeFocus;
 window.handleInlineTimeBlur = handleInlineTimeBlur;
 window.handleInlineTimeKeydown = handleInlineTimeKeydown;
+window.handleInlineDurationFocus = handleInlineDurationFocus;
+window.handleInlineDurationBlur = handleInlineDurationBlur;
+window.handleInlineDurationKeydown = handleInlineDurationKeydown;
 window.handleInlineFocus = handleInlineFocus;
 window.handleInlineBlur = handleInlineBlur;
 window.handleInlineKeydown = handleInlineKeydown;

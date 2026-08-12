@@ -1132,15 +1132,31 @@ header a {
     justify-content: flex-end;
     white-space: nowrap;
     line-height: 1;
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 .event-duration-left-tag {
     font-size: 0.65rem;
-    font-weight: 400;
+    font-weight: 600;
     white-space: nowrap;
-    pointer-events: none;
     line-height: 1;
+    pointer-events: auto;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.event-duration-left-tag:hover {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.event-duration-left-tag:focus {
+    outline: none;
+    background: var(--card-bg, #1e1e1e);
+    box-shadow: 0 0 0 2px var(--accent-color, #0984e3);
+    border-radius: 4px;
 }
 
 /* Day Selection for Calendar */
