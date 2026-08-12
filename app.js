@@ -991,11 +991,35 @@ function getEventTimes(event, currentDelay) {
     }
     
     const manualDelay = event.delay || 0;
-    const effectiveDelay = currentDelay + manualDelay;
-    const actualStart = addMinutes(originalStart, effectiveDelay);
-    const actualEnd = addMinutes(originalEnd, effectiveDelay);
-    const newDelay = getMinutesDiff(actualEnd, originalEnd);
-    return { actualStart, actualEnd, newDelay };
+
+    if (isBufferEvent(event)) {
+        // Buffer events (coffee, lunch, dinner, breaks) start after preceding delayed talks,
+        // but by default end at their scheduled nominal end time (absorbing delay to keep schedule on time).
+        const nominalStart = addMinutes(originalStart, manualDelay);
+        const nominalEnd = addMinutes(originalEnd, manualDelay);
+
+        const delayedStartM = timeToMinutes(addMinutes(originalStart, currentDelay + manualDelay));
+        const nominalStartM = timeToMinutes(nominalStart);
+        const nominalEndM = timeToMinutes(nominalEnd);
+
+        // Start when preceding talks finish (delayedStart), or nominalStart if no incoming delay
+        const actualStartM = Math.max(nominalStartM, delayedStartM);
+        const actualStart = addMinutes('00:00', actualStartM);
+
+        // End at nominalEnd (absorbs delay to keep schedule on time), or actualStart if talks ran past nominalEnd
+        const actualEndM = Math.max(actualStartM, nominalEndM);
+        const actualEnd = addMinutes('00:00', actualEndM);
+
+        const newDelay = getMinutesDiff(actualEnd, originalEnd);
+        return { actualStart, actualEnd, newDelay };
+    } else {
+        // Standard event maintains duration, shifted by cumulative delay (currentDelay + manualDelay)
+        const effectiveDelay = currentDelay + manualDelay;
+        const actualStart = addMinutes(originalStart, effectiveDelay);
+        const actualEnd = addMinutes(originalEnd, effectiveDelay);
+        const newDelay = getMinutesDiff(actualEnd, originalEnd);
+        return { actualStart, actualEnd, newDelay };
+    }
 }
 
 let activeTimeBefore = null;
@@ -1183,10 +1207,15 @@ function handleInlineDurationBlur(e, date, index) {
     const rawText = e.target.innerText.trim();
     const newDur = parseInt(rawText, 10);
 
-    if (!isNaN(newDur) && newDur > 0 && newDur !== activeDurationBefore) {
+    if (!isNaN(newDur) && newDur >= 0 && newDur !== activeDurationBefore) {
         history.push();
-        const origStart = event.origStart || event.start;
-        event.origEnd = addMinutes(origStart, newDur);
+        const cumulativeDelayBefore = getParallelAwareCumulativeDelay(day.events, index);
+        const { actualStart } = getEventTimes(event, cumulativeDelayBefore);
+        const newActualEnd = addMinutes(actualStart, newDur);
+        const manualDelay = event.delay || 0;
+
+        // Calculate target origEnd so that actualEnd equals newActualEnd
+        event.origEnd = addMinutes(newActualEnd, -(cumulativeDelayBefore + manualDelay));
         event.end = event.origEnd;
         event.duration = newDur;
         event.durationMinutes = newDur;
